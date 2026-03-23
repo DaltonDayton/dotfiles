@@ -3,6 +3,10 @@ return {
   version = "*",
   ---@module 'obsidian'
   ---@type obsidian.config
+  event = {
+    "BufReadPre " .. vim.fn.expand("~") .. "/vaults/**/*.md",
+    "BufNewFile " .. vim.fn.expand("~") .. "/vaults/**/*.md",
+  },
   keys = {
     { "<leader>of", "<cmd>Obsidian quick_switch<cr>", desc = "Find note" },
     { "<leader>os", "<cmd>Obsidian search<cr>", desc = "Search vault" },
@@ -39,6 +43,12 @@ return {
     },
     attachments = {
       folder = "0 - Files",
+    },
+    note_id_func = function(title)
+      return title
+    end,
+    frontmatter = {
+      enabled = false,
     },
   },
 }

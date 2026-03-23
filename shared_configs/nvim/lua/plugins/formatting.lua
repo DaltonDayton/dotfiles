@@ -27,6 +27,8 @@ return {
       format_on_save = function(bufnr)
         -- Disable with a global or buffer-local variable
         if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then return end
+        local path = vim.fn.expand("%:p")
+        if vim.startswith(path, vim.fn.expand("~") .. "/vaults/") then return end
         return {
           lsp_fallback = true,
           async = false,
