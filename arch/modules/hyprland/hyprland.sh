@@ -311,66 +311,24 @@ function configure_swaync() {
 }
 
 # Function to configure cliphist clipboard manager
+# Note: cliphist is started via exec-once in hyprland.conf rather than systemd,
+# because the upstream service has Requisite=graphical-session.target which
+# cannot be cleared via drop-in override (systemd 260), and Hyprland does not
+# activate graphical-session.target.
 function configure_cliphist() {
   local config_dir="$HOME/.config/cliphist"
   local config_file="$config_dir/config"
-  local override_dir="$HOME/.config/systemd/user/cliphist.service.d"
-  local override_file="$override_dir/config.conf"
 
   # Desired config content (max history to 100 items for security)
   local desired_config="max-items=100"
-
-  # Desired systemd override content
-  local desired_override
-  desired_override="$(cat << EOF
-[Unit]
-# Remove hard dependency on graphical-session.target so it can start manually
-Requisite=
-
-[Service]
-ExecStart=
-ExecStart=/usr/bin/wl-paste --watch cliphist -config-path $config_file store
-EOF
-)"
 
   # Write cliphist config if missing or content has changed
   mkdir -p "$config_dir"
   if [ ! -f "$config_file" ] || [ "$(cat "$config_file")" != "$desired_config" ]; then
     log_info "Writing cliphist config (max-items=100)..."
-    printf '%s\n' "$desired_config" > "$config_file"
+    printf '%s\n' "$desired_config" >"$config_file"
   else
     log_info "Cliphist config already up to date"
   fi
 
-  # Write systemd override if missing or content has changed
-  mkdir -p "$override_dir"
-  local needs_reload=false
-  if [ ! -f "$override_file" ] || [ "$(cat "$override_file")" != "$desired_override" ]; then
-    log_info "Writing cliphist systemd service override..."
-    printf '%s\n' "$desired_override" > "$override_file"
-    needs_reload=true
-  else
-    log_info "Cliphist systemd override already up to date"
-  fi
-
-  if [ "$needs_reload" = true ]; then
-    systemctl --user daemon-reload
-  fi
-
-  # Enable cliphist service if not already enabled
-  if ! systemctl --user is-enabled cliphist.service >/dev/null 2>&1; then
-    log_info "Enabling cliphist service..."
-    systemctl --user enable cliphist.service
-  fi
-
-  # Note: Service will auto-start on next graphical session login
-  # Don't try to start it now if graphical-session.target isn't active
-  if systemctl --user is-active graphical-session.target >/dev/null 2>&1; then
-    if ! systemctl --user is-active cliphist.service >/dev/null 2>&1; then
-      log_info "Starting cliphist service..."
-      systemctl --user start cliphist.service
-    fi
-  else
-    log_info "Cliphist service will auto-start on next login (graphical-session.target not active)"
-  fi
 }
