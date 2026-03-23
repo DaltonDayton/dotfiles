@@ -6,7 +6,7 @@ return {
   },
   cmd = { "DBUI", "DBUIToggle", "DBUIAddConnection", "DBUIFindBuffer" },
   keys = {
-    { "<leader>od", "<cmd>DBUIToggle<CR>", desc = "Database UI Toggle" },
+    { "<leader>ed", "<cmd>DBUIToggle<CR>", desc = "Database UI Toggle" },
   },
   init = function()
     vim.g.db_ui_use_nerd_fonts = 1

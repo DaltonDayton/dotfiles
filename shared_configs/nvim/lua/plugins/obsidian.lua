@@ -1,28 +1,44 @@
-return {}
--- return {
---   "obsidian-nvim/obsidian.nvim",
---   version = "*", -- recommended, use latest release instead of latest commit
---   ft = "markdown",
---   -- Replace the above line with this if you only want to load obsidian.nvim for markdown files in your vault:
---   -- event = {
---   --   -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
---   --   -- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/*.md"
---   --   -- refer to `:h file-pattern` for more examples
---   --   "BufReadPre path/to/my-vault/*.md",
---   --   "BufNewFile path/to/my-vault/*.md",
---   -- },
---   ---@module 'obsidian'
---   ---@type obsidian.config
---   opts = {
---     workspaces = {
---       {
---         name = "personal",
---         path = "~/vaults/personal",
---       },
---       {
---         name = "work",
---         path = "~/vaults/work",
---       },
---     },
---   },
--- }
+return {
+  "obsidian-nvim/obsidian.nvim",
+  version = "*",
+  ---@module 'obsidian'
+  ---@type obsidian.config
+  keys = {
+    { "<leader>of", "<cmd>Obsidian quick_switch<cr>", desc = "Find note" },
+    { "<leader>os", "<cmd>Obsidian search<cr>", desc = "Search vault" },
+    { "<leader>on", "<cmd>Obsidian new<cr>", desc = "New note" },
+    { "<leader>ot", "<cmd>Obsidian template<cr>", desc = "Insert template" },
+    { "<leader>ob", "<cmd>Obsidian backlinks<cr>", desc = "Backlinks" },
+    { "<leader>ol", "<cmd>Obsidian links<cr>", desc = "Links in note" },
+    { "<leader>oa", "<cmd>Obsidian tags<cr>", desc = "Tags" },
+    { "<leader>or", "<cmd>Obsidian rename<cr>", desc = "Rename note" },
+    { "<leader>oc", "<cmd>Obsidian toggle_checkbox<cr>", desc = "Toggle checkbox" },
+    { "<leader>ow", "<cmd>Obsidian workspace<cr>", desc = "Switch workspace" },
+    { "<leader>op", "<cmd>Obsidian paste_img<cr>", desc = "Paste image" },
+    { "<leader>oe", "<cmd>Obsidian extract_note<cr>", mode = "v", desc = "Extract to note" },
+    { "<leader>ok", "<cmd>Obsidian link<cr>", mode = "v", desc = "Link selection" },
+  },
+  opts = {
+    legacy_commands = false,
+    workspaces = {
+      {
+        name = "Personal",
+        path = "~/vaults/Personal",
+      },
+      {
+        name = "Work",
+        path = "~/vaults/Work",
+      },
+    },
+    new_notes_location = "notes_subdir",
+    notes_subdir = "1 - Fleeting Notes",
+    templates = {
+      folder = "5 - Templates",
+      date_format = "%Y-%m-%d",
+      time_format = "%H:%M",
+    },
+    attachments = {
+      folder = "0 - Files",
+    },
+  },
+}
