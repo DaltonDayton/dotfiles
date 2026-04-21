@@ -1,0 +1,66 @@
+// Package manifest defines the on-disk TOML schema for modules and host
+// profiles, plus parsers that decode them.
+package manifest
+
+// Module mirrors modules/<name>/module.toml.
+type Module struct {
+	Name        string   `toml:"name"`
+	Description string   `toml:"description"`
+	Tags        []string `toml:"tags"`
+	DependsOn   []string `toml:"depends_on"`
+	Hosts       []string `toml:"hosts"`
+
+	Packages    []Packages  `toml:"packages"`
+	Symlinks    []Symlink   `toml:"symlinks"`
+	Commands    []Command   `toml:"commands"`
+	Files       []File      `toml:"files"`
+	Services    []Service   `toml:"services"`
+	Directories []Directory `toml:"directories"`
+}
+
+type Packages struct {
+	Manager string   `toml:"manager"` // "pacman" | "paru" | "yay" | "flatpak"
+	Names   []string `toml:"names"`
+	Hosts   []string `toml:"hosts"`
+}
+
+type Symlink struct {
+	Src   string   `toml:"src"`
+	Dst   string   `toml:"dst"`
+	Hosts []string `toml:"hosts"`
+}
+
+type Command struct {
+	Run   string   `toml:"run"`
+	Check string   `toml:"check"`
+	Hosts []string `toml:"hosts"`
+}
+
+type File struct {
+	Dst         string   `toml:"dst"`
+	Content     string   `toml:"content"`
+	ContentFrom string   `toml:"content_from"`
+	Mode        string   `toml:"mode"`
+	Hosts       []string `toml:"hosts"`
+}
+
+type Service struct {
+	Name  string   `toml:"name"`
+	Scope string   `toml:"scope"` // "user" | "system"
+	State string   `toml:"state"` // "enabled" | "started" | "enabled+started"
+	Hosts []string `toml:"hosts"`
+}
+
+type Directory struct {
+	Path  string   `toml:"path"`
+	Mode  string   `toml:"mode"`
+	Hosts []string `toml:"hosts"`
+}
+
+// Host mirrors hosts/<name>.toml.
+type Host struct {
+	Name      string            `toml:"name"`
+	AURHelper string            `toml:"aur_helper"`
+	Modules   []string          `toml:"modules"`
+	Vars      map[string]string `toml:"vars"`
+}
