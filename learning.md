@@ -361,6 +361,31 @@ The Go thing worth noting: **refining a predicate by widening its inputs**. The 
 
 ---
 
+## Follow-up — install.sh + TTYs + Arch sudoers (`b994ed7`)
+
+A real debugging story. `quill install` with paru selected froze after the declarative phase showed "skipped." Went hunting.
+
+The nested issues:
+
+1. **`yay -S paru` is interactive by default.** Even with `--noconfirm`, yay still prompts for "Diffs to show?" and "Packages to cleanBuild?". These are separate prompts with their own flags: `--answerdiff=None --answerclean=None`. And yay shells out to makepkg, which *also* needs `--noconfirm` — pass it via `--mflags=--noconfirm`.
+
+2. **`exec.Command(...).CombinedOutput()` gives the child pipes, not a TTY.** Fine for non-interactive commands. Not fine when the child wants to `sudo` — Arch's `/etc/sudoers` defaults include `tty_tickets` (credentials cached for terminal A aren't valid from terminal B, and a pipe-attached child has no terminal at all). So even after `sudo -v` primed the cache, yay's internal sudo saw "no TTY" and died with `a terminal is required`.
+
+3. **Fix: inherit stdio on `exec.Command`.**
+   ```go
+   cmd.Stdin = os.Stdin
+   cmd.Stdout = os.Stdout
+   cmd.Stderr = os.Stderr
+   cmd.Run()
+   ```
+   Now the child sees the real terminal, so sudo works, interactive prompts work if they do sneak through, etc. Cost: we lose the captured-output buffer for error reporting. Acceptable — the user already saw the output on screen.
+
+4. **But inherited stdio collides with Bubble Tea.** The TUI owns the terminal while `prog.Run()` is active. Running install.sh *during* the TUI would interleave sudo prompts with rendered progress lines, which is horrifying.
+
+5. **Fix: two-phase runner.** Phase 1: TUI drives all declarative actions across all modules. Phase 2: after the TUI exits, a plain loop runs every module's install.sh with inherited stdio. This changes the ordering contract — a module's declarative action can no longer depend on a prior module's install.sh output — but in practice, modules with install.sh (SSH keys, AUR bootstraps) aren't generating files that later declarative actions consume. Documented the new invariant in `CLAUDE.md`.
+
+**Go idiom tucked in here:** inherited stdio is the default when you construct `exec.Cmd` via `Command`, *but only* for interactive subprocesses launched by an interactive parent. If you're going through `CombinedOutput()` or `Output()`, those helpers *pipe* stdin/stdout. Setting the fields explicitly is the escape hatch. This is the same trick `go run`, `docker run`, etc. use to forward the terminal.
+
 ## End of auto-generated plan (Phases 1–6 complete)
 
 Remaining manual smoke test: run `./bin/quill apply git` (once you're ready to have it repoint `~/.gitconfig`), then re-run to confirm idempotency. `./bin/quill install` for the interactive flow. `./bin/quill path` to symlink into `~/.local/bin`.
