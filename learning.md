@@ -345,6 +345,20 @@ Pacman needs root, but prompting mid-run would mangle the Bubble Tea progress vi
 
 - **Why "`sudo -n` everywhere else" is still right**. The runner never prompts. Only the CLI layer (which owns stdin/stdout before the TUI takes over) ever invokes an interactive sudo. If a user runs `quill apply` after their sudo timestamp has expired and they also somehow bypass the upfront prime, the `sudo -n` will fail loudly with a clear error — much better than a mysterious hang inside the progress view.
 
+## Follow-up — don't prime sudo when nothing needs doing (`65ca416`)
+
+First polish pass. The initial `PlanNeedsSudo` answered "could this plan need root" — which was right by construction but annoying in practice: a second `quill apply` run with nothing pending still printed the priming banner (and, past the sudo timestamp, would have prompted for a password the run didn't need).
+
+Fix: refine the predicate from *capability* to *necessity*. Before saying yes, call `Check()` on the sudo-capable action. Three outcomes:
+
+- `(true, nil)` — already applied, Apply won't run → no sudo needed.
+- `(false, nil)` — work to do → prime sudo.
+- `(_, err)` — Check failed, so ApplyActions will short-circuit with an error event and never call Apply → no sudo needed.
+
+This is safe because `Check` is defined by the `Action` contract as cheap and side-effect-free. Calling it twice (once here, once inside `ApplyActions`) is the cost of avoiding the spurious prompt. In the `git` module case, `Check` is `pacman -Q <pkg>` + `readlink ~/.gitconfig` — microseconds.
+
+The Go thing worth noting: **refining a predicate by widening its inputs**. The old version only needed `Action` (for the type assertion). The new version calls `Check`, which is already on the `Action` interface — no new dependency, just using more of the interface you already had. When you find yourself wanting a new method to answer a question like this, first check whether existing methods compose into the answer.
+
 ---
 
 ## End of auto-generated plan (Phases 1–6 complete)
