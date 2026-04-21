@@ -1,0 +1,8 @@
+name = "yay"
+description = "AUR helper (yay)"
+tags = ["essential"]
+depends_on = ["git"]
+
+[[packages]]
+manager = "pacman"
+names = ["base-devel"]
