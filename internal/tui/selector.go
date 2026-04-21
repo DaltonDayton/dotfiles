@@ -51,8 +51,7 @@ func SelectModules(mods []*module.Module, preselected map[string]bool) ([]string
 		fields = append(fields, huh.NewMultiSelect[string]().
 			Title(Title.Render(tag)).
 			Options(options...).
-			Value(&chosen).
-			Filtering(true))
+			Value(&chosen))
 	}
 	form := huh.NewForm(huh.NewGroup(fields...))
 	if err := form.Run(); err != nil {
