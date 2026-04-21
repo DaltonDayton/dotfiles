@@ -1,0 +1,6 @@
+name = "archlinux"
+aur_helper = "paru"
+modules = ["git"]
+
+[vars]
+git_email = "daltondayton1@gmail.com"

@@ -1,0 +1,11 @@
+name = "git"
+description = "Git + global gitconfig"
+tags = ["essential"]
+
+[[packages]]
+manager = "pacman"
+names = ["git"]
+
+[[symlinks]]
+src = "files/.gitconfig.tmpl"
+dst = "~/.gitconfig"
