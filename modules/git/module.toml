@@ -4,7 +4,7 @@ tags = ["essential"]
 
 [[packages]]
 manager = "pacman"
-names = ["git"]
+names = ["git", "github-cli", "openssh", "bat"]
 
 [[symlinks]]
 src = "files/.gitconfig.tmpl"
