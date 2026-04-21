@@ -82,9 +82,6 @@ func newInstallCmd() *cobra.Command {
 						continue
 					}
 					runner.ApplyActions(p.Module.Name, p.Actions, events)
-					if err := runner.RunInstallSh(p.Module); err != nil {
-						events <- runner.Event{Kind: runner.EventError, Module: p.Module.Name, Err: err}
-					}
 				}
 			}()
 
@@ -92,7 +89,23 @@ func newInstallCmd() *cobra.Command {
 				return err
 			}
 
+			// install.sh runs after the TUI releases the terminal so scripts
+			// that shell out to sudo can use the real TTY.
+			var scriptErrs int
+			for _, p := range plan {
+				if p.BuildErr != nil {
+					continue
+				}
+				if err := runner.RunInstallSh(p.Module); err != nil {
+					fmt.Fprintln(cmd.ErrOrStderr(), err)
+					scriptErrs++
+				}
+			}
+
 			_ = state.SaveSelection(statePath, selected)
+			if scriptErrs > 0 {
+				return fmt.Errorf("%d install.sh scripts failed", scriptErrs)
+			}
 			return nil
 		},
 	}

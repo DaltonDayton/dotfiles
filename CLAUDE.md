@@ -25,7 +25,9 @@ Always read the plan before implementing a task — it specifies exact code, fil
 
 **Idempotency is the contract.** Every action executor (`internal/action/*.go`) implements the `Action` interface with `Describe()`, `Check() (bool, error)`, `Apply() error`. `Check` returns `true` iff the system is already in the desired state — the runner then skips `Apply`. Stateless — no system-state file. The only persisted state is `~/.local/state/quill/last_selection.json`, which is a UI preference (remembers selector defaults), not system truth.
 
-**Declarative first, escape hatch when needed.** Modules describe their work in `module.toml` (packages / symlinks / commands / files / services / directories). When declarative doesn't fit (SSH key generation, GPU detection, interactive wizards), drop into `modules/<name>/install.sh` — it runs after the declarative actions and must self-check for idempotency.
+**Declarative first, escape hatch when needed.** Modules describe their work in `module.toml` (packages / symlinks / commands / files / services / directories). When declarative doesn't fit (SSH key generation, GPU detection, interactive wizards), drop into `modules/<name>/install.sh`. Scripts must self-check for idempotency (exit 0 when already applied).
+
+**Install.sh ordering.** All modules' declarative actions run first (inside the TUI for `install`, inline for `apply`). Then *after* the TUI releases the terminal, install.sh scripts run in module order with inherited stdio — so they can use the real TTY for `sudo`, interactive prompts, etc. Trade-off: a module's declarative action cannot depend on an earlier module's install.sh output, because all declarative work finishes before any script runs.
 
 **TDD per the plan.** Each `internal/*` package is introduced alongside its `_test.go` in the same task. Tests use `t.TempDir()` for filesystem work and inject fakes for shell-outs (see `internal/action/services.go`'s `var systemctl` and `internal/action/packages.go`'s `var pkgDrivers`). Run `go test ./...` before committing a task.
 

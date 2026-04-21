@@ -6,7 +6,9 @@ command -v paru >/dev/null && exit 0
 
 # Fast path: use yay if it's already here.
 if command -v yay >/dev/null; then
-    yay -S --needed --noconfirm paru
+    yay -S --needed --noconfirm \
+        --answerdiff=None --answerclean=None --mflags=--noconfirm \
+        paru
     exit 0
 fi
 

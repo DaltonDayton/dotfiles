@@ -42,9 +42,6 @@ func newApplyCmd() *cobra.Command {
 						continue
 					}
 					runner.ApplyActions(p.Module.Name, p.Actions, events)
-					if err := runner.RunInstallSh(p.Module); err != nil {
-						events <- runner.Event{Kind: runner.EventError, Module: p.Module.Name, Err: err}
-					}
 				}
 			}()
 
@@ -61,6 +58,19 @@ func newApplyCmd() *cobra.Command {
 					fmt.Printf("  ✗ %s: %s (%v)\n", e.Module, e.Action, e.Err)
 				}
 			}
+
+			// Run install.sh scripts after streaming completes so they can own
+			// the terminal (for sudo prompts, interactive bootstraps, etc.).
+			for _, p := range plan {
+				if p.BuildErr != nil {
+					continue
+				}
+				if err := runner.RunInstallSh(p.Module); err != nil {
+					fmt.Printf("  ✗ %s: install.sh failed (%v)\n", p.Module.Name, err)
+					failed++
+				}
+			}
+
 			fmt.Printf("\nApplied: %d  Skipped: %d  Failed: %d\n", applied, skipped, failed)
 			if failed > 0 {
 				return fmt.Errorf("%d actions failed", failed)
