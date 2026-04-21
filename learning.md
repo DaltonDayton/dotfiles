@@ -240,3 +240,95 @@ The "eject" button for things declarative TOML can't express.
 - **Self-idempotency contract**: the declarative actions let the runner gate `Apply` on `Check`. `install.sh` doesn't have that luxury — the script itself must be safe to re-run. That's documented in `CLAUDE.md` and called out in the action's doc comment.
 
 ---
+
+## Task 16 — Cobra CLI skeleton (`52a3d7c`)
+
+First external CLI dep. Cobra is the de-facto standard for Go CLIs (kubectl, gh, hugo).
+
+- **Command-builder pattern**: each subcommand lives in its own file (`list.go`, `status.go`) and returns `*cobra.Command` from a `newXxxCmd()` constructor. `main.go` calls `root.AddCommand(newListCmd(), newStatusCmd(), ...)`. Keeps each subcommand self-contained and trivially testable.
+- **Persistent flags (`root.PersistentFlags().StringVar(...)`)** are inherited by subcommands. `--repo` works on `quill list --repo /path` and every other subcommand. Local (non-persistent) flags would only attach to the specific subcommand.
+- **`RunE` vs `Run`**: `RunE` returns an `error`, which cobra prints and exits 1 on. `Run` is the older error-swallowing variant. Always use `RunE` in real code — proper exit codes matter for scripting.
+- **Shared context via a package-level helper** (`cmd/quill/context.go`'s `loadCtx`): rather than threading `RepoRoot`, `Modules`, `Host` through every command's closure, each command calls `loadCtx()` at the top of its `RunE`. Centralizes the "figure out where the repo lives and load modules/host" logic — lookup stays flexible (env var, flag, binary-relative) without duplication.
+- **Stubs for unimplemented commands** compile but error at runtime with a clear message pointing at the task number. Lets the rest of the CLI structure come together before every subcommand is implemented. The stubs get deleted as each real command lands.
+
+---
+
+## Task 17 — Lipgloss styles and banner (`44d575b`)
+
+Three Charm libraries added together: `lipgloss` (styling), `bubbletea` (interactive TUI), `huh` (forms).
+
+- **Style values as package-level vars**: each style (`Title`, `Subtle`, `Success`, …) is built once at import time and reused. Lipgloss's `Style` is a value type — you chain builder methods (`Bold(true).Foreground(...)`) and store the result. It's goroutine-safe for reads, which is what you want for a shared palette.
+- **`.Render(s)`** is how you apply a style. `Title.Render("quill")` returns a string with ANSI escape codes. Pure strings in, pure strings out — no side effects, which is why you can compose them freely in `Banner`.
+- **Package doc comments**: `internal/tui/styles.go` has `// Package tui contains ...` above the `package tui` line. Go tooling picks up package docs from any file in the package, but by convention they go on the most central-feeling file. Go's docs toolchain (`go doc`, pkg.go.dev) surfaces these directly.
+
+---
+
+## Task 18 — Huh module selector (`5f8f090`)
+
+Huh's form API is declarative but with some surprises. Grouped multi-selects bind to a single shared slice pointer, so defaults require careful handling.
+
+- **Test the pure helper, not the form**: `huh.Form.Run()` takes over the terminal, which is a nightmare to unit-test. Extracting `GroupByTag` as a pure data-transform gives us something testable; the form construction code is thin enough to eyeball-verify.
+- **`[]huh.Option[string]`** is a generic type — Huh's options are parameterized by the value they return. We use `string` here (module names), but for a typed selector you'd see `huh.Option[int]` etc. Generics showed up in Go 1.18 and libraries have gradually adopted them for exactly this kind of API.
+- **Shared `&chosen` across fields**: every `MultiSelect` in the form uses `Value(&chosen)`. That means every selection across all tag groups ends up in the same slice. `unique(chosen)` dedupes at the end. This matches Huh's data model, which expects a single binding per value.
+- **Pre-seeding defaults via the bound slice**: before building fields, we prepend the preselected names to `chosen`. When Huh renders, any option whose value is already in the slice starts checked. Not intuitive, but the correct incantation.
+- **Slice re-slicing for dedupe (`out := xs[:0]`)**: `unique` reuses the input slice's backing array. Safe here because we've already iterated past each element before overwriting. Saves an allocation — idiomatic Go when the function owns the input.
+
+---
+
+## Task 19 — Bubble Tea progress view + install command (`1bc9c43`)
+
+First use of The Elm Architecture in Go — Bubble Tea's `Model` / `Init` / `Update` / `View` pattern.
+
+- **Model-Update-View**: your TUI state is one struct (`Model`). `Init()` returns a command to do first (here: wait for the first event). `Update(msg)` handles an incoming message and returns a new model + optional next command. `View()` renders the model as a string. No mutation outside `Update`. One-way data flow.
+- **Typed message envelope (`type eventMsg runner.Event`)**: Bubble Tea passes messages as `interface{}` (well, `tea.Msg`), and dispatches based on type. Wrapping `runner.Event` in our own named type `eventMsg` lets us match on it cleanly in the `switch msg := msg.(type)` block without conflicting with any other package that might also emit `tea.Msg` values.
+- **Commands as `func() tea.Msg`**: `waitEvent(m.events)` returns a closure that blocks on a channel read and returns the next message. Bubble Tea's runtime spawns this in a goroutine, so the TUI loop stays responsive. Every Update that wants to keep listening returns `waitEvent(m.events)` again — recursive-ish, but cheap.
+- **Concurrent goroutine feeds events**: in `install.go`, a `go func() { ... close(events) }()` runs the apply loop in the background and closes the channel when done. The `waitEvent` reader detects the close via `<-chan` returning `ok=false` and emits `doneMsg{}`, which triggers `tea.Quit`. Classic producer-consumer-with-cleanup pattern.
+
+---
+
+## Task 20 — Non-interactive `apply` (`148d060`)
+
+Same event stream as `install`, but no TUI — just stdout.
+
+- **Same runner.ApplyActions, different consumer**: the runner doesn't know or care whether its events go to a Bubble Tea model or a `for e := range events` loop. Designing the runner to emit events rather than call a UI layer directly pays off exactly here — two commands, one orchestrator.
+- **Exit code via returned error**: `return fmt.Errorf("%d actions failed", failed)` — cobra prints this to stderr and exits 1. CI-friendly. Don't `os.Exit(1)` from inside a `RunE`; return an error and let cobra handle the exit.
+- **`for e := range events` over a channel**: this is the canonical Go pattern for consuming a producer-closed channel. When the producer calls `close(events)`, the loop exits automatically. No sentinel values, no extra state.
+
+---
+
+## Task 21 — `path` command (`3bc97da`)
+
+Mostly an excuse for a clean "pure helper + thin command" split.
+
+- **Pure helper is the tested unit**: `ensurePathLine(rcPath)` is a pure function — takes a path, touches only that file, returns a bool. That's what the unit tests exercise (missing file, present line, commented-out line). The cobra command itself is thin glue and not worth testing in isolation.
+- **`bufio.Scanner` over `bytes.Reader`**: simpler than hand-splitting a byte slice on newlines. For files measured in KB, not MB, this is the right tool.
+- **`os.IsNotExist` (older form)** vs `errors.Is(err, fs.ErrNotExist)` (newer): both work for `os.ReadFile`. The newer form is preferred in new code — it handles wrapped errors too.
+- **`os.Remove` before `os.Symlink`**: `Symlink` errors if the target already exists. The idempotent pattern is "remove then create." We use `_ = os.Remove(link)` because "doesn't exist" is fine; this would be a bug if we cared about distinguishing permission-denied from not-found, but for a user-local path we don't.
+
+---
+
+## Task 22 — bootstrap.sh (`73decfb`)
+
+Thirty-line bash, no Go. Called out because the `set -euo pipefail` + `exec` tail are worth internalizing.
+
+- **`set -euo pipefail`**: `-e` = exit on first error, `-u` = error on unset variable, `-o pipefail` = propagate errors through pipes. Should be the first thing in every non-trivial bash script. It's why the script stays readable — we don't check `$?` after every command because we know failure terminates us.
+- **`${VAR:-default}` parameter expansion**: `${DOTFILES_REPO_URL:-https://...}` means "use `$DOTFILES_REPO_URL` if set, otherwise the default." That's how we let the user override via env vars without writing flag-parsing logic.
+- **`exec ./bin/quill install`** at the end: replaces the shell process with the Go binary instead of forking. When the user pipes `curl ... | bash`, the `exec` means the interactive installer inherits the terminal directly — no zombie bash parent, no signal-handling weirdness.
+
+---
+
+## Task 23 — First real git module + host profile (`96b0620`, `6d82e74`)
+
+The first actual *end-user* data. Also a small landmine.
+
+- **Render-on-disk side effect caught**: `BuildActions` renders `.tmpl` files to a sibling file (stripping the `.tmpl` suffix). That means running `quill status` has a filesystem side effect — it writes a rendered file next to the template. That rendered file got committed by accident; `6d82e74` added a `.gitignore` pattern to keep only `.tmpl` (and `.gitkeep`) files in `modules/*/files/`. Lesson: "pure analysis" commands can have side effects in this codebase — we accept that because it keeps the symlink target stable.
+- **Templated gitconfig** uses `{{ .Vars.git_email }}` — the `Vars` map from the host profile. Any string in `hosts/<name>.toml`'s `[vars]` table becomes available to templates. This is the hook you'll use for per-host differences like monitor configs, usernames, etc.
+- **Smoke-tested via `list` + `status`**: `quill list` prints `git  Git + global gitconfig`; `quill status` prints `git  PENDING (1/2)` (git installed, `.gitconfig` not yet applied). Actual apply is deferred until you greenlight — your existing `~/.gitconfig` points at a pre-startover path, and applying would repoint it.
+
+---
+
+## End of auto-generated plan (Phases 1–6 complete)
+
+Remaining manual smoke test: run `./bin/quill apply git` (once you're ready to have it repoint `~/.gitconfig`), then re-run to confirm idempotency. `./bin/quill install` for the interactive flow. `./bin/quill path` to symlink into `~/.local/bin`.
+
+Phase 7 in the plan is open-ended polish — add follow-up modules and extra action types as needs arise.
