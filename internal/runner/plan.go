@@ -26,14 +26,27 @@ func BuildPlan(mods []*module.Module, host *manifest.Host) []ModulePlan {
 	return out
 }
 
-// PlanNeedsSudo reports whether any action in the plan will invoke a
-// privileged command. Actions opt in by implementing a NeedsSudo() method;
-// the structural interface here avoids adding it to the core Action
-// contract since most action types never need root.
+// PlanNeedsSudo reports whether any action in the plan will actually invoke
+// a privileged command. An action qualifies when it (a) opts in via a
+// NeedsSudo() method and (b) its Check returns (false, nil) — i.e., Apply
+// will run. Check errors mean Apply is skipped, so no sudo is needed.
+//
+// This runs Check once per sudo-capable action before the main apply loop.
+// Check is required to be cheap and side-effect-free, so the pre-pass is
+// the right cost to pay to avoid prompting the user when every action is
+// already satisfied.
 func PlanNeedsSudo(plan []ModulePlan) bool {
 	for _, p := range plan {
 		for _, a := range p.Actions {
-			if s, ok := a.(interface{ NeedsSudo() bool }); ok && s.NeedsSudo() {
+			s, ok := a.(interface{ NeedsSudo() bool })
+			if !ok || !s.NeedsSudo() {
+				continue
+			}
+			done, err := a.Check()
+			if err != nil {
+				continue
+			}
+			if !done {
 				return true
 			}
 		}
