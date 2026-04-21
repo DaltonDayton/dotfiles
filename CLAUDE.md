@@ -31,6 +31,8 @@ Always read the plan before implementing a task — it specifies exact code, fil
 
 **File scope.** One responsibility per file. Action types get their own file (`symlinks.go`, `packages.go`, …). TUI presentation lives in `internal/tui/` and is a pure consumer of `internal/runner` events — `runner` never imports `tui`.
 
+**Sudo is primed once, upfront.** The `pacman` driver uses `sudo -n` so it never prompts mid-action (a prompt inside the Bubble Tea progress view would mangle it). Before `install`/`apply` starts the runner, the CLI builds the plan via `runner.BuildPlan`, scans it with `runner.PlanNeedsSudo`, and, if any action opts in via a `NeedsSudo() bool` method, calls `primeSudo` (interactive `sudo -v`) so the cached credential carries the rest of the run. `NeedsSudo` is a structural interface — action types opt in by implementing the method; it isn't part of the core `Action` contract.
+
 **No `sudo` surprises.** The `pacman` driver uses `sudo -n`, which errors out rather than prompting. Users are expected to have run `sudo -v` before `quill apply`, or to be in a context where passwordless sudo is configured. Don't paper over this with prompts.
 
 ## Build, run, test

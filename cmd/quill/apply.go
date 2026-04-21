@@ -26,18 +26,24 @@ func newApplyCmd() *cobra.Command {
 			}
 			ordered = runner.FilterByHost(ordered, ctx.Host.Name)
 
+			plan := runner.BuildPlan(ordered, ctx.Host)
+			if runner.PlanNeedsSudo(plan) {
+				if err := primeSudo(); err != nil {
+					return err
+				}
+			}
+
 			events := make(chan runner.Event, 64)
 			go func() {
 				defer close(events)
-				for _, m := range ordered {
-					acts, err := runner.BuildActions(m, ctx.Host)
-					if err != nil {
-						events <- runner.Event{Kind: runner.EventError, Module: m.Name, Err: err}
+				for _, p := range plan {
+					if p.BuildErr != nil {
+						events <- runner.Event{Kind: runner.EventError, Module: p.Module.Name, Err: p.BuildErr}
 						continue
 					}
-					runner.ApplyActions(m.Name, acts, events)
-					if err := runner.RunInstallSh(m); err != nil {
-						events <- runner.Event{Kind: runner.EventError, Module: m.Name, Err: err}
+					runner.ApplyActions(p.Module.Name, p.Actions, events)
+					if err := runner.RunInstallSh(p.Module); err != nil {
+						events <- runner.Event{Kind: runner.EventError, Module: p.Module.Name, Err: err}
 					}
 				}
 			}()

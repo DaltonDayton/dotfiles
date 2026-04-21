@@ -68,3 +68,19 @@ func TestPackages_unknownManager(t *testing.T) {
 func TestPackages_satisfiesActionInterface(t *testing.T) {
 	var _ Action = (*Packages)(nil)
 }
+
+func TestPackages_NeedsSudo(t *testing.T) {
+	cases := map[string]bool{
+		"pacman":  true,
+		"paru":    true,
+		"yay":     true,
+		"flatpak": false,
+		"unknown": false,
+	}
+	for mgr, want := range cases {
+		p := &Packages{Manager: mgr}
+		if got := p.NeedsSudo(); got != want {
+			t.Errorf("NeedsSudo(%q) = %v, want %v", mgr, got, want)
+		}
+	}
+}

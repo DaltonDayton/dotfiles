@@ -327,6 +327,26 @@ The first actual *end-user* data. Also a small landmine.
 
 ---
 
+## Follow-up — sudo priming (`<pending>`)
+
+Pacman needs root, but prompting mid-run would mangle the Bubble Tea progress view. Solution: prime sudo *once* before the TUI starts, then the driver's existing `sudo -n` calls ride the cached credential.
+
+- **Structural interfaces for optional capabilities**. Not every action needs root; only `Packages` with pacman/paru/yay does. Rather than adding `NeedsSudo() bool` to the core `Action` interface (forcing every action to implement it), the opt-in uses a type assertion against an anonymous interface:
+  ```go
+  if s, ok := a.(interface{ NeedsSudo() bool }); ok && s.NeedsSudo() {
+      return true
+  }
+  ```
+  This is idiomatic Go — interfaces are structural, so you can define one inline at the use-site. Actions that implement `NeedsSudo` opt in; others ignore the question. Same pattern the stdlib uses (`io.WriterTo`, `fmt.Stringer`, etc. are all separate from the core interfaces they extend).
+
+- **`BuildPlan` vs. inline build**. The runner previously built actions inside the goroutine that applied them. To scan for sudo-needers we need the whole plan before execution starts, so `BuildPlan(mods, host) []ModulePlan` materializes the full list up front. `ModulePlan.BuildErr` is stored rather than short-circuited — per-module build errors surface as events during apply, so the user sees "module X failed to plan" in context instead of the whole run aborting.
+
+- **`exec.Command("sudo", "-v")` with inherited stdin/stdout/stderr**. `primeSudo` doesn't capture output — it wires the child process directly to the terminal so the password prompt is handled normally. `CombinedOutput` would have swallowed the prompt and blocked waiting for input it can't display.
+
+- **Why "`sudo -n` everywhere else" is still right**. The runner never prompts. Only the CLI layer (which owns stdin/stdout before the TUI takes over) ever invokes an interactive sudo. If a user runs `quill apply` after their sudo timestamp has expired and they also somehow bypass the upfront prime, the `sudo -n` will fail loudly with a clear error — much better than a mysterious hang inside the progress view.
+
+---
+
 ## End of auto-generated plan (Phases 1–6 complete)
 
 Remaining manual smoke test: run `./bin/quill apply git` (once you're ready to have it repoint `~/.gitconfig`), then re-run to confirm idempotency. `./bin/quill install` for the interactive flow. `./bin/quill path` to symlink into `~/.local/bin`.

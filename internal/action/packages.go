@@ -59,6 +59,17 @@ func (p *Packages) Check() (bool, error) {
 	return true, nil
 }
 
+// NeedsSudo reports whether Apply will invoke a privileged command. Used
+// by the CLI to decide whether to prime sudo credentials before handing
+// control to the TUI.
+func (p *Packages) NeedsSudo() bool {
+	switch p.Manager {
+	case "pacman", "paru", "yay":
+		return true
+	}
+	return false
+}
+
 func (p *Packages) Apply() error {
 	d, err := p.driver()
 	if err != nil {
