@@ -1,7 +1,0 @@
-[user]
-    name = Dalton Dayton
-    email = daltondayton1@gmail.com
-[init]
-    defaultBranch = main
-[pull]
-    rebase = true
