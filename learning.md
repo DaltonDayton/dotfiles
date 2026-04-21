@@ -327,7 +327,7 @@ The first actual *end-user* data. Also a small landmine.
 
 ---
 
-## Follow-up — sudo priming (`<pending>`)
+## Follow-up — sudo priming (`d49f7fa`)
 
 Pacman needs root, but prompting mid-run would mangle the Bubble Tea progress view. Solution: prime sudo *once* before the TUI starts, then the driver's existing `sudo -n` calls ride the cached credential.
 
