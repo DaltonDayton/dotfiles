@@ -1,0 +1,255 @@
+add_newline = true
+
+# A minimal left prompt
+format = """$directory$character"""
+palette = "catppuccin_mocha"
+
+# move the rest of the prompt to the right
+right_format = """$all"""
+command_timeout = 1000
+
+[git_status]
+format = "[[$conflicted](yellow)[$untracked](218)[$modified$renamed](255)[$staged](green)[$deleted](red)($ahead_behind$stashed)]($style)"
+conflicted = " $count "
+untracked = " $count "
+modified = " $count "
+deleted = " $count "
+staged = " $count "
+renamed = " $count "
+stashed = " $count "
+style = "cyan"
+
+[palettes.catppuccin_mocha]
+rosewater = "#f5e0dc"
+flamingo = "#f2cdcd"
+pink = "#f5c2e7"
+mauve = "#cba6f7"
+red = "#f38ba8"
+maroon = "#eba0ac"
+peach = "#fab387"
+yellow = "#f9e2af"
+green = "#a6e3a1"
+teal = "#94e2d5"
+sky = "#89dceb"
+sapphire = "#74c7ec"
+blue = "#89b4fa"
+lavender = "#b4befe"
+text = "#cdd6f4"
+subtext1 = "#bac2de"
+subtext0 = "#a6adc8"
+overlay2 = "#9399b2"
+overlay1 = "#7f849c"
+overlay0 = "#6c7086"
+surface2 = "#585b70"
+surface1 = "#45475a"
+surface0 = "#313244"
+base = "#1e1e2e"
+mantle = "#181825"
+crust = "#11111b"
+
+[palettes.nord]
+rosewater = "#e5e9f0"
+flamingo = "#d8dee9"
+pink = "#b48ead"
+mauve = "#88c0d0"
+red = "#bf616a"
+maroon = "#bf616a"
+peach = "#d08770"
+yellow = "#ebcb8b"
+green = "#a3be8c"
+teal = "#8fbcbb"
+sky = "#88c0d0"
+sapphire = "#81a1c1"
+blue = "#5e81ac"
+lavender = "#e5e9f0"
+text = "#eceff4"
+subtext1 = "#e5e9f0"
+subtext0 = "#d8dee9"
+overlay2 = "#d8dee9"
+overlay1 = "#4c566a"
+overlay0 = "#4c566a"
+surface2 = "#4c566a"
+surface1 = "#434c5e"
+surface0 = "#3b4252"
+base = "#2e3440"
+mantle = "#2e3440"
+crust = "#2e3440"
+
+
+[aws]
+disabled = true
+symbol = " "
+
+[custom.aws_project]
+command = "echo  $(aws configure get region)"
+when = '''
+    test -d .elasticbeanstalk ||
+    test -d terraform ||
+    test -d infra ||
+    test -d cdk ||
+    test -d deploy
+'''
+style = "bright-blue"
+format = "[$output]($style)"
+
+[buf]
+symbol = " "
+
+[c]
+symbol = " "
+
+[conda]
+symbol = " "
+
+[crystal]
+symbol = " "
+
+[dart]
+symbol = " "
+
+[directory]
+read_only = " 󰌾"
+
+[docker_context]
+symbol = " "
+
+[elixir]
+symbol = " "
+
+[elm]
+symbol = " "
+
+[fennel]
+symbol = " "
+
+[fossil_branch]
+symbol = " "
+
+[git_branch]
+symbol = " "
+
+[golang]
+symbol = " "
+
+[guix_shell]
+symbol = " "
+
+[haskell]
+symbol = " "
+
+[haxe]
+symbol = " "
+
+[hg_branch]
+symbol = " "
+
+[hostname]
+ssh_symbol = " "
+
+[java]
+symbol = " "
+
+[julia]
+symbol = " "
+
+[kotlin]
+symbol = " "
+
+[lua]
+symbol = " "
+
+[memory_usage]
+symbol = "󰍛 "
+
+[meson]
+symbol = "󰔷 "
+
+[nim]
+symbol = "󰆥 "
+
+[nix_shell]
+symbol = " "
+
+[nodejs]
+symbol = " "
+
+[ocaml]
+symbol = " "
+
+[os.symbols]
+Alpaquita = " "
+Alpine = " "
+AlmaLinux = " "
+Amazon = " "
+Android = " "
+Arch = " "
+Artix = " "
+CentOS = " "
+Debian = " "
+DragonFly = " "
+Emscripten = " "
+EndeavourOS = " "
+Fedora = " "
+FreeBSD = " "
+Garuda = "󰛓 "
+Gentoo = " "
+HardenedBSD = "󰞌 "
+Illumos = "󰈸 "
+Kali = " "
+Linux = " "
+Mabox = " "
+Macos = " "
+Manjaro = " "
+Mariner = " "
+MidnightBSD = " "
+Mint = " "
+NetBSD = " "
+NixOS = " "
+OpenBSD = "󰈺 "
+openSUSE = " "
+OracleLinux = "󰌷 "
+Pop = " "
+Raspbian = " "
+Redhat = " "
+RedHatEnterprise = " "
+RockyLinux = " "
+Redox = "󰀘 "
+Solus = "󰠳 "
+SUSE = " "
+Ubuntu = " "
+Unknown = " "
+Void = " "
+Windows = "󰍲 "
+
+[package]
+symbol = "󰏗 "
+
+[perl]
+symbol = " "
+
+[php]
+symbol = " "
+
+[pijul_channel]
+symbol = " "
+
+[python]
+symbol = " "
+
+[rlang]
+symbol = "󰟔 "
+
+[ruby]
+symbol = " "
+
+[rust]
+symbol = " "
+
+[scala]
+symbol = " "
+
+[swift]
+symbol = " "
+
+[zig]
+symbol = " "

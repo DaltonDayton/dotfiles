@@ -3,7 +3,6 @@
 /coverage.out
 .DS_Store
 
-# Rendered template outputs (BuildActions writes these next to .tmpl sources)
-modules/*/files/*
-!modules/*/files/*.tmpl
-!modules/*/files/.gitkeep
+# Rendered .tmpl outputs (BuildActions writes to the stripped-suffix sibling).
+# Add one line per new .tmpl file.
+modules/git/files/.gitconfig

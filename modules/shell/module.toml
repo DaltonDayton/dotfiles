@@ -1,0 +1,31 @@
+name = "shell"
+description = "zsh + starship + yazi + modern CLI tools"
+tags = ["essential"]
+depends_on = ["git"]
+
+[[packages]]
+manager = "pacman"
+names = [
+    "zsh",
+    "starship",
+    "eza",
+    "zoxide",
+    "bat",
+    "less",
+    "fzf",
+    "yazi",
+    "atuin",
+    "nvtop",
+]
+
+[[symlinks]]
+src = "files/.zshrc"
+dst = "~/.zshrc"
+
+[[symlinks]]
+src = "files/starship.toml"
+dst = "~/.config/starship.toml"
+
+[[symlinks]]
+src = "files/yazi"
+dst = "~/.config/yazi"
