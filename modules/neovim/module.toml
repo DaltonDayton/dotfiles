@@ -1,7 +1,7 @@
 name = "neovim"
 description = "neovim + lazy.nvim config"
 tags = ["essential"]
-depends_on = ["git"]
+depends_on = ["git", "asdf"]
 
 [[packages]]
 manager = "pacman"
