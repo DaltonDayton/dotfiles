@@ -1,0 +1,14 @@
+name = "fonts"
+description = "system + terminal + UI fonts"
+tags = ["essential"]
+
+[[packages]]
+manager = "pacman"
+names = [
+    "noto-fonts",
+    "noto-fonts-cjk",
+    "noto-fonts-emoji",
+    "noto-fonts-extra",
+    "ttf-cascadia-code-nerd",
+    "inter-font",
+]
