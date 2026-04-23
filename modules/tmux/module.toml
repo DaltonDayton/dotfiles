@@ -1,0 +1,12 @@
+name = "tmux"
+description = "tmux + catppuccin + plugin manager"
+tags = ["essential"]
+depends_on = ["git"]
+
+[[packages]]
+manager = "pacman"
+names = ["tmux"]
+
+[[symlinks]]
+src = "files/tmux.conf"
+dst = "~/.config/tmux/tmux.conf"
