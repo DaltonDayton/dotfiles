@@ -20,7 +20,7 @@ func newApplyCmd() *cobra.Command {
 			if len(names) == 0 {
 				names = ctx.Host.Modules
 			}
-			ordered, err := runner.ResolveDeps(ctx.Modules, names)
+			ordered, err := runner.ResolveDeps(ctx.Modules, names, ctx.Host.AURHelper)
 			if err != nil {
 				return err
 			}

@@ -16,7 +16,7 @@ func mod(name string, deps ...string) *module.Module {
 
 func TestResolveDeps_transitive(t *testing.T) {
 	all := []*module.Module{mod("a"), mod("b", "a"), mod("c", "b")}
-	got, err := ResolveDeps(all, []string{"c"})
+	got, err := ResolveDeps(all, []string{"c"}, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -33,7 +33,7 @@ func TestResolveDeps_transitive(t *testing.T) {
 
 func TestResolveDeps_cycle(t *testing.T) {
 	all := []*module.Module{mod("a", "b"), mod("b", "a")}
-	_, err := ResolveDeps(all, []string{"a"})
+	_, err := ResolveDeps(all, []string{"a"}, "")
 	if err == nil {
 		t.Fatal("expected cycle error")
 	}
@@ -41,9 +41,34 @@ func TestResolveDeps_cycle(t *testing.T) {
 
 func TestResolveDeps_unknownModule(t *testing.T) {
 	all := []*module.Module{mod("a")}
-	_, err := ResolveDeps(all, []string{"ghost"})
+	_, err := ResolveDeps(all, []string{"ghost"}, "")
 	if err == nil {
 		t.Fatal("expected error for unknown module")
+	}
+}
+
+func TestResolveDeps_aurSentinelResolvesToHelper(t *testing.T) {
+	all := []*module.Module{mod("paru"), mod("yay"), mod("asdf", "aur")}
+	got, err := ResolveDeps(all, []string{"asdf"}, "paru")
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []string{"paru", "asdf"}
+	if len(got) != len(want) {
+		t.Fatalf("got %d modules, want %d", len(got), len(want))
+	}
+	for i, m := range got {
+		if m.Name != want[i] {
+			t.Errorf("got[%d] = %s, want %s", i, m.Name, want[i])
+		}
+	}
+}
+
+func TestResolveDeps_aurSentinelWithoutHelperErrors(t *testing.T) {
+	all := []*module.Module{mod("paru"), mod("asdf", "aur")}
+	_, err := ResolveDeps(all, []string{"asdf"}, "")
+	if err == nil {
+		t.Fatal("expected error when aur_helper is unset")
 	}
 }
 

@@ -44,7 +44,7 @@ func newInstallCmd() *cobra.Command {
 				return nil
 			}
 
-			ordered, err := runner.ResolveDeps(ctx.Modules, selected)
+			ordered, err := runner.ResolveDeps(ctx.Modules, selected, ctx.Host.AURHelper)
 			if err != nil {
 				return err
 			}

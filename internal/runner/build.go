@@ -1,6 +1,7 @@
 package runner
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -27,7 +28,17 @@ func BuildActions(m *module.Module, host *manifest.Host) ([]action.Action, error
 		if !hostMatch(p.Hosts, host.Name) {
 			continue
 		}
-		acts = append(acts, &action.Packages{Manager: p.Manager, Names: p.Names})
+		mgr := p.Manager
+		if mgr == "aur" {
+			// "aur" is a logical manager — it resolves to whichever AUR
+			// helper the host selected (paru or yay). Keeps modules portable
+			// across hosts that differ only on AUR helper preference.
+			if host.AURHelper == "" {
+				return nil, fmt.Errorf("module %q uses manager=\"aur\" but host %q has no aur_helper set", m.Name, host.Name)
+			}
+			mgr = host.AURHelper
+		}
+		acts = append(acts, &action.Packages{Manager: mgr, Names: p.Names})
 	}
 	for _, s := range m.Symlinks {
 		if !hostMatch(s.Hosts, host.Name) {

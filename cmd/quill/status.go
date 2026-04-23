@@ -16,7 +16,7 @@ func newStatusCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			ordered, err := runner.ResolveDeps(ctx.Modules, ctx.Host.Modules)
+			ordered, err := runner.ResolveDeps(ctx.Modules, ctx.Host.Modules, ctx.Host.AURHelper)
 			if err != nil {
 				return err
 			}
