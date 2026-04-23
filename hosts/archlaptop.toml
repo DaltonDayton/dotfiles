@@ -1,5 +1,4 @@
 name = "archlaptop"
-aur_helper = "paru"
 modules = ["git", "shell", "tmux", "kitty", "fonts", "asdf", "neovim"]
 
 [vars]

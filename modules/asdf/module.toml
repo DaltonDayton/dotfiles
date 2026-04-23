@@ -5,7 +5,7 @@ depends_on = ["git"]
 
 [[packages]]
 manager = "pacman"
-names = ["dotnet-sdk"]
+names = ["dotnet-sdk", "libyaml"]
 
 [[packages]]
 manager = "aur"

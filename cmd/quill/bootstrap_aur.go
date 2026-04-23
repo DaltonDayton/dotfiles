@@ -5,42 +5,36 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-
-	"github.com/DaltonDayton/dotfiles/internal/manifest"
 )
 
-// ensureAURHelper makes sure host.AURHelper is installed and on PATH,
-// bootstrapping it from source when missing. It's a pre-flight step —
-// runs before any module action so declarative AUR packages can trust
-// the helper exists. Idempotent: no output when the helper is already
-// present.
-func ensureAURHelper(host *manifest.Host) error {
-	helper := host.AURHelper
-	if _, err := exec.LookPath(helper); err == nil {
-		return nil
+// ensureAURHelpers installs paru and yay from source if missing. Runs as
+// a pre-flight step before any module action so declarative AUR packages
+// can trust a helper is on PATH. Idempotent: skipped silently when both
+// helpers are already installed. Paru is built first via makepkg, then
+// yay is pulled via paru (fast path).
+func ensureAURHelpers() error {
+	for _, h := range []string{"paru", "yay"} {
+		if _, err := exec.LookPath(h); err == nil {
+			continue
+		}
+		fmt.Printf("Bootstrapping AUR helper: %s\n", h)
+		if err := bootstrapAURHelper(h, "https://aur.archlinux.org/"+h+".git"); err != nil {
+			return err
+		}
 	}
-	fmt.Printf("Bootstrapping AUR helper: %s\n", helper)
-	switch helper {
-	case "paru":
-		return bootstrapAURHelper("paru", "https://aur.archlinux.org/paru.git")
-	case "yay":
-		return bootstrapAURHelper("yay", "https://aur.archlinux.org/yay.git")
-	default:
-		return fmt.Errorf("unsupported aur_helper %q (expected paru or yay)", helper)
-	}
+	return nil
 }
 
-// bootstrapAURHelper installs an AUR helper from source: ensures base-devel,
-// then uses the other helper as a fast path if available, otherwise clones
-// from AUR and builds via makepkg. Commands inherit stdio so the user can
-// watch makepkg progress — this runs before the TUI takes over.
+// bootstrapAURHelper installs a single AUR helper from source: ensures
+// base-devel, then uses the other helper as a fast path if available,
+// otherwise clones from AUR and builds via makepkg. Inherits stdio so
+// the user can watch makepkg progress — this runs before the TUI takes
+// over.
 func bootstrapAURHelper(name, gitURL string) error {
 	if err := runInherit("sudo", "pacman", "-S", "--needed", "--noconfirm", "base-devel", "git"); err != nil {
 		return fmt.Errorf("install base-devel: %w", err)
 	}
 
-	// Fast path: if the other helper is installed, use it to pull this one
-	// from the AUR (avoids a manual makepkg build).
 	other := otherHelper(name)
 	if _, err := exec.LookPath(other); err == nil {
 		return runInherit(other, "-S", "--needed", "--noconfirm",

@@ -31,8 +31,9 @@ func ParseHost(path string) (*Host, error) {
 		h.Vars = map[string]string{}
 	}
 	if h.AURHelper == "" {
-		// AUR helper is fundamental on Arch — default so hosts that omit it
-		// still work. Override in hosts/<name>.toml to pick yay instead.
+		// Default AUR helper. Both paru and yay are installed during
+		// pre-flight regardless; this field only chooses which one resolves
+		// `manager = "aur"` in module.toml.
 		h.AURHelper = "paru"
 	}
 	return &h, nil
