@@ -1,0 +1,11 @@
+name = "kitty"
+description = "kitty terminal"
+tags = ["essential"]
+
+[[packages]]
+manager = "pacman"
+names = ["kitty"]
+
+[[symlinks]]
+src = "files/kitty.conf"
+dst = "~/.config/kitty/kitty.conf"
