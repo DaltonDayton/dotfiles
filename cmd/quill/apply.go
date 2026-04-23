@@ -20,7 +20,7 @@ func newApplyCmd() *cobra.Command {
 			if len(names) == 0 {
 				names = ctx.Host.Modules
 			}
-			ordered, err := runner.ResolveDeps(ctx.Modules, names, ctx.Host.AURHelper)
+			ordered, err := runner.ResolveDeps(ctx.Modules, names)
 			if err != nil {
 				return err
 			}
@@ -31,6 +31,9 @@ func newApplyCmd() *cobra.Command {
 				if err := primeSudo(); err != nil {
 					return err
 				}
+			}
+			if err := ensureAURHelper(ctx.Host); err != nil {
+				return err
 			}
 
 			events := make(chan runner.Event, 64)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os/exec"
 
 	"github.com/DaltonDayton/dotfiles/internal/runner"
 	"github.com/spf13/cobra"
@@ -16,7 +17,12 @@ func newStatusCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			ordered, err := runner.ResolveDeps(ctx.Modules, ctx.Host.Modules, ctx.Host.AURHelper)
+			helperMarker := "OK"
+			if _, err := exec.LookPath(ctx.Host.AURHelper); err != nil {
+				helperMarker = "PENDING"
+			}
+			fmt.Printf("%-20s %s\n", "aur-helper ("+ctx.Host.AURHelper+")", helperMarker)
+			ordered, err := runner.ResolveDeps(ctx.Modules, ctx.Host.Modules)
 			if err != nil {
 				return err
 			}

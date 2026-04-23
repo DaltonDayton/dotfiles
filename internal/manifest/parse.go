@@ -30,5 +30,10 @@ func ParseHost(path string) (*Host, error) {
 	if h.Vars == nil {
 		h.Vars = map[string]string{}
 	}
+	if h.AURHelper == "" {
+		// AUR helper is fundamental on Arch — default so hosts that omit it
+		// still work. Override in hosts/<name>.toml to pick yay instead.
+		h.AURHelper = "paru"
+	}
 	return &h, nil
 }

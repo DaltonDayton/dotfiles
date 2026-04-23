@@ -1,7 +1,7 @@
 name = "asdf"
 description = "language runtimes (asdf-managed nodejs/ruby + system dotnet)"
 tags = ["essential"]
-depends_on = ["git", "aur"]
+depends_on = ["git"]
 
 [[packages]]
 manager = "pacman"

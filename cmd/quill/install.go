@@ -44,7 +44,7 @@ func newInstallCmd() *cobra.Command {
 				return nil
 			}
 
-			ordered, err := runner.ResolveDeps(ctx.Modules, selected, ctx.Host.AURHelper)
+			ordered, err := runner.ResolveDeps(ctx.Modules, selected)
 			if err != nil {
 				return err
 			}
@@ -65,6 +65,9 @@ func newInstallCmd() *cobra.Command {
 				if err := primeSudo(); err != nil {
 					return err
 				}
+			}
+			if err := ensureAURHelper(ctx.Host); err != nil {
+				return err
 			}
 
 			events := make(chan runner.Event, 64)

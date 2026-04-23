@@ -97,3 +97,17 @@ func TestParseHost_emptyVarsMapIsNonNil(t *testing.T) {
 		t.Error("Vars map should be non-nil even when TOML omits [vars]")
 	}
 }
+
+func TestParseHost_aurHelperDefaultsToParu(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "minimal.toml")
+	os.WriteFile(path, []byte(`name = "minimal"`), 0o644)
+
+	h, err := ParseHost(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if h.AURHelper != "paru" {
+		t.Errorf("AURHelper = %q, want paru (default)", h.AURHelper)
+	}
+}

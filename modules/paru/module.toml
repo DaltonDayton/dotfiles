@@ -1,8 +1,0 @@
-name = "paru"
-description = "AUR helper (paru)"
-tags = ["essential"]
-depends_on = ["git"]
-
-[[packages]]
-manager = "pacman"
-names = ["base-devel"]
