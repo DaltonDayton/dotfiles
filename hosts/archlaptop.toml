@@ -1,0 +1,7 @@
+name = "archlaptop"
+aur_helper = "paru"
+modules = ["git", "paru", "shell", "tmux", "kitty", "fonts", "neovim"]
+
+[vars]
+git_email = "50755420+DaltonDayton@users.noreply.github.com"
+git_signing_key = "~/.ssh/id_ed25519"
