@@ -1,0 +1,12 @@
+name = "neovim"
+description = "neovim + lazy.nvim config"
+tags = ["essential"]
+depends_on = ["git"]
+
+[[packages]]
+manager = "pacman"
+names = ["neovim", "lazygit", "ripgrep", "fd", "unzip"]
+
+[[symlinks]]
+src = "files/nvim"
+dst = "~/.config/nvim"
