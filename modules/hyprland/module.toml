@@ -1,0 +1,52 @@
+name = "hyprland"
+description = "Hyprland desktop session: WM, bar, terminal, theming"
+tags = ["essential", "desktop"]
+depends_on = ["fonts"]
+
+[[packages]]
+manager = "pacman"
+names = [
+    "hyprland", "hyprpaper", "hypridle", "hyprlock", "hyprlauncher",
+    "hyprpicker", "hyprpolkitagent", "qt5-wayland", "qt6-wayland",
+    "waybar", "rofi", "kitty",
+    "pipewire-pulse", "pavucontrol",
+    "bluez", "bluez-utils", "blueman",
+    "grim", "slurp", "satty", "wl-clipboard", "wf-recorder",
+    "cliphist",
+    "tesseract", "tesseract-data-eng",
+    "xdg-utils", "desktop-file-utils", "shared-mime-info", "archlinux-xdg-menu",
+    "jq", "btop",
+]
+
+[[packages]]
+manager = "aur"
+names = ["matugen-bin", "bibata-cursor-theme-bin", "grimblast-git"]
+
+[[symlinks]]
+src = "files/hypr"
+dst = "~/.config/hypr"
+
+[[symlinks]]
+src = "files/waybar"
+dst = "~/.config/waybar"
+
+[[symlinks]]
+src = "files/kitty"
+dst = "~/.config/kitty"
+
+[[symlinks]]
+src = "files/matugen"
+dst = "~/.config/matugen"
+
+[[symlinks]]
+src = "files/wallpapers"
+dst = "~/.config/wallpapers"
+
+[[files]]
+dst = "~/.config/cliphist/config"
+content = "max-items=100\n"
+
+[[services]]
+scope = "system"
+name = "bluetooth.service"
+state = "enabled"
