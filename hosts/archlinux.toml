@@ -1,5 +1,5 @@
 name = "archlinux"
-modules = ["git", "shell", "tmux", "fonts", "asdf", "neovim"]
+modules = ["git", "shell", "tmux", "fonts", "asdf", "neovim", "hyprland"]
 
 [vars]
 git_email = "50755420+DaltonDayton@users.noreply.github.com"
