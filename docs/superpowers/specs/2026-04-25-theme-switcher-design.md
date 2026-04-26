@@ -76,7 +76,8 @@ Bash scripts live in the existing hypr scripts subdir:
 modules/hyprland/files/hypr/scripts/
 ├── theme-switcher.sh         # Super+D entry
 ├── wallpaper-picker.sh       # Super+Shift+D entry
-└── apply-theme.sh            # called by theme-switcher and on first install
+├── apply-theme.sh            # called by theme-switcher and on first install
+└── rofi-thumbnail.sh         # rofi preview-cmd helper (fixed-aspect thumbnails)
 ```
 
 ## Runtime layout (`~/.config`)
@@ -94,7 +95,7 @@ One symlink, plus six small mutable indirection files:
 ~/.config/wlogout/colors/colors.css    # one line: @import "...";
 ```
 
-When `<active>` is `matugen`, each indirection points at `~/.config/<app>/colors/matugen.<ext>` instead — the files matugen's existing templates already write to. Matugen's `config.toml` is **unchanged**. The switcher just re-aims the indirection.
+When `<active>` is `matugen`, each indirection points at `~/.config/<app>/colors/matugen.<ext>` instead — the files matugen's existing templates already write to. The switcher just re-aims the indirection.
 
 Each app's main config sources its respective `colors/colors.<ext>` exactly once. The current `include colors/matugen.conf` references in `kitty.conf`, `hyprland.conf`, etc. get changed to `colors/colors.conf` (one-line edits in 3 files; waybar layouts already use `colors/colors.css`).
 
@@ -109,7 +110,7 @@ Each app's main config sources its respective `colors/colors.<ext>` exactly once
 ### `apply-theme.sh <name>` (the workhorse)
 
 1. **Resolve wallpaper.** Look up `<name>:<path>` in `${XDG_STATE_HOME:-$HOME/.local/state}/themes/wallpapers.txt`. If the path exists, that's the wallpaper. Otherwise pick the alphabetically-first wallpaper from the theme's pool:
-   - matugen → union of every theme's `wallpapers/`
+   - matugen → union of every theme's `wallpapers/` plus `${MATUGEN_WALLPAPERS_DIR:-$HOME/Pictures/Wallpapers}` if it exists
    - any other theme → just `themes/<name>/wallpapers/`
    Persist the choice back into `wallpapers.txt`.
 2. **Rewrite the 6 indirection files** to point at the right palette source. For static themes: `~/.config/themes/<name>/<app>.<ext>`. For matugen: `~/.config/<app>/colors/matugen.<ext>`.
@@ -128,8 +129,8 @@ Each app's main config sources its respective `colors/colors.<ext>` exactly once
 ### `wallpaper-picker.sh` (Super+Shift+D)
 
 1. Read current theme from `themes/current`.
-2. Build wallpaper pool (matugen → union; otherwise → current theme's `wallpapers/`).
-3. Show rofi picker with `-show-icons` (file path → thumbnail), current wallpaper marked.
+2. Build wallpaper pool (matugen → union of `themes/*/wallpapers/` plus `${MATUGEN_WALLPAPERS_DIR:-$HOME/Pictures/Wallpapers}`; otherwise → current theme's `wallpapers/`).
+3. Show rofi picker with `-show-icons` and a dedicated wallpaper theme (`~/.config/rofi/wallpaper-picker.rasi`). Thumbnails are generated through `-preview-cmd` (`rofi-thumbnail.sh`) so image cards render at a fixed rectangular aspect.
 4. On selection, persist `<theme>:<selected-path>` to `wallpapers.txt`.
 5. Apply the wallpaper:
    - **If current theme is matugen:** `matugen image <selected-path>` (matugen post-hooks handle reload).

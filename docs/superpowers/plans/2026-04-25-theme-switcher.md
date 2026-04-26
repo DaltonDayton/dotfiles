@@ -26,6 +26,12 @@ All 30 tasks below are **complete and committed on `startover`**. The switcher m
 
 This is a separate authoring effort and warrants its own plan rather than back-fitting tasks into this one. The original meridian sources include per-app palettes that can be used as starting material, but they need translating into the canonical vocabulary defined in `modules/hyprland/files/themes/rose-pine/`.
 
+Post-plan UX follow-ups landed on `startover`:
+
+- `wallpaper-picker.sh` now supports an optional personal pool in matugen mode (`${MATUGEN_WALLPAPERS_DIR:-$HOME/Pictures/Wallpapers}`).
+- Wallpaper picker visuals moved to a dedicated rofi theme (`modules/hyprland/files/rofi/wallpaper-picker.rasi`).
+- Thumbnail rendering is delegated to `rofi-thumbnail.sh` via `rofi -preview-cmd` for fixed-aspect image cards.
+
 ---
 
 ## File Structure
@@ -50,9 +56,13 @@ modules/hyprland/files/themes/
 modules/hyprland/files/hypr/scripts/
 ├── apply-theme.sh                        # workhorse, called by switcher and pickers
 ├── theme-switcher.sh                     # Super+D
-└── wallpaper-picker.sh                   # Super+Shift+D
+├── wallpaper-picker.sh                   # Super+Shift+D
+└── rofi-thumbnail.sh                     # preview-cmd thumbnail generator
 modules/hyprland/files/rofi/
-└── (minimal config dir importing colors/colors.rasi)
+├── config.rasi
+├── wallpaper-picker.rasi
+└── colors/
+    └── .gitkeep
 modules/hyprland/files/swaync/
 └── (minimal config dir importing colors/colors.css)
 modules/hyprland/files/wlogout/
