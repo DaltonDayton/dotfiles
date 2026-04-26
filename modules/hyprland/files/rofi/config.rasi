@@ -4,7 +4,7 @@ configuration {
     icon-theme: "Papirus-Dark";
 }
 
-@import "colors/colors.rasi";
+@import "colors/colors.rasi"
 
 * {
     background-color: @bg0;

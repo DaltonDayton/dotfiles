@@ -65,14 +65,14 @@ if [[ "$mode" == "matugen" ]]; then
   write_one "$HOME/.config/hypr/colors/colors.conf"    'source = ~/.config/hypr/colors/matugen.conf'
   write_one "$HOME/.config/waybar/colors/colors.css"   '@import "matugen.css";'
   write_one "$HOME/.config/kitty/colors/colors.conf"   'include matugen.conf'
-  write_one "$HOME/.config/rofi/colors/colors.rasi"    '@import "matugen.rasi";'
+  write_one "$HOME/.config/rofi/colors/colors.rasi"    '@import "matugen.rasi"'
   write_one "$HOME/.config/swaync/colors/colors.css"   '@import "matugen.css";'
   write_one "$HOME/.config/wlogout/colors/colors.css"  '@import "matugen.css";'
 else
   write_one "$HOME/.config/hypr/colors/colors.conf"    "source = ~/.config/themes/${THEME}/hypr.conf"
   write_one "$HOME/.config/waybar/colors/colors.css"   "@import \"../../themes/${THEME}/waybar.css\";"
   write_one "$HOME/.config/kitty/colors/colors.conf"   "include ~/.config/themes/${THEME}/kitty.conf"
-  write_one "$HOME/.config/rofi/colors/colors.rasi"    "@import \"../../themes/${THEME}/rofi.rasi\";"
+  write_one "$HOME/.config/rofi/colors/colors.rasi"    "@import \"../../themes/${THEME}/rofi.rasi\""
   write_one "$HOME/.config/swaync/colors/colors.css"   "@import \"../../themes/${THEME}/swaync.css\";"
   write_one "$HOME/.config/wlogout/colors/colors.css"  "@import \"../../themes/${THEME}/wlogout.css\";"
 fi
