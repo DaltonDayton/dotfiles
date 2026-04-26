@@ -9,6 +9,13 @@ THEMES_DIR="$HOME/.config/themes"
 STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/themes"
 WALLPAPERS_STATE="$STATE_DIR/wallpapers.txt"
 CURRENT_STATE="$STATE_DIR/current"
+ROFI_THEME="$HOME/.config/rofi/wallpaper-picker.rasi"
+ROFI_THUMBNAIL_PROFILE="r280x158-v1"
+ROFI_THUMBNAIL_CMD="$HOME/.config/hypr/scripts/rofi-thumbnail.sh \"{input}\" \"{output}\" \"{size}\" 280 158"
+rofi_theme_args=()
+if [[ -f "$ROFI_THEME" ]]; then
+  rofi_theme_args=(-theme "$ROFI_THEME")
+fi
 
 if [[ ! -f "$CURRENT_STATE" ]]; then
   notify-send "Wallpaper" "No active theme — run Super+D first" -u critical
@@ -56,19 +63,16 @@ selected_idx=$(
   {
     for i in "${!pool[@]}"; do
       wp="${pool[$i]}"
-      if [[ "$mode" == "matugen" ]]; then
-        theme_part=$(basename "$(dirname "$(dirname "$wp")")")
-        label="$theme_part/$(basename "$wp")"
-      else
-        label="$(basename "$wp")"
-      fi
+      label="$(basename "$wp")"
 
       if [[ "$wp" == "$current_wp" ]]; then
         label="● $label"
       fi
-      printf '%s\0icon\x1f%s\n' "$label" "$wp"
+      printf '%s\0icon\x1fthumbnail://%s?%s\n' "$label" "$wp" "$ROFI_THUMBNAIL_PROFILE"
     done
-  } | rofi -dmenu -i -show-icons -format i -p "Wallpaper"
+  } | rofi -no-config -dmenu -i -show-icons -format i -p "Wallpaper (PgDn/PgUp)" \
+      -preview-cmd "$ROFI_THUMBNAIL_CMD" \
+      "${rofi_theme_args[@]}"
 )
 
 [[ -z "$selected_idx" ]] && exit 0
