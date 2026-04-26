@@ -4,15 +4,20 @@ A Go CLI that declaratively manages the user's Arch Linux setup — packages, do
 
 ## Where things live
 
-- **Design spec:** `docs/superpowers/specs/2026-04-21-quill-design.md`
-- **Implementation plan:** `docs/superpowers/plans/2026-04-21-quill-implementation.md`
+**Code:**
 - **Go binary entry:** `cmd/quill/main.go`
 - **Internal packages:** `internal/{manifest,module,host,template,action,runner,state,tui}`
 - **Modules (dotfile units):** `modules/<name>/module.toml` + `files/` + optional `install.sh`
 - **Host profiles:** `hosts/<hostname>.toml`
 - **Bootstrap entry:** `bootstrap.sh`
 
-Always read the plan before implementing a task — it specifies exact code, file paths, and test shapes.
+**Specs and plans** (always read the plan before implementing a task — it specifies exact code, file paths, and test shapes):
+
+| Feature | Spec | Plan |
+|---|---|---|
+| Quill core (Go CLI, action types, runner, TUI) | `docs/superpowers/specs/2026-04-21-quill-design.md` | `docs/superpowers/plans/2026-04-21-quill-implementation.md` |
+| `hyprland` mega-module (WM, bar, terminal, theming engine) | `docs/superpowers/specs/2026-04-25-hyprland-module-design.md` | `docs/superpowers/plans/2026-04-25-hyprland-module-implementation.md` |
+| Theme switcher (Super+D / Super+Shift+D, indirection layer, matugen-as-theme) | `docs/superpowers/specs/2026-04-25-theme-switcher-design.md` | `docs/superpowers/plans/2026-04-25-theme-switcher.md` |
 
 ## User context
 

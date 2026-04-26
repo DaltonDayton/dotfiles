@@ -1,5 +1,7 @@
 # Theme Switcher — Design
 
+> **Status (2026-04-26):** Mechanism implemented and shipping on `startover`. Two themes ship today (`rose-pine`, `matugen`); the other 9 meridian themes (`catppuccin`, `e-ink`, `everforest-dark`, `gruvbox-dark`, `kanagawa`, `nightfox`, `noir`, `nord-darker`, `tokyo-night`) are pending follow-up authoring work — see the "Status" section in the implementation plan.
+
 ## Context
 
 The user has a working matugen-driven Material You theming pipeline in the `hyprland` module: matugen renders palettes from a wallpaper into `~/.config/<app>/colors/matugen.<ext>` for kitty / waybar / hyprland / GTK / rofi / pywalfox, with post-hooks reloading each app. There's also a parallel set of 10 hand-authored static palettes (catppuccin-mocha, gruvbox-dark, rose-pine, nord, kanagawa, tokyo-night, nightfox, e-ink, monochrome, everforest-dark) sitting in `modules/hyprland/files/waybar/colors/custom/*.css` — currently inert because nothing switches between them.
