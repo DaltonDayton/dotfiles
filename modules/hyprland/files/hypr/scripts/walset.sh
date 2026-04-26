@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export PATH="$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin"
+
 # Directory containing wallpapers
 WALL_DIR="$HOME/Pictures/Wallpapers"
 
