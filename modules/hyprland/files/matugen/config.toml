@@ -35,3 +35,8 @@ post_hook = 'pywalfox update'
 [templates.rofi]
 input_path = '~/.config/matugen/templates/rofi-colors.rasi'
 output_path = '~/.config/rofi/colors/matugen.rasi'
+
+[templates.swaync]
+input_path = '~/.config/matugen/templates/swaync-colors.css'
+output_path = '~/.config/swaync/colors/matugen.css'
+post_hook = 'pkill swaync; swaync >/dev/null 2>&1 &'
