@@ -1,0 +1,19 @@
+name        = "ai"
+description = "Claude Code and opencode — binaries, settings, and customizations"
+tags        = ["dev", "ai"]
+
+[[packages]]
+manager = "pacman"
+names   = ["opencode"]
+
+[[packages]]
+manager = "aur"
+names   = ["claude-code"]
+
+[[symlinks]]
+src = "files/claude/settings.json"
+dst = "~/.claude/settings.json"
+
+[[symlinks]]
+src = "files/opencode/opencode.json"
+dst = "~/.config/opencode/opencode.json"

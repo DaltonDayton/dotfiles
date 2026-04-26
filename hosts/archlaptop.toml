@@ -1,5 +1,5 @@
 name = "archlaptop"
-modules = ["git", "shell", "tmux", "fonts", "asdf", "neovim", "hyprland"]
+modules = ["git", "shell", "tmux", "fonts", "asdf", "neovim", "hyprland", "ai"]
 
 [vars]
 git_email = "50755420+DaltonDayton@users.noreply.github.com"
