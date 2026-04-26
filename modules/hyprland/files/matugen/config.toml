@@ -34,4 +34,4 @@ post_hook = 'pywalfox update'
 
 [templates.rofi]
 input_path = '~/.config/matugen/templates/rofi-colors.rasi'
-output_path = '~/.config/rofi/launchers/shared/matugen.rasi'
+output_path = '~/.config/rofi/colors/matugen.rasi'
