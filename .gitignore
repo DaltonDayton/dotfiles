@@ -6,3 +6,4 @@
 # Rendered .tmpl outputs (BuildActions writes to the stripped-suffix sibling).
 # Add one line per new .tmpl file.
 modules/git/files/.gitconfig
+modules/neovim/files/nvim/lazy-lock.json
