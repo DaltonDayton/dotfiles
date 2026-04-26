@@ -16,11 +16,13 @@ names = [
     "tesseract", "tesseract-data-eng",
     "xdg-utils", "desktop-file-utils", "shared-mime-info", "archlinux-xdg-menu",
     "jq", "btop",
+    "awww",
+    "nwg-look",
 ]
 
 [[packages]]
 manager = "aur"
-names = ["matugen-bin", "bibata-cursor-theme-bin", "grimblast-git"]
+names = ["matugen-bin", "bibata-cursor-theme-bin", "grimblast-git", "python-pywalfox"]
 
 [[symlinks]]
 src = "files/hypr"

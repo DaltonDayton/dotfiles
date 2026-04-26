@@ -11,4 +11,5 @@ names = [
     "noto-fonts-extra",
     "ttf-cascadia-code-nerd",
     "inter-font",
+    "ttf-jetbrains-mono-nerd"
 ]

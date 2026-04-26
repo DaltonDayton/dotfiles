@@ -93,7 +93,7 @@ alias mkdir='mkdir -p'
 eval "$(fzf --zsh)"
 eval "$(starship init zsh)"
 eval "$(atuin init zsh)"
-eval "$(tv init zsh)"
+# eval "$(tv init zsh)"
 eval "$(zoxide init --cmd cd zsh)"
 
 
