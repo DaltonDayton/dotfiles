@@ -99,6 +99,17 @@ if [[ "$mode" == "matugen" ]]; then
   write_one "$HOME/.config/rofi/colors/colors.rasi"    '@import "matugen.rasi"'
   write_one "$HOME/.config/swaync/colors/colors.css"   '@import "matugen.css";'
   write_one "$HOME/.config/wlogout/colors/colors.css"  '@import "matugen.css";'
+
+  # Matugen post-hooks run before these indirection rewrites, so reload here too.
+  hyprctl reload >/dev/null 2>&1 || true
+  pkill -SIGUSR2 waybar 2>/dev/null || true
+  if pids=$(pidof kitty 2>/dev/null) && [[ -n "$pids" ]]; then
+    kill -SIGUSR1 $pids 2>/dev/null || true
+  fi
+  if pgrep -x swaync >/dev/null 2>&1; then
+    pkill swaync 2>/dev/null || true
+    (swaync >/dev/null 2>&1 &)
+  fi
 else
   write_one "$HOME/.config/hypr/colors/colors.conf"    "source = ~/.config/themes/${THEME}/hypr.conf"
   write_one "$HOME/.config/waybar/colors/colors.css"   "@import \"../../themes/${THEME}/waybar.css\";"
