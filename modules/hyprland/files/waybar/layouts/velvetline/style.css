@@ -15,7 +15,7 @@ window#waybar {
 }
 
 tooltip {
-    background: @surface;
+    background: @bg1;
     border: 1px solid rgba(100, 114, 125, 0.5);
 }
 
@@ -45,8 +45,8 @@ tooltip label {
     background-color: #121212;
     margin-right: 10px;
     padding: 0 10px;
-    background-color: @surface;
-    color: @primary;
+    background-color: @bg1;
+    color: @blue;
 }
 
 #power-profiles-daemon {
@@ -56,8 +56,8 @@ tooltip label {
 #workspaces {
     padding: 8px 5px;
     border-radius: 16px;
-    background-color: @surface;
-    color: @primary;
+    background-color: @bg1;
+    color: @blue;
 }
 
 #workspaces button {
@@ -66,12 +66,12 @@ tooltip label {
     border-radius: 50px;
     color: transparent;
     transition: all 0.3s ease-in-out;
-    background-color: @on_secondary;
+    background-color: @grey1;
 }
 
 #workspaces button.active {
-    background-color: @primary;
-    color: @surface;
+    background-color: @blue;
+    color: @bg1;
     min-width: 50px;
     transition: all 0.3s ease-in-out;
     font-size: 13px;
@@ -79,16 +79,16 @@ tooltip label {
 }
 
 #workspaces button:hover {
-    background-color: @secondary;
-    color: @surface;
+    background-color: @purple;
+    color: @bg1;
     border-radius: 16px;
     min-width: 50px;
     background-size: 400% 400%;
 }
 
 #workspaces button.urgent {
-    background-color: @error;
-    color: @surface;
+    background-color: @red;
+    color: @bg1;
     border-radius: 16px;
     min-width: 50px;
     background-size: 400% 400%;

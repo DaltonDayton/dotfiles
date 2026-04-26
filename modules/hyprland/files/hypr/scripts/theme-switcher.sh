@@ -12,7 +12,7 @@ current=""
 
 # Build labeled list: optional display_name from meta.toml, fall back to dir name
 declare -A label_to_dir=()
-mapfile -t dirs < <(find "$THEMES_DIR" -mindepth 1 -maxdepth 1 -type d ! -name '.*' -printf '%f\n' | sort)
+mapfile -t dirs < <(find -L "$THEMES_DIR" -mindepth 1 -maxdepth 1 -type d ! -name '.*' -printf '%f\n' | sort)
 
 menu=""
 for d in "${dirs[@]}"; do

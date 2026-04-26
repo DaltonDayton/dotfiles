@@ -34,7 +34,7 @@ declare -a pool=()
 if [[ "$mode" == "matugen" ]]; then
   # union of every theme's wallpapers/
   while IFS= read -r -d '' f; do pool+=("$f"); done < <(
-    find "$THEMES_DIR" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -print0 | sort -z
+    find -L "$THEMES_DIR" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -print0 | sort -z
   )
 else
   while IFS= read -r -d '' f; do pool+=("$f"); done < <(
@@ -44,7 +44,9 @@ fi
 
 # --- Resolve wallpaper: last-used or first in pool ---------------------------
 wallpaper=""
-saved=$(grep "^${THEME}:" "$WALLPAPERS_STATE" | head -n1 | cut -d':' -f2-)
+saved=""
+saved_line=$(grep -m1 "^${THEME}:" "$WALLPAPERS_STATE" || true)
+[[ -n "$saved_line" ]] && saved="${saved_line#*:}"
 if [[ -n "$saved" && -f "$saved" ]]; then
   wallpaper="$saved"
 elif (( ${#pool[@]} > 0 )); then
@@ -62,6 +64,29 @@ write_one() {
 }
 
 if [[ "$mode" == "matugen" ]]; then
+  if [[ -n "$wallpaper" ]]; then
+    matugen_input="$wallpaper"
+    matugen_tmp=""
+    ext="${wallpaper##*.}"
+    mime=$(file --mime-type -b "$wallpaper" 2>/dev/null || true)
+    if [[ "$mime" == "image/jpeg" && "$ext" != "jpg" && "$ext" != "jpeg" ]]; then
+      matugen_tmp=$(mktemp --suffix=.jpg)
+      cp "$wallpaper" "$matugen_tmp"
+      matugen_input="$matugen_tmp"
+    elif [[ "$mime" == "image/png" && "$ext" != "png" ]]; then
+      matugen_tmp=$(mktemp --suffix=.png)
+      cp "$wallpaper" "$matugen_tmp"
+      matugen_input="$matugen_tmp"
+    fi
+
+    # matugen post-hooks regenerate matugen.* and reload each app
+    if ! matugen image "$matugen_input" --prefer darkness; then
+      [[ -n "$matugen_tmp" ]] && rm -f "$matugen_tmp"
+      exit 1
+    fi
+    [[ -n "$matugen_tmp" ]] && rm -f "$matugen_tmp"
+  fi
+
   write_one "$HOME/.config/hypr/colors/colors.conf"    'source = ~/.config/hypr/colors/matugen.conf'
   write_one "$HOME/.config/waybar/colors/colors.css"   '@import "matugen.css";'
   write_one "$HOME/.config/kitty/colors/colors.conf"   'include matugen.conf'
@@ -75,15 +100,7 @@ else
   write_one "$HOME/.config/rofi/colors/colors.rasi"    "@import \"../../themes/${THEME}/rofi.rasi\""
   write_one "$HOME/.config/swaync/colors/colors.css"   "@import \"../../themes/${THEME}/swaync.css\";"
   write_one "$HOME/.config/wlogout/colors/colors.css"  "@import \"../../themes/${THEME}/wlogout.css\";"
-fi
 
-# --- Wallpaper + reload pipeline ---------------------------------------------
-if [[ "$mode" == "matugen" ]]; then
-  if [[ -n "$wallpaper" ]]; then
-    # matugen post-hooks regenerate matugen.* and reload each app
-    matugen image "$wallpaper"
-  fi
-else
   if [[ -n "$wallpaper" ]]; then
     awww img "$wallpaper" \
       --transition-type center --transition-fps 165 \
@@ -102,4 +119,4 @@ else
 fi
 
 echo "$THEME" > "$CURRENT_STATE"
-notify-send "Theme" "$THEME"
+notify-send "Theme" "$THEME" || true
