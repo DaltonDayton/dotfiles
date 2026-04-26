@@ -244,7 +244,12 @@ bind = $mainMod SHIFT, D, exec, ~/.config/hypr/scripts/wallpaper-picker.sh
 
 ### Existing matugen pipeline
 
-Stays as-is. `modules/hyprland/files/matugen/config.toml` and the templates under `matugen/templates/` are unchanged. The matugen palette files at `~/.config/<app>/colors/matugen.<ext>` keep being matugen's output; the only difference post-this-work is that those files are *referenced* by an indirection rather than being directly sourced from each app's main config.
+Invocation pattern unchanged: the switcher and wallpaper-picker call `matugen image <wallpaper>`, matugen renders templates and runs post-hooks to reload affected apps. Two changes are needed in this work:
+
+1. **All existing templates get rewritten** to emit the canonical variable vocabulary (covered below in "Matugen template rewrites"). They keep emitting Material names alongside as a free hedge.
+2. **`matugen/config.toml` gains two new template sections** (swaync, wlogout) to cover the apps newly in scope, and the existing `[templates.rofi]` `output_path` changes from `~/.config/rofi/launchers/shared/matugen.rasi` to `~/.config/rofi/colors/matugen.rasi` so the indirection from `colors/colors.rasi` resolves correctly.
+
+The matugen palette files at `~/.config/<app>/colors/matugen.<ext>` keep being matugen's output; the only difference post-this-work is that those files are *referenced* by an indirection rather than being directly sourced from each app's main config.
 
 ### Main app config edits (one line each)
 
