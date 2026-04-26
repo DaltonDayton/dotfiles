@@ -1,0 +1,27 @@
+@import "colors/colors.css";
+
+* {
+    background-image: none;
+    box-shadow: none;
+    font-family: "DM Sans", sans-serif;
+    font-size: 18px;
+    color: @fg;
+}
+
+window {
+    background-color: alpha(@bg0, 0.85);
+}
+
+button {
+    border-radius: 12px;
+    border: 2px solid @bg4;
+    background-color: @bg1;
+    margin: 12px;
+    padding: 24px;
+}
+
+button:hover, button:focus {
+    background-color: @bg3;
+    border-color: @blue;
+    outline-style: none;
+}
