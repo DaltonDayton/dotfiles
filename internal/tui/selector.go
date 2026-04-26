@@ -31,9 +31,17 @@ func SelectModules(mods []*module.Module, preselected map[string]bool) ([]string
 	}
 	sort.Strings(tags)
 
-	var chosen []string
-	for _, n := range preselectedOrdered(mods, preselected) {
-		chosen = append(chosen, n)
+	// Each multi-select needs its own backing slice — sharing one across
+	// groups causes huh to clobber selections from earlier groups.
+	chosenByTag := make(map[string]*[]string, len(tags))
+	for _, tag := range tags {
+		init := []string{}
+		for _, m := range groups[tag] {
+			if preselected[m.Name] {
+				init = append(init, m.Name)
+			}
+		}
+		chosenByTag[tag] = &init
 	}
 
 	var fields []huh.Field
@@ -51,23 +59,18 @@ func SelectModules(mods []*module.Module, preselected map[string]bool) ([]string
 		fields = append(fields, huh.NewMultiSelect[string]().
 			Title(Title.Render(tag)).
 			Options(options...).
-			Value(&chosen))
+			Value(chosenByTag[tag]))
 	}
 	form := huh.NewForm(huh.NewGroup(fields...))
 	if err := form.Run(); err != nil {
 		return nil, err
 	}
-	return unique(chosen), nil
-}
 
-func preselectedOrdered(mods []*module.Module, pre map[string]bool) []string {
-	var out []string
-	for _, m := range mods {
-		if pre[m.Name] {
-			out = append(out, m.Name)
-		}
+	var all []string
+	for _, tag := range tags {
+		all = append(all, *chosenByTag[tag]...)
 	}
-	return out
+	return unique(all), nil
 }
 
 func unique(xs []string) []string {

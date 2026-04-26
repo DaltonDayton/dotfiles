@@ -75,7 +75,11 @@ func newInstallCmd() *cobra.Command {
 			for _, m := range ordered {
 				names = append(names, m.Name)
 			}
-			prog := tea.NewProgram(tui.NewProgress(names, events))
+			counts := make(map[string]int, len(plan))
+			for _, p := range plan {
+				counts[p.Module.Name] = len(p.Actions)
+			}
+			prog := tea.NewProgram(tui.NewProgress(names, counts, events))
 
 			go func() {
 				defer close(events)
