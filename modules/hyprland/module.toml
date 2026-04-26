@@ -8,7 +8,7 @@ manager = "pacman"
 names = [
     "hyprland", "hyprpaper", "hypridle", "hyprlock", "hyprlauncher",
     "hyprpicker", "hyprpolkitagent", "qt5-wayland", "qt6-wayland",
-    "waybar", "rofi", "kitty",
+    "waybar", "rofi", "kitty", "swaync", "wlogout",
     "pipewire-pulse", "pavucontrol",
     "bluez", "bluez-utils", "blueman",
     "grim", "slurp", "satty", "wl-clipboard", "wf-recorder",
@@ -43,6 +43,22 @@ dst = "~/.config/matugen"
 [[symlinks]]
 src = "files/wallpapers"
 dst = "~/.config/wallpapers"
+
+[[symlinks]]
+src = "files/themes"
+dst = "~/.config/themes"
+
+[[symlinks]]
+src = "files/rofi"
+dst = "~/.config/rofi"
+
+[[symlinks]]
+src = "files/swaync"
+dst = "~/.config/swaync"
+
+[[symlinks]]
+src = "files/wlogout"
+dst = "~/.config/wlogout"
 
 [[files]]
 dst = "~/.config/cliphist/config"
