@@ -14,3 +14,9 @@ curl -fsSL https://raw.githubusercontent.com/DaltonDayton/dotfiles/main/bootstra
 ```
 
 (Not yet published — see the plan for current status.)
+
+### Bootstrap from the `startover` branch (current WIP)
+
+```sh
+DOTFILES_BRANCH=startover bash <(curl -fsSL https://raw.githubusercontent.com/DaltonDayton/dotfiles/startover/bootstrap.sh)
+```
