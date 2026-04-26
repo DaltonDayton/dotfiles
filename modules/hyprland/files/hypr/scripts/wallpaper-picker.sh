@@ -44,28 +44,31 @@ mkdir -p "$STATE_DIR"
 touch "$WALLPAPERS_STATE"
 current_wp=$(grep "^${THEME}:" "$WALLPAPERS_STATE" | head -n1 | cut -d':' -f2-)
 
-# Build rofi menu with thumbnails
+# Build rofi menu + label->path map. In matugen mode the pool unions
+# multiple theme dirs, so prefix the label with the theme name to avoid
+# basename collisions (two themes can both ship a `default.png`).
+declare -A label_to_path=()
 menu=""
 for wp in "${pool[@]}"; do
-  base=$(basename "$wp")
-  if [[ "$wp" == "$current_wp" ]]; then
-    menu+="● ${base}"$'\0'"icon"$'\x1f'"${wp}"$'\n'
+  if [[ "$mode" == "matugen" ]]; then
+    theme_part=$(basename "$(dirname "$(dirname "$wp")")")
+    label="$theme_part/$(basename "$wp")"
   else
-    menu+="${base}"$'\0'"icon"$'\x1f'"${wp}"$'\n'
+    label="$(basename "$wp")"
+  fi
+  label_to_path["$label"]="$wp"
+  if [[ "$wp" == "$current_wp" ]]; then
+    menu+="● ${label}"$'\0'"icon"$'\x1f'"${wp}"$'\n'
+  else
+    menu+="${label}"$'\0'"icon"$'\x1f'"${wp}"$'\n'
   fi
 done
 
-selected=$(printf '%b' "$menu" | rofi -dmenu -i -show-icons -p "Wallpaper")
+selected=$(printf '%s' "$menu" | rofi -dmenu -i -show-icons -p "Wallpaper")
 [[ -z "$selected" ]] && exit 0
 selected="${selected#● }"
 
-# Resolve full path
-selected_path=""
-for wp in "${pool[@]}"; do
-  if [[ "$(basename "$wp")" == "$selected" ]]; then
-    selected_path="$wp"; break
-  fi
-done
+selected_path="${label_to_path[$selected]:-}"
 [[ -z "$selected_path" ]] && { notify-send "Wallpaper" "Could not resolve: $selected" -u critical; exit 1; }
 
 # Persist
