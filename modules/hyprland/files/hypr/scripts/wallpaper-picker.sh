@@ -26,8 +26,14 @@ fi
 # Build pool
 declare -a pool=()
 if [[ "$mode" == "matugen" ]]; then
+  matugen_extra_dir="${MATUGEN_WALLPAPERS_DIR:-$HOME/Pictures/Wallpapers}"
   while IFS= read -r -d '' f; do pool+=("$f"); done < <(
-    find "$THEMES_DIR" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -print0 | sort -z
+    {
+      find -L "$THEMES_DIR" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -print0
+      if [[ -d "$matugen_extra_dir" ]]; then
+        find -L "$matugen_extra_dir" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -print0
+      fi
+    } | sort -zu
   )
 else
   while IFS= read -r -d '' f; do pool+=("$f"); done < <(
@@ -44,32 +50,30 @@ mkdir -p "$STATE_DIR"
 touch "$WALLPAPERS_STATE"
 current_wp=$(grep "^${THEME}:" "$WALLPAPERS_STATE" | head -n1 | cut -d':' -f2-)
 
-# Build rofi menu + label->path map. In matugen mode the pool unions
-# multiple theme dirs, so prefix the label with the theme name to avoid
-# basename collisions (two themes can both ship a `default.png`).
-declare -A label_to_path=()
-menu=""
-for wp in "${pool[@]}"; do
-  if [[ "$mode" == "matugen" ]]; then
-    theme_part=$(basename "$(dirname "$(dirname "$wp")")")
-    label="$theme_part/$(basename "$wp")"
-  else
-    label="$(basename "$wp")"
-  fi
-  label_to_path["$label"]="$wp"
-  if [[ "$wp" == "$current_wp" ]]; then
-    menu+="● ${label}"$'\0'"icon"$'\x1f'"${wp}"$'\n'
-  else
-    menu+="${label}"$'\0'"icon"$'\x1f'"${wp}"$'\n'
-  fi
-done
+# Build rofi rows using -format i so selection resolves by index. This avoids
+# relying on NUL bytes in shell variables (bash strings cannot hold them).
+selected_idx=$(
+  {
+    for i in "${!pool[@]}"; do
+      wp="${pool[$i]}"
+      if [[ "$mode" == "matugen" ]]; then
+        theme_part=$(basename "$(dirname "$(dirname "$wp")")")
+        label="$theme_part/$(basename "$wp")"
+      else
+        label="$(basename "$wp")"
+      fi
 
-selected=$(printf '%s' "$menu" | rofi -dmenu -i -show-icons -p "Wallpaper")
-[[ -z "$selected" ]] && exit 0
-selected="${selected#● }"
+      if [[ "$wp" == "$current_wp" ]]; then
+        label="● $label"
+      fi
+      printf '%s\0icon\x1f%s\n' "$label" "$wp"
+    done
+  } | rofi -dmenu -i -show-icons -format i -p "Wallpaper"
+)
 
-selected_path="${label_to_path[$selected]:-}"
-[[ -z "$selected_path" ]] && { notify-send "Wallpaper" "Could not resolve: $selected" -u critical; exit 1; }
+[[ -z "$selected_idx" ]] && exit 0
+selected_path="${pool[$selected_idx]:-}"
+[[ -z "$selected_path" ]] && { notify-send "Wallpaper" "Could not resolve selection index: $selected_idx" -u critical; exit 1; }
 
 # Persist
 sed -i "/^${THEME}:/d" "$WALLPAPERS_STATE"
@@ -77,7 +81,26 @@ printf '%s:%s\n' "$THEME" "$selected_path" >> "$WALLPAPERS_STATE"
 
 # Apply
 if [[ "$mode" == "matugen" ]]; then
-  matugen image "$selected_path"
+  matugen_input="$selected_path"
+  matugen_tmp=""
+  ext="${selected_path##*.}"
+  mime=$(file --mime-type -b "$selected_path" 2>/dev/null || true)
+  if [[ "$mime" == "image/jpeg" && "$ext" != "jpg" && "$ext" != "jpeg" ]]; then
+    matugen_tmp=$(mktemp --suffix=.jpg)
+    cp "$selected_path" "$matugen_tmp"
+    matugen_input="$matugen_tmp"
+  elif [[ "$mime" == "image/png" && "$ext" != "png" ]]; then
+    matugen_tmp=$(mktemp --suffix=.png)
+    cp "$selected_path" "$matugen_tmp"
+    matugen_input="$matugen_tmp"
+  fi
+
+  if ! matugen image "$matugen_input" --prefer darkness; then
+    [[ -n "$matugen_tmp" ]] && rm -f "$matugen_tmp"
+    notify-send "Wallpaper" "Matugen failed for $(basename "$selected_path")" -u critical
+    exit 1
+  fi
+  [[ -n "$matugen_tmp" ]] && rm -f "$matugen_tmp"
 else
   awww img "$selected_path" \
     --transition-type wipe --transition-fps 165 \

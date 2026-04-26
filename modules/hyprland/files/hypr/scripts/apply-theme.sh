@@ -32,9 +32,15 @@ fi
 # --- Build wallpaper pool -----------------------------------------------------
 declare -a pool=()
 if [[ "$mode" == "matugen" ]]; then
-  # union of every theme's wallpapers/
+  # union of every theme's wallpapers/ + optional personal wallpaper dir
+  matugen_extra_dir="${MATUGEN_WALLPAPERS_DIR:-$HOME/Pictures/Wallpapers}"
   while IFS= read -r -d '' f; do pool+=("$f"); done < <(
-    find -L "$THEMES_DIR" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -print0 | sort -z
+    {
+      find -L "$THEMES_DIR" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -print0
+      if [[ -d "$matugen_extra_dir" ]]; then
+        find -L "$matugen_extra_dir" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -print0
+      fi
+    } | sort -zu
   )
 else
   while IFS= read -r -d '' f; do pool+=("$f"); done < <(

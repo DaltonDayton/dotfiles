@@ -1,6 +1,5 @@
 [config.wallpaper]
-command = "awww"
-arguments = ["img", "--transition-type", "center", "--transition-fps", "165","--transition-step", "30", "--transition-duration", "2"]
+command = "awww img '{{ image }}' --transition-type center --transition-fps 165 --transition-step 30 --transition-duration 2"
 set = true
 
 [templates.kitty]

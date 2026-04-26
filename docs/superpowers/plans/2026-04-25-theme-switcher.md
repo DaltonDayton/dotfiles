@@ -14,14 +14,15 @@
 
 ## Status (2026-04-26)
 
-All 30 tasks below are **complete and committed on `startover`**. The switcher mechanism, indirection layer, both pickers, the canonical-vocabulary matugen templates, and the install-time seeding all work. Two themes ship with this plan:
+All 30 tasks below are **complete and committed on `startover`**. The switcher mechanism, indirection layer, both pickers, the canonical-vocabulary matugen templates, and the install-time seeding all work. Three themes currently ship:
 
 - `rose-pine` — full reference bundle (palette × 6 apps + wallpapers)
+- `catppuccin` — full static bundle (palette × 6 apps + wallpapers)
 - `matugen` — Material You mode (`meta.toml` marker; palette is generated from the active wallpaper)
 
 **Pending follow-up — port the remaining themes from `meridian`.** The user's source repo at `~/Downloads/hypraccelerator/theme-switchers/.config/colorschemes-v2/` contains 9 additional static themes that were intentionally deferred (see "File Structure" note below). Each port is mechanical from the rose-pine reference: author the 6 palette files (`hypr.conf`, `kitty.conf`, `waybar.css`, `rofi.rasi`, `swaync.css`, `wlogout.css`) using the canonical vocabulary, drop wallpapers in `wallpapers/`, write `meta.toml`. Themes to port:
 
-`catppuccin`, `e-ink`, `everforest-dark`, `gruvbox-dark`, `kanagawa`, `nightfox`, `noir`, `nord-darker`, `tokyo-night`
+`e-ink`, `everforest-dark`, `gruvbox-dark`, `kanagawa`, `nightfox`, `noir`, `nord-darker`, `tokyo-night`
 
 This is a separate authoring effort and warrants its own plan rather than back-fitting tasks into this one. The original meridian sources include per-app palettes that can be used as starting material, but they need translating into the canonical vocabulary defined in `modules/hyprland/files/themes/rose-pine/`.
 
@@ -83,7 +84,7 @@ modules/hyprland/files/waybar/colors/colors.css           # replaced by install.
 modules/hyprland/files/waybar/colors/custom/*.css         # 10 files; rose-pine.css moves into themes/rose-pine/waybar.css, others deleted
 ```
 
-The other 9 static themes (catppuccin-mocha, gruvbox-dark, kanagawa, tokyo-night, nightfox, everforest-dark, e-ink, monochrome, nord) are deleted as part of this work because their palettes only existed for waybar — they'd be partial themes after this change. Adding them back as full themes (all 6 palette files + wallpapers each) is a follow-up authoring task, mechanical from the rose-pine reference.
+The remaining 8 static themes (`e-ink`, `everforest-dark`, `gruvbox-dark`, `kanagawa`, `nightfox`, `noir`, `nord-darker`, `tokyo-night`) are follow-up authoring work. Each is mechanical from the rose-pine/catppuccin references: add all 6 palette files plus wallpapers.
 
 ---
 

@@ -1,6 +1,6 @@
 # Theme Switcher — Design
 
-> **Status (2026-04-26):** Mechanism implemented and shipping on `startover`. Two themes ship today (`rose-pine`, `matugen`); the other 9 meridian themes (`catppuccin`, `e-ink`, `everforest-dark`, `gruvbox-dark`, `kanagawa`, `nightfox`, `noir`, `nord-darker`, `tokyo-night`) are pending follow-up authoring work — see the "Status" section in the implementation plan.
+> **Status (2026-04-26):** Mechanism implemented and shipping on `startover`. Three themes ship today (`rose-pine`, `catppuccin`, `matugen`); the other 8 meridian themes (`e-ink`, `everforest-dark`, `gruvbox-dark`, `kanagawa`, `nightfox`, `noir`, `nord-darker`, `tokyo-night`) are pending follow-up authoring work — see the "Status" section in the implementation plan.
 
 ## Context
 
