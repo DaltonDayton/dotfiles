@@ -32,9 +32,9 @@ Obsolete under the new architecture:
 
 | # | Chunk | Status | Commit |
 |---|---|---|---|
-| 1 | `ocr-screenshot.sh` | ☑ done | (pending) |
-| 2 | `songdetail.sh` | ☐ todo | — |
-| 3 | Extract `keybindings.conf` from `hyprland.conf` | ☐ todo | — |
+| 1 | `ocr-screenshot.sh` | ☑ done | `5a506f5` (bundled w/ aur cleanup) |
+| 2 | `songdetail.sh` | ☒ skipped | dead code: 0 callers, superseded by `mediaplayer.py` |
+| 3 | Extract `keybindings.conf` from `hyprland.conf` | ☑ done | (pending) |
 | 4 | Extract `windowrules.conf` from `hyprland.conf` | ☐ todo | — |
 | 5 | Add `hypridle.conf` | ☐ todo | — |
 | 6 | Device-keyed monitor variants | ☐ todo | — |
