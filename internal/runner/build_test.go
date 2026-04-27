@@ -70,42 +70,33 @@ func TestBuildActions_rendersTemplateSymlink(t *testing.T) {
 	}
 }
 
-func TestBuildActions_aurManagerResolvesToHostHelper(t *testing.T) {
-	m := &module.Module{
-		Dir: "/tmp",
-		Module: &manifest.Module{
-			Name:     "asdf",
-			Packages: []manifest.Packages{{Manager: "aur", Names: []string{"asdf-vm"}}},
-		},
+func TestBuildActions_managerDefaultsToYay(t *testing.T) {
+	cases := map[string]string{
+		"":       "yay", // unset → default to yay (handles repos + AUR)
+		"aur":    "yay", // logical alias kept for module readability
+		"pacman": "pacman",
+		"yay":    "yay",
 	}
-	host := &manifest.Host{Name: "h", AURHelper: "paru"}
-	acts, err := BuildActions(m, host)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(acts) != 1 {
-		t.Fatalf("got %d, want 1", len(acts))
-	}
-	pkg, ok := acts[0].(*action.Packages)
-	if !ok {
-		t.Fatalf("got %T, want *action.Packages", acts[0])
-	}
-	if pkg.Manager != "paru" {
-		t.Errorf("Manager = %q, want paru", pkg.Manager)
-	}
-}
-
-func TestBuildActions_aurManagerWithoutHostHelperErrors(t *testing.T) {
-	m := &module.Module{
-		Dir: "/tmp",
-		Module: &manifest.Module{
-			Name:     "asdf",
-			Packages: []manifest.Packages{{Manager: "aur", Names: []string{"asdf-vm"}}},
-		},
-	}
-	host := &manifest.Host{Name: "h"}
-	if _, err := BuildActions(m, host); err == nil {
-		t.Fatal("expected error when host has no aur_helper")
+	for input, want := range cases {
+		m := &module.Module{
+			Dir: "/tmp",
+			Module: &manifest.Module{
+				Name:     "ex",
+				Packages: []manifest.Packages{{Manager: input, Names: []string{"x"}}},
+			},
+		}
+		host := &manifest.Host{Name: "h"}
+		acts, err := BuildActions(m, host)
+		if err != nil {
+			t.Fatalf("input=%q: %v", input, err)
+		}
+		pkg, ok := acts[0].(*action.Packages)
+		if !ok {
+			t.Fatalf("input=%q: got %T", input, acts[0])
+		}
+		if pkg.Manager != want {
+			t.Errorf("input=%q: Manager = %q, want %q", input, pkg.Manager, want)
+		}
 	}
 }
 

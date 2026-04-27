@@ -32,7 +32,7 @@ func newApplyCmd() *cobra.Command {
 					return err
 				}
 			}
-			if err := ensureAURHelpers(); err != nil {
+			if err := ensureAURHelper(); err != nil {
 				return err
 			}
 

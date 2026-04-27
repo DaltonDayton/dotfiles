@@ -57,7 +57,6 @@ func TestParseHost_happyPath(t *testing.T) {
 	path := filepath.Join(dir, "laptop.toml")
 	content := `
 name = "laptop"
-aur_helper = "paru"
 modules = ["git", "zsh"]
 
 [vars]
@@ -73,9 +72,6 @@ monitor = "eDP-1,preferred,auto,1.0"
 	}
 	if h.Name != "laptop" {
 		t.Errorf("Name = %q, want laptop", h.Name)
-	}
-	if h.AURHelper != "paru" {
-		t.Errorf("AURHelper = %q, want paru", h.AURHelper)
 	}
 	if h.Vars["monitor"] == "" {
 		t.Errorf("Vars = %+v", h.Vars)
@@ -95,19 +91,5 @@ func TestParseHost_emptyVarsMapIsNonNil(t *testing.T) {
 	// panic on write, and forcing it non-nil lets callers append freely.
 	if h.Vars == nil {
 		t.Error("Vars map should be non-nil even when TOML omits [vars]")
-	}
-}
-
-func TestParseHost_aurHelperDefaultsToParu(t *testing.T) {
-	dir := t.TempDir()
-	path := filepath.Join(dir, "minimal.toml")
-	os.WriteFile(path, []byte(`name = "minimal"`), 0o644)
-
-	h, err := ParseHost(path)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if h.AURHelper != "paru" {
-		t.Errorf("AURHelper = %q, want paru (default)", h.AURHelper)
 	}
 }

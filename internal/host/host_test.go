@@ -10,7 +10,6 @@ func TestLoad_byHostname(t *testing.T) {
 	dir := t.TempDir()
 	os.WriteFile(filepath.Join(dir, "laptop.toml"), []byte(`
 name = "laptop"
-aur_helper = "paru"
 modules = ["git"]
 `), 0o644)
 

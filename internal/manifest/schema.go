@@ -19,7 +19,12 @@ type Module struct {
 }
 
 type Packages struct {
-	Manager string   `toml:"manager"` // "pacman" | "paru" | "yay" | "flatpak"
+	// Manager is "pacman" | "aur" | "yay" | "flatpak". Optional — empty
+	// defaults to "yay", which handles both official repos and AUR. Use
+	// "pacman" to force official-repo-only (faster, no AUR network round
+	// trip), or "aur" to flag AUR-sourced packages explicitly. "aur" is a
+	// logical alias that resolves to yay.
+	Manager string   `toml:"manager"`
 	Names   []string `toml:"names"`
 	Hosts   []string `toml:"hosts"`
 }
@@ -59,8 +64,7 @@ type Directory struct {
 
 // Host mirrors hosts/<name>.toml.
 type Host struct {
-	Name      string            `toml:"name"`
-	AURHelper string            `toml:"aur_helper"`
-	Modules   []string          `toml:"modules"`
-	Vars      map[string]string `toml:"vars"`
+	Name    string            `toml:"name"`
+	Modules []string          `toml:"modules"`
+	Vars    map[string]string `toml:"vars"`
 }

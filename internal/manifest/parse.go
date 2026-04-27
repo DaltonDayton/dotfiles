@@ -30,11 +30,5 @@ func ParseHost(path string) (*Host, error) {
 	if h.Vars == nil {
 		h.Vars = map[string]string{}
 	}
-	if h.AURHelper == "" {
-		// Default AUR helper. Both paru and yay are installed during
-		// pre-flight regardless; this field only chooses which one resolves
-		// `manager = "aur"` in module.toml.
-		h.AURHelper = "paru"
-	}
 	return &h, nil
 }

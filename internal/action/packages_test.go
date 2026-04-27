@@ -72,7 +72,6 @@ func TestPackages_satisfiesActionInterface(t *testing.T) {
 func TestPackages_NeedsSudo(t *testing.T) {
 	cases := map[string]bool{
 		"pacman":  true,
-		"paru":    true,
 		"yay":     true,
 		"flatpak": false,
 		"unknown": false,

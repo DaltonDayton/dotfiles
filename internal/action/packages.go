@@ -18,7 +18,6 @@ type PackageDriver interface {
 // manager calls.
 var pkgDrivers = map[string]PackageDriver{
 	"pacman":  &pacmanDriver{},
-	"paru":    &paruDriver{},
 	"yay":     &yayDriver{},
 	"flatpak": &flatpakDriver{},
 }
@@ -64,7 +63,7 @@ func (p *Packages) Check() (bool, error) {
 // control to the TUI.
 func (p *Packages) NeedsSudo() bool {
 	switch p.Manager {
-	case "pacman", "paru", "yay":
+	case "pacman", "yay":
 		return true
 	}
 	return false
@@ -111,20 +110,10 @@ func (pacmanDriver) Install(names []string) error {
 	return runSudo(args...)
 }
 
-type paruDriver struct{}
-
-func (paruDriver) IsInstalled(name string) (bool, error) {
-	return pacmanDriver{}.IsInstalled(name) // paru reads the pacman DB
-}
-func (paruDriver) Install(names []string) error {
-	args := append([]string{"-S", "--needed", "--noconfirm"}, names...)
-	return exec.Command("paru", args...).Run()
-}
-
 type yayDriver struct{}
 
 func (yayDriver) IsInstalled(name string) (bool, error) {
-	return pacmanDriver{}.IsInstalled(name)
+	return pacmanDriver{}.IsInstalled(name) // yay reads the pacman DB
 }
 func (yayDriver) Install(names []string) error {
 	args := append([]string{"-S", "--needed", "--noconfirm"}, names...)

@@ -64,7 +64,7 @@
       "Bash(rm:*)"
     ]
   },
-  "model": "opus",
+  "model": "opus[1m]",
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
@@ -81,5 +81,6 @@
   "sandbox": {
     "enabled": true
   },
-  "autoMemoryEnabled": true
+  "autoMemoryEnabled": true,
+  "theme": "dark"
 }

@@ -8,12 +8,12 @@ manager = "pacman"
 names = [
     "hyprland", "hyprpaper", "hypridle", "hyprlock", "hyprlauncher",
     "hyprpicker", "hyprpolkitagent", "qt5-wayland", "qt6-wayland",
-    "waybar", "rofi", "kitty", "swaync", "wlogout",
+    "waybar", "rofi", "kitty", "swaync",
     "pipewire-pulse", "pavucontrol",
     "bluez", "bluez-utils", "blueman",
     "grim", "slurp", "satty", "wl-clipboard", "wf-recorder",
     "cliphist",
-    "tesseract", "tesseract-data-eng",
+    "tesseract", "tesseract-data-eng", "libnotify",
     "xdg-utils", "desktop-file-utils", "shared-mime-info", "archlinux-xdg-menu",
     "jq", "btop",
     "awww",
@@ -22,7 +22,7 @@ names = [
 
 [[packages]]
 manager = "aur"
-names = ["matugen-bin", "bibata-cursor-theme-bin", "grimblast-git", "python-pywalfox"]
+names = ["matugen-bin", "bibata-cursor-theme-bin", "grimblast-git", "python-pywalfox", "wlogout"]
 
 [[symlinks]]
 src = "files/hypr"
