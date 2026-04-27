@@ -65,17 +65,21 @@ Order is dependencies-first, smallest-blast-radius-first. Easy to reorder.
 
 ### Tier 2 — refactor target's `hyprland.conf` into pieces
 
-Current target's `files/hypr/hyprland.conf` is 346 lines (everything in one file). Source split it into focused files. We'll do the same.
+Treat `arch/modules/hyprland/hypr/` as the source of truth for Hyprland behavior. The seed content copied from `~/.config/hypr_new/` / `startover` was only a scaffold and must not win if it conflicts with the working `arch/` config.
 
 **3. Extract `keybindings.conf`** (~259 source lines as reference)
-- Pull all `bind = ...` blocks out of target `files/hypr/hyprland.conf` into `files/hypr/keybindings.conf`. Source the new file via `source = ./keybindings.conf` in the parent.
-- Review: reconcile target's bindings (theme switcher chord, wallpaper picker) against source's set. Target's bindings are authoritative where they exist; pull missing ones from source individually.
+- Use `arch/modules/hyprland/hypr/keybindings.conf` as the baseline, not the default `startover` file.
+- Port the full working bind set into `files/hypr/keybindings.conf`, then apply only the intentional deltas required by the new module shape:
+  - keep `Super+D` and `Super+Shift+D` pointing at `~/.config/hypr/scripts/{theme-switcher,wallpaper-picker}.sh`
+  - update legacy `Scripts/` paths to lowercase `scripts/`
+  - leave voxtype-related binds deferred until the voxtype config/scripts/submap land
+- Source the new file via `source = ./keybindings.conf` only after any variables it uses (`$terminal`, `$fileManager`, `$menu`) are defined.
 
 **4. Extract `windowrules.conf`** (~106 source lines as reference)
-- Same pattern: pull `windowrule`/`windowrulev2` blocks into `files/hypr/windowrules.conf`, source from parent.
+- Port `arch/modules/hyprland/hypr/windowrules.conf` directly into `files/hypr/windowrules.conf` and source it from the parent config.
 
 **5. Add `hypridle.conf`** (29 source lines)
-- New file `files/hypr/hypridle.conf`. Add `hypridle` package to `module.toml` and an `exec-once = hypridle` line in `hyprland.conf` (it's a user-session daemon, not a systemd service).
+- New file `files/hypr/hypridle.conf`, copied from the working `arch` setup and then adapted only if the new module shape requires it. Add `hypridle` package to `module.toml` and an `exec-once = hypridle` line in `hyprland.conf` (it's a user-session daemon, not a systemd service).
 
 ### Tier 3 — device-keyed monitor variants
 
