@@ -34,13 +34,14 @@ Obsolete under the new architecture:
 |---|---|---|---|
 | 1 | `ocr-screenshot.sh` | ☑ done | `5a506f5` (bundled w/ aur cleanup) |
 | 2 | `songdetail.sh` | ☒ skipped | dead code: 0 callers, superseded by `mediaplayer.py` |
-| 3 | Extract `keybindings.conf` from `hyprland.conf` | ☑ done | (pending) |
-| 4 | Extract `windowrules.conf` from `hyprland.conf` | ☐ todo | — |
-| 5 | Add `hypridle.conf` | ☐ todo | — |
+| 3 | Extract `keybindings.conf` from `hyprland.conf` | ☑ done | `10d3092` |
+| 3.5 | Extract `programs.conf` from `hyprland.conf` | ☑ done | `94963c4` (added beyond original plan) |
+| 4 | Extract `windowrules.conf` from `hyprland.conf` | ☑ done | `e4f9139` |
+| 5 | Add `hypridle.conf` | ☑ done | `e4f9139` (file + `hypridle` pkg + `exec-once`) |
 | 6 | Device-keyed monitor variants | ☐ todo | — |
-| 7 | Bibata cursor theme bundle | ☐ todo | — |
+| 7 | Bibata cursor theme bundle | ☑ done via AUR | `bibata-cursor-theme-bin` pkg + env vars; no bundled `files/cursors/` |
 | 8 | voxtype configs | ☐ todo | — |
-| 9 | `voxtype-clipboard.sh` | ☐ todo | — |
+| 9 | `voxtype-clipboard.sh` | ☐ todo | script staged untracked; land with 8 + 10 |
 | 10 | voxtype submap (`hypr/conf.d/voxtype-submap.conf`) | ☐ todo | — |
 | 11 | `sddm.conf` | ☐ todo | — |
 | 12 | `xorg-laptop.conf` (only if not Wayland-only) | ☐ todo | — |
