@@ -14,17 +14,12 @@
 
 ## Status (2026-04-26)
 
-All 30 tasks below are **complete and committed on `startover`**. The switcher mechanism, indirection layer, both pickers, the canonical-vocabulary matugen templates, and the install-time seeding all work. Three themes currently ship:
+All 30 tasks below are **complete and committed on `startover`**. The switcher mechanism, indirection layer, both pickers, the canonical-vocabulary matugen templates, and the install-time seeding all work. The current repo ships 11 theme bundles total (10 static + 1 matugen):
 
-- `rose-pine` — full reference bundle (palette × 6 apps + wallpapers)
-- `catppuccin` — full static bundle (palette × 6 apps + wallpapers)
-- `matugen` — Material You mode (`meta.toml` marker; palette is generated from the active wallpaper)
+- Static: `catppuccin`, `e-ink`, `everforest-dark`, `gruvbox-dark`, `kanagawa`, `nightfox`, `noir`, `nord-darker`, `rose-pine`, `tokyo-night`
+- Dynamic: `matugen` (`meta.toml` marker; palette is generated from the active wallpaper)
 
-**Pending follow-up — port the remaining themes from `meridian`.** The user's source repo at `~/Downloads/hypraccelerator/theme-switchers/.config/colorschemes-v2/` contains 9 additional static themes that were intentionally deferred (see "File Structure" note below). Each port is mechanical from the rose-pine reference: author the 6 palette files (`hypr.conf`, `kitty.conf`, `waybar.css`, `rofi.rasi`, `swaync.css`, `wlogout.css`) using the canonical vocabulary, drop wallpapers in `wallpapers/`, write `meta.toml`. Themes to port:
-
-`e-ink`, `everforest-dark`, `gruvbox-dark`, `kanagawa`, `nightfox`, `noir`, `nord-darker`, `tokyo-night`
-
-This is a separate authoring effort and warrants its own plan rather than back-fitting tasks into this one. The original meridian sources include per-app palettes that can be used as starting material, but they need translating into the canonical vocabulary defined in `modules/hyprland/files/themes/rose-pine/`.
+The earlier "remaining themes" follow-up from this plan has been completed in-repo.
 
 Post-plan UX follow-ups landed on `startover`:
 
@@ -94,7 +89,7 @@ modules/hyprland/files/waybar/colors/colors.css           # replaced by install.
 modules/hyprland/files/waybar/colors/custom/*.css         # 10 files; rose-pine.css moves into themes/rose-pine/waybar.css, others deleted
 ```
 
-The remaining 8 static themes (`e-ink`, `everforest-dark`, `gruvbox-dark`, `kanagawa`, `nightfox`, `noir`, `nord-darker`, `tokyo-night`) are follow-up authoring work. Each is mechanical from the rose-pine/catppuccin references: add all 6 palette files plus wallpapers.
+Static theme authoring noted above has already landed; keep this plan as historical implementation detail.
 
 ---
 
@@ -1733,6 +1728,8 @@ If smoke testing surfaced any fixes, commit them with descriptive messages. Othe
 
 ## Follow-up work (not in this plan)
 
-- Author the other 9 static themes (catppuccin-mocha, gruvbox-dark, kanagawa, tokyo-night, nightfox, everforest-dark, e-ink, monochrome, nord) as full bundles. Mechanical copy from rose-pine, swap the hex values per theme.
+- Add any net-new static themes (for example `monochrome`/`nord` variants) as full bundles using the canonical palette vocabulary and full 6-app coverage.
 - Refine rofi/swaync/wlogout `style.css` files to taste.
 - Consider a `themes/` migration helper script if author burden becomes annoying.
+- Revisit Waybar layouts (`layouts/alchemy`, `layouts/subtle`, `layouts/ultra_minimal`, `layouts/velvetline`, `layouts/waybar-v1`, `layouts/waybar-v2`): audit module parity and theme behavior, then decide whether to standardize one default or keep multiple curated options.
+- If multiple Waybar layouts remain, add a layout switcher keybind (e.g., rofi picker + symlink flip for `~/.config/waybar/config.jsonc` and `~/.config/waybar/style.css`, then Waybar restart).

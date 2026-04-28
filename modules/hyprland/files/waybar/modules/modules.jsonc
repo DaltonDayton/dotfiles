@@ -37,16 +37,44 @@
     },
 
     "network": {
-        "interface": "wlo1",
         "format": "{ifname}",
         "format-wifi": "{essid} ",
         "format-ethernet": "{ipaddr}/{cidr} 󰊗",
-        "format-disconnected": "", //An empty format will hide the module.
+        "format-disconnected": "󰤮 Offline",
         "tooltip-format": "{ifname} via {gwaddr} 󰊗",
         "tooltip-format-wifi": "{essid} ({signalStrength}%) ",
         "tooltip-format-ethernet": "{ifname} ",
         "tooltip-format-disconnected": "Disconnected",
         "max-length": 50
+    },
+
+    "bluetooth": {
+        "format": "󰂯",
+        "format-disabled": "󰂲",
+        "format-off": "󰂲",
+        "format-connected": "󰂱 {device_alias}",
+        "format-discoverable": "󰂰",
+        "tooltip-format": "{controller_alias}",
+        "tooltip-format-connected": "Controller: {controller_alias}\nConnected devices:\n{device_enumerate}",
+        "tooltip-format-enumerate-connected": "- {device_alias} ({device_address})",
+        "on-click": "blueman-manager"
+    },
+
+    "idle_inhibitor": {
+        "format": "{icon}",
+        "format-icons": {
+            "activated": "󰅶",
+            "deactivated": "󰾪"
+        },
+        "tooltip-format-activated": "Idle inhibitor: on",
+        "tooltip-format-deactivated": "Idle inhibitor: off"
+    },
+
+    "tray": {
+        "icon-size": 21,
+        "spacing": 10,
+        "reverse-direction": true,
+        "show-passive-items": true
     },
 
     "battery": {

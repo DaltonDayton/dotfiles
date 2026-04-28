@@ -40,6 +40,11 @@ tooltip label {
 #custom-weather,
 #pulseaudio,
 #battery,
+#tray,
+#bluetooth,
+#idle_inhibitor,
+#custom-cpu,
+#custom-gpu,
 #network,
 #power-profiles-daemon {
     background-color: #121212;

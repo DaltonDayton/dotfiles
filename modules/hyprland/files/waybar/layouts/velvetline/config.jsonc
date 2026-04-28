@@ -9,21 +9,24 @@
 
     "modules-left": [
         "custom/launcher",
-        "clock",
-        "hyprland/workspaces"
+        "tray",
+        "hyprland/workspaces",
+        "custom/cpu",
+        "custom/gpu"
     ],
 
     "modules-center": [
-        "custom/notification",
-        "custom/media"
+        "custom/media",
+        "custom/notification"
     ],
 
     "modules-right": [
+        "idle_inhibitor",
         "custom/pacman",
         "custom/weather",
         "pulseaudio",
-        "battery",
+        "bluetooth",
         "network",
-        "power-profiles-daemon"
+        "clock"
     ]
 }

@@ -35,7 +35,7 @@
         "smooth-scrolling-threshold": 10, // This value was tested using a trackpad, it should be lowered if using a mouse.
         "on-scroll-up": "playerctl next",
         "on-scroll-down": "playerctl previous",
-        "exec": "/home/user1/.config/waybar/scripts/mediaplayer.py 2> /dev/null" // Script in resources/custom_modules folder
+        "exec": "$HOME/.config/waybar/scripts/mediaplayer.py 2> /dev/null" // Script in resources/custom_modules folder
     },
 
     "custom/pacman": {
@@ -53,5 +53,19 @@
         "format": "{}",
         "tooltip": true,
         "interval": 3600
+    },
+
+    "custom/cpu": {
+        "interval": 2,
+        "exec": "$HOME/.config/waybar/scripts/cpu.sh",
+        "tooltip": false,
+        "on-click": "kitty -e btop"
+    },
+
+    "custom/gpu": {
+        "interval": 2,
+        "exec": "nvidia-smi --query-gpu=utilization.gpu,temperature.gpu --format=csv,noheader,nounits | awk -F', ' '{printf \"󰓫 %3d%% %2dC\", $1, $2}'",
+        "tooltip": false,
+        "on-click": "kitty -e nvtop"
     }
 }
