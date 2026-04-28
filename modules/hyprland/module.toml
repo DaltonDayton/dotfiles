@@ -8,7 +8,7 @@ manager = "pacman"
 names = [
     "hyprland", "hyprpaper", "hypridle", "hyprlock", "hyprlauncher",
     "hyprpicker", "hyprpolkitagent", "qt5-wayland", "qt6-wayland",
-    "waybar", "rofi", "kitty", "swaync",
+    "waybar", "rofi", "kitty", "swaync", "sddm",
     "pipewire-pulse", "pavucontrol",
     "bluez", "bluez-utils", "blueman",
     "grim", "slurp", "satty", "wl-clipboard", "wf-recorder",
@@ -71,4 +71,9 @@ content = "max-items=100\n"
 [[services]]
 scope = "system"
 name = "bluetooth.service"
+state = "enabled"
+
+[[services]]
+scope = "system"
+name = "sddm.service"
 state = "enabled"

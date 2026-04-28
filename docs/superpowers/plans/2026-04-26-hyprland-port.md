@@ -43,9 +43,9 @@ Obsolete under the new architecture:
 | 8 | voxtype configs | ☑ done | hostname-keyed; `voxtype` AUR + `wtype` pacman; setup block in install.sh |
 | 9 | `voxtype-clipboard.sh` | ☑ done | tracked at `files/hypr/scripts/voxtype-clipboard.sh` |
 | 10 | voxtype submap (`hypr/conf.d/voxtype-submap.conf`) | ☑ done | submap tracked in repo (not generated); sourced from `hyprland.conf` |
-| 11 | `sddm.conf` | ☐ todo | — |
-| 12 | `xorg-laptop.conf` (only if not Wayland-only) | ☐ todo | — |
-| 13 | SDDM theme bundle | ☐ todo | — |
+| 11 | `sddm.conf` | ☑ done | sudo symlink to `/etc/sddm.conf`; theme dir renamed to `quill` |
+| 12 | `xorg-laptop.conf` | ☑ done | host-keyed (`files/xorg/archlaptop.conf`), sudo-symlinked to `/etc/X11/xorg.conf.d/20-nvidia-ignore.conf` |
+| 13 | SDDM theme bundle | ☑ done | `files/sddm-theme/`, sudo cp -rT to `/usr/share/sddm/themes/quill/`; host-keyed `theme.archlaptop.conf` overrides |
 | 14 | hyprlock config | ☑ done | reuses hypr's color vars (no separate matugen template); active wallpaper via state symlink |
 
 Order is dependencies-first, smallest-blast-radius-first. Easy to reorder.

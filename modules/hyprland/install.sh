@@ -17,6 +17,39 @@ link_device_variant() {
 link_device_variant "$MODULE_DIR/files/hypr/monitors" "$MODULE_DIR/files/hypr/monitors.conf" "default"
 link_device_variant "$MODULE_DIR/files/voxtype/configs" "$MODULE_DIR/files/voxtype/config.toml" "default"
 
+# --- SDDM (sudo) ---------------------------------------------------
+# /etc/sddm.conf is a sudo symlink so live edits to the tracked file apply
+# without re-copying. The theme bundle is sudo-cp'd because /usr/share/ is
+# root-owned and SDDM reads it directly. theme.${HOSTNAME}.conf, if present,
+# overrides the default theme.conf for that host (e.g. larger font on laptop).
+if [[ "$(readlink /etc/sddm.conf 2>/dev/null)" != "$MODULE_DIR/files/sddm.conf" ]]; then
+  sudo ln -sfn "$MODULE_DIR/files/sddm.conf" /etc/sddm.conf
+fi
+
+SDDM_THEME_DIR="/usr/share/sddm/themes/quill"
+if ! sudo diff -rq "$MODULE_DIR/files/sddm-theme" "$SDDM_THEME_DIR" >/dev/null 2>&1; then
+  sudo mkdir -p "$SDDM_THEME_DIR"
+  sudo cp -rT "$MODULE_DIR/files/sddm-theme" "$SDDM_THEME_DIR"
+fi
+
+HOST_THEME="$MODULE_DIR/files/sddm-theme/theme.${HOSTNAME}.conf"
+if [[ -f "$HOST_THEME" ]]; then
+  sudo cp "$HOST_THEME" "$SDDM_THEME_DIR/theme.conf"
+fi
+
+# --- Xorg drop-in (sudo, host-keyed) -------------------------------
+# SDDM greeter is X11; on Optimus laptops we restrict X to the Intel iGPU
+# to avoid the NVIDIA dirty-state segfault on warm reboot. Host-keyed: only
+# applies if files/xorg/${HOSTNAME}.conf exists.
+XORG_SRC="$MODULE_DIR/files/xorg/${HOSTNAME}.conf"
+XORG_DROPIN="/etc/X11/xorg.conf.d/20-nvidia-ignore.conf"
+if [[ -f "$XORG_SRC" ]]; then
+  if [[ "$(readlink "$XORG_DROPIN" 2>/dev/null)" != "$XORG_SRC" ]]; then
+    sudo mkdir -p /etc/X11/xorg.conf.d
+    sudo ln -sfn "$XORG_SRC" "$XORG_DROPIN"
+  fi
+fi
+
 # --- Voxtype first-run setup ---------------------------------------
 # Idempotent: --download skips a cached model; gpu --enable is a no-op when
 # already enabled; systemd is guarded by file existence. We deliberately
