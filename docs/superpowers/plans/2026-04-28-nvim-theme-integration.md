@@ -831,7 +831,7 @@ If any per-theme spec needed adjustment, commit each fix with a descriptive mess
 
 ## Follow-up work (not in this plan)
 
-- Per-theme custom_highlights — the user dropped the catppuccin block as part of this work. Revisit if any theme feels rough after living with defaults; add tuning back inside the theme's `setup` callback in its `nvim.lua`.
+- Per-theme custom_highlights — the user dropped the catppuccin block as part of this work. Revisit if any theme feels rough after living with defaults; add tuning back inside the theme's `setup` callback in its `nvim.lua`, or in a `post = function() ... end` hook for highlights that should run after `:colorscheme` applies.
 - Refine the matugen highlight set — the template ships a minimal viable group. Common additions: telescope, snacks, gitsigns numhl, which-key, todo-comments. Add inline in `nvim-colors.lua`.
-- Lualine theme switching — `lua/plugins/lualine.lua` likely hardcodes a theme. If it does, wire it up to read `require("config.theme").current()` or use `theme = "auto"`.
 - Cache the dispatcher's state read — `M.current()` does a synchronous file read on every call; if that becomes hot, memoize and invalidate on `Signal`.
+- Extract a shared `lua/config/theme_helpers.lua` if `post` hooks across themes start repeating the same patterns (e.g. `clear_bg` for `LineNr` / `NvimTree*` / `SignColumn`). Today kanagawa and tokyo-night each duplicate the helper inline — one more theme with the same shape and the duplication earns a refactor.

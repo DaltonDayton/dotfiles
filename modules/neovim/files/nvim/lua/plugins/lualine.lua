@@ -33,7 +33,7 @@ return {
 
     lualine.setup({
       options = {
-        theme = "catppuccin-mocha",
+        theme = "auto",
       },
       sections = {
         lualine_b = {

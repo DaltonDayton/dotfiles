@@ -8,4 +8,19 @@ return {
     end,
   },
   scheme = "tokyonight-moon",
+  post = function()
+    local function clear_bg(group)
+      local hl = vim.api.nvim_get_hl(0, { name = group, link = false })
+      hl.bg = nil
+      hl.ctermbg = nil
+      vim.api.nvim_set_hl(0, group, hl)
+    end
+    for _, g in ipairs({
+      "NvimTreeNormal", "NvimTreeNormalNC", "NvimTreeNormalFloat",
+      "NvimTreeEndOfBuffer", "NvimTreeWinSeparator",
+      "NvimTreeStatusLine", "NvimTreeStatusLineNC",
+    }) do
+      clear_bg(g)
+    end
+  end,
 }
