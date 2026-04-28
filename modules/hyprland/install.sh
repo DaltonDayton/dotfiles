@@ -54,6 +54,7 @@ seed_indirection "$HOME/.config/kitty/colors/colors.conf"   'include ~/.config/t
 seed_indirection "$HOME/.config/rofi/colors/colors.rasi"    '@import "../../themes/rose-pine/rofi.rasi"'
 seed_indirection "$HOME/.config/swaync/colors/colors.css"   '@import "../../themes/rose-pine/swaync.css";'
 seed_indirection "$HOME/.config/wlogout/colors/colors.css"  '@import "../../themes/rose-pine/wlogout.css";'
+seed_indirection "$HOME/.config/tmux/colors/colors.conf"    'source-file ~/.config/themes/rose-pine/tmux.conf'
 
 STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/themes"
 mkdir -p "$STATE_DIR"

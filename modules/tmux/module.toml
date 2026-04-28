@@ -1,5 +1,5 @@
 name = "tmux"
-description = "tmux + catppuccin + plugin manager"
+description = "tmux + plugin manager + theme indirection"
 tags = ["essential"]
 depends_on = ["git"]
 

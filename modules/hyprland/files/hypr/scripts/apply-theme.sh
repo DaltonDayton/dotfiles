@@ -102,6 +102,7 @@ if [[ "$mode" == "matugen" ]]; then
   write_one "$HOME/.config/rofi/colors/colors.rasi"    '@import "matugen.rasi"'
   write_one "$HOME/.config/swaync/colors/colors.css"   '@import "matugen.css";'
   write_one "$HOME/.config/wlogout/colors/colors.css"  '@import "matugen.css";'
+  write_one "$HOME/.config/tmux/colors/colors.conf"    'source-file ~/.config/tmux/colors/matugen.conf'
 
   # Matugen post-hooks run before these indirection rewrites, so reload here too.
   hyprctl reload >/dev/null 2>&1 || true
@@ -120,6 +121,7 @@ else
   write_one "$HOME/.config/rofi/colors/colors.rasi"    "@import \"../../themes/${THEME}/rofi.rasi\""
   write_one "$HOME/.config/swaync/colors/colors.css"   "@import \"../../themes/${THEME}/swaync.css\";"
   write_one "$HOME/.config/wlogout/colors/colors.css"  "@import \"../../themes/${THEME}/wlogout.css\";"
+  write_one "$HOME/.config/tmux/colors/colors.conf"    "source-file ~/.config/themes/${THEME}/tmux.conf"
 
   if [[ -n "$wallpaper" ]]; then
     awww img "$wallpaper" \
@@ -137,6 +139,8 @@ else
     (swaync >/dev/null 2>&1 &)
   fi
 fi
+
+tmux source-file "$HOME/.config/tmux/tmux.conf" >/dev/null 2>&1 || true
 
 echo "$THEME" > "$CURRENT_STATE"
 notify-send "Theme" "$THEME" || true
