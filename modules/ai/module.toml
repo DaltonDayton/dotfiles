@@ -17,3 +17,7 @@ dst = "~/.claude/settings.json"
 [[symlinks]]
 src = "files/opencode/opencode.json"
 dst = "~/.config/opencode/opencode.json"
+
+[[symlinks]]
+src = "files/opencode/tui.json"
+dst = "~/.config/opencode/tui.json"
