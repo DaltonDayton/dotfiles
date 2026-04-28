@@ -27,6 +27,7 @@
         "pulseaudio",
         "bluetooth",
         "network",
+        "battery",
         "clock"
     ]
 }
