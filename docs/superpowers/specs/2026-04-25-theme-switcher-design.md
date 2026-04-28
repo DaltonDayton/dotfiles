@@ -1,8 +1,6 @@
 # Theme Switcher — Design
 
-> **Status (2026-04-26):** Mechanism implemented and shipping on `startover`. Three themes ship today (`rose-pine`, `catppuccin`, `matugen`); the other 8 meridian themes (`e-ink`, `everforest-dark`, `gruvbox-dark`, `kanagawa`, `nightfox`, `noir`, `nord-darker`, `tokyo-night`) are pending follow-up authoring work — see the "Status" section in the implementation plan.
->
-> **Status (2026-04-28):** nvim integration in progress per `docs/superpowers/plans/2026-04-28-nvim-theme-integration.md`. After it lands, the visible-shell set is hypr/waybar/kitty/rofi/swaync/wlogout/nvim.
+> **Status (2026-04-28):** Switcher mechanism, indirection layer, both pickers, and all 11 theme bundles (10 static + matugen) are shipping on `startover`. Neovim integration completed and committed (`9836354` predecessors); the visible-shell set is now hypr / waybar / kitty / rofi / swaync / wlogout / nvim. See the implementation plans for full task breakdowns.
 
 ## Context
 

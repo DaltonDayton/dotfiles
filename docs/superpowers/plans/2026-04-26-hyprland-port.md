@@ -159,3 +159,17 @@ git merge startover
 git push
 git worktree remove /home/dalton/.dotfiles-main   # tear down the worktree
 ```
+
+---
+
+## Post-port follow-ups (landed after the table above)
+
+These shipped after chunk 14 and aren't part of the original port, but are worth recording:
+
+- **Voxtype end-to-end on `archlaptop`** (commit `9836354`):
+  - `link_device_variant` generalized to take a file extension; voxtype now picks `archlaptop.toml` instead of falling through to a stale upstream `default.conf`.
+  - Host-scoped pacman packages introduced: `sof-firmware` (rt715 SoundWire mic — silent without it), `linux-headers` (DKMS prereq), `nvidia-open-dkms` + `nvidia-utils` + `nvidia-prime` (proprietary NVIDIA stack so whisper's Vulkan backend targets the dGPU instead of nouveau), `vulkan-tools`.
+  - Tracked systemd drop-in (`files/voxtype/systemd/<host>.conf`) symlinked into `~/.config/systemd/user/voxtype.service.d/gpu.conf` by `install.sh`; daemon-reload + restart only when the link target changes.
+  - Voxtype config pinned to Vulkan device index 1 via `gpu_device` (the string-based `VOXTYPE_VULKAN_DEVICE=nvidia` filter wasn't honored on this rig).
+  - Idempotency fix: `voxtype setup gpu --enable` is now guarded on current status (the previous `grep -q` pattern triggered SIGPIPE under `set -o pipefail`, inverting the guard).
+  - Cold-start transcription ~8s (model load to GPU); warm runs ~0.7s.

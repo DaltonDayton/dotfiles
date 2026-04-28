@@ -4,11 +4,23 @@
 
 **Goal:** Tie Neovim into the existing theme framework so Super+D switches nvim's colorscheme alongside hypr/waybar/kitty/rofi/swaync/wlogout. Each static theme picks an existing tuned plugin (catppuccin, rose-pine, kanagawa, …); matugen mode renders a small generated colorscheme from the canonical palette.
 
-**Architecture:** Each `themes/<name>/` gains an `nvim.lua` spec file declaring `{ plugin = <lazy spec>, scheme = "..." }`. A dispatcher (`modules/neovim/files/nvim/lua/config/theme.lua`) reads `~/.local/state/themes/current`, requires the matching spec, and runs `vim.cmd.colorscheme(spec.scheme)`. Lazy.nvim gates each colorscheme plugin with `cond = current == name`, so only the active theme's plugin loads at startup; runtime switches force-load via `require("lazy").load(...)`. For matugen, a new matugen template emits a self-applying nvim colorscheme file (`~/.config/nvim/colors/matugen.lua`) so the dispatcher's matugen path is just `vim.cmd.colorscheme("matugen")`. Live-reload across running nvim instances is via a `Signal` autocmd on `SIGUSR1`, sent by `apply-theme.sh` after writing state.
+**Architecture:** Each `themes/<name>/` gains an `nvim.lua` spec file declaring `{ plugin = <lazy spec>, scheme = "..." }`. A dispatcher (`modules/neovim/files/nvim/lua/config/theme.lua`) reads `~/.local/state/themes/current`, requires the matching spec, and runs `vim.cmd.colorscheme(spec.scheme)`. Lazy.nvim registers all 10 colorscheme plugins: the active theme's plugin keeps `lazy = false, priority = 1000` so it loads at startup, while inactive ones get rewritten to `lazy = true` so they're installed up front but only loaded on switch via `require("lazy").load(...)`. (An earlier `cond`-based variant was replaced because `cond = false` blocked install entirely, breaking pre-download.) For matugen, a new matugen template emits a self-applying nvim colorscheme file (`~/.config/nvim/colors/matugen.lua`) so the dispatcher's matugen path is just `dofile()`-ing that file (using `:colorscheme matugen` is a no-op when matugen is already current, so wallpaper changes wouldn't refresh). Live-reload across running nvim instances is via a `Signal` autocmd on `SIGUSR1`, sent by `apply-theme.sh` after writing state, and by matugen's nvim post-hook on wallpaper changes. Each theme's spec also accepts an optional `post = function() ... end` hook that runs after `:colorscheme` to override highlights.
 
 **Tech Stack:** Neovim 0.10+ (Signal autocmd), lazy.nvim (plugin manager — already in use), matugen (template adds an nvim emitter), bash (one-line addition to apply-theme.sh). No Go changes.
 
 **Spec:** [`docs/superpowers/specs/2026-04-25-theme-switcher-design.md`](../specs/2026-04-25-theme-switcher-design.md) (updated by Task 1)
+
+---
+
+## Status (2026-04-28)
+
+All tasks complete and shipping on `startover` (commits `d6ca86e` for the integration, `77140b8` for lualine `theme = "auto"` and tokyo-night tree transparency). Notes on what changed during implementation:
+
+- Inactive colorscheme plugins are gated with `lazy = true` (not `cond` as originally written) — `cond = false` blocks installation, defeating the pre-download goal.
+- Matugen path uses `dofile()` instead of `vim.cmd.colorscheme("matugen")` — vim treats setting the colorscheme to its current value as a no-op even if the underlying file changed, so `:colorscheme matugen` wouldn't refresh palettes on wallpaper switches while matugen was active.
+- Spec gained an optional `post = function()` hook (demoed on kanagawa to clear `LineNr`/`SignColumn` backgrounds and on tokyo-night for `NvimTree*` transparency). Helpers stay inline per-theme; extract to a shared module if a third theme repeats the same pattern.
+
+The `[whisper]` section's `gpu_device` selector and the systemd `__NV_PRIME_RENDER_OFFLOAD=1` drop-in shipped separately under the voxtype follow-up (commit `9836354`); not part of this plan.
 
 ---
 
@@ -621,24 +633,20 @@ git commit -m "nvim: theme dispatcher reads ~/.local/state/themes/current"
 **Files:**
 - Modify: `modules/neovim/files/nvim/lua/plugins/colorscheme.lua` (full rewrite)
 
-The current file ships a hand-tuned catppuccin block. Replace it with a list that registers all 10 colorscheme plugins, each gated by `cond` so only the active one loads at startup.
+The current file ships a hand-tuned catppuccin block. Replace it with a list that registers all 10 colorscheme plugins. The active theme's plugin keeps `lazy = false, priority = 1000` (loads eagerly at startup); inactive ones are rewritten to `lazy = true` so lazy.nvim installs them up front but doesn't require them until the dispatcher calls `require("lazy").load(...)` on a runtime switch. (An earlier `cond`-based design was abandoned because `cond = false` skips installation entirely.)
 
 - [ ] **Step 1: Overwrite the file**
 
 Path: `modules/neovim/files/nvim/lua/plugins/colorscheme.lua`
 
 ```lua
--- Each theme's plugin spec is authored in `~/.config/themes/<name>/nvim.lua`.
--- We aggregate them here so lazy.nvim knows about every option, but gate each
--- with `cond` so only the active theme's plugin actually loads at startup.
--- Runtime theme switches force-load via `require("lazy").load(...)`.
+-- Register every theme's colorscheme plugin so lazy.nvim installs them all up
+-- front. The active theme loads eagerly with high priority; the rest stay
+-- lazy = true (installed but not required), and the dispatcher force-loads
+-- them via `require("lazy").load(...)` on theme switch.
 
 local theme = require("config.theme")
 local active = theme.current()
-
-local function only(name)
-  return function() return active == name end
-end
 
 local specs = {}
 for _, name in ipairs(theme.list()) do
@@ -646,7 +654,10 @@ for _, name in ipairs(theme.list()) do
     local ok, t = pcall(dofile, vim.fn.expand("~/.config/themes/" .. name .. "/nvim.lua"))
     if ok and type(t) == "table" and type(t.plugin) == "table" then
       local plugin = vim.deepcopy(t.plugin)
-      plugin.cond = only(name)
+      if name ~= active then
+        plugin.lazy = true
+        plugin.priority = nil
+      end
       table.insert(specs, plugin)
     end
   end

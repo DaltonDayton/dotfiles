@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Status (2026-04-28):** Skeleton landed and the deferred items have all been ported (see `2026-04-26-hyprland-port.md` for chunk-by-chunk tracking + post-port voxtype/NVIDIA hardening). Module ships at `modules/hyprland/` with full app coverage (hypr, waybar, kitty, swaync, wlogout, rofi, matugen, voxtype, sddm-theme/conf, themes, wallpapers). Plan retained as historical record.
+
 **Goal:** Stand up the `modules/hyprland/` mega-module skeleton with seed content from the user's `~/.config/*_new/` work-in-progress directories, retire the standalone `modules/kitty/` module, and validate the framework via `quill list/status/apply`.
 
 **Architecture:** A single quill module under `modules/hyprland/` that owns the Hyprland desktop session — WM configs, bar, terminal, theming engine, wallpapers. Declarative actions (packages, symlinks, files, services) live in `module.toml`; the imperative `install.sh` handles a one-time `matugen` render so a fresh machine has colors after `quill apply`. No new Go code is added — all action types referenced already exist.

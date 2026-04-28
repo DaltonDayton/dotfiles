@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Status (2026-04-28):** Quill is built and shipping on `startover`. All action types from this plan exist in `internal/action/`; the runner, manifest parser, host detection, template renderer, TUI, and CLI commands (`list`/`status`/`apply`/`install`/`path`) all work. `flatpak` and `paru` from the original spec were not implemented (only `pacman` and `yay` are wired up in `internal/action/packages.go`). Real modules (`git`, `shell`, `tmux`, `fonts`, `asdf`, `neovim`, `hyprland`, `ai`) live under `modules/`. Plan retained as historical record of the design phase.
+
 **Goal:** Build a Go CLI (`quill`) that declaratively installs and manages an Arch Linux workstation setup (packages, dotfiles, services, host-specific config) via a Charm-powered TUI.
 
 **Architecture:** Single binary. Each "module" is a directory under `modules/` containing a `module.toml` manifest plus files. The binary parses manifests, filters by host, resolves dependencies, then runs idempotent **actions** (`packages`, `symlinks`, `commands`, `files`, `services`, `directories`). A Charm TUI (Huh for forms, Bubble Tea for progress, Lip Gloss for styling) drives `quill install`; non-interactive `apply`/`list`/`status` commands cover scripted re-runs. Stateless idempotency — every action has a `Check()` that determines whether `Apply()` needs to run.
