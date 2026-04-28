@@ -62,6 +62,9 @@ elif (( ${#pool[@]} > 0 )); then
   printf '%s:%s\n' "$THEME" "$wallpaper" >> "$WALLPAPERS_STATE"
 fi
 
+# Track active wallpaper so hyprlock can render it at lock time.
+[[ -n "$wallpaper" ]] && ln -sfn "$wallpaper" "$STATE_DIR/current_wallpaper"
+
 # --- Rewrite indirection files ------------------------------------------------
 write_one() {
   local file="$1" content="$2"

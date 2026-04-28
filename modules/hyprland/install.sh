@@ -58,3 +58,4 @@ seed_indirection "$HOME/.config/wlogout/colors/colors.css"  '@import "../../them
 STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/themes"
 mkdir -p "$STATE_DIR"
 [[ -f "$STATE_DIR/current" ]] || echo rose-pine > "$STATE_DIR/current"
+[[ -L "$STATE_DIR/current_wallpaper" ]] || ln -sfn "$MODULE_DIR/files/wallpapers/default.png" "$STATE_DIR/current_wallpaper"

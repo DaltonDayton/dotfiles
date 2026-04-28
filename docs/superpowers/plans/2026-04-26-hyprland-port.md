@@ -46,7 +46,7 @@ Obsolete under the new architecture:
 | 11 | `sddm.conf` | ☐ todo | — |
 | 12 | `xorg-laptop.conf` (only if not Wayland-only) | ☐ todo | — |
 | 13 | SDDM theme bundle | ☐ todo | — |
-| 14 | hyprlock config + matugen template | ☐ todo | — |
+| 14 | hyprlock config | ☑ done | reuses hypr's color vars (no separate matugen template); active wallpaper via state symlink |
 
 Order is dependencies-first, smallest-blast-radius-first. Easy to reorder.
 
