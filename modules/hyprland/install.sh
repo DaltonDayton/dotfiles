@@ -8,14 +8,14 @@ MODULE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # The link target is relative so it stays valid through the parent
 # files/hypr -> ~/.config/hypr symlink.
 link_device_variant() {
-  local dir="$1" target_link="$2" fallback="$3"
-  local pick="$dir/${HOSTNAME}.conf"
-  [[ -f "$pick" ]] || pick="$dir/${fallback}.conf"
+  local dir="$1" target_link="$2" fallback="$3" ext="${4:-conf}"
+  local pick="$dir/${HOSTNAME}.${ext}"
+  [[ -f "$pick" ]] || pick="$dir/${fallback}.${ext}"
   ln -sfn "$(basename "$(dirname "$pick")")/$(basename "$pick")" "$target_link"
 }
 
 link_device_variant "$MODULE_DIR/files/hypr/monitors" "$MODULE_DIR/files/hypr/monitors.conf" "default"
-link_device_variant "$MODULE_DIR/files/voxtype/configs" "$MODULE_DIR/files/voxtype/config.toml" "default"
+link_device_variant "$MODULE_DIR/files/voxtype/configs" "$MODULE_DIR/files/voxtype/config.toml" "default" "toml"
 
 # --- SDDM (sudo) ---------------------------------------------------
 # /etc/sddm.conf is a sudo symlink so live edits to the tracked file apply
@@ -57,8 +57,37 @@ fi
 # voxtype-submap.conf is tracked in the repo and sourced from hyprland.conf.
 if command -v voxtype >/dev/null 2>&1; then
   voxtype setup --download
-  sudo voxtype setup gpu --enable
   [[ -f "$HOME/.config/systemd/user/voxtype.service" ]] || voxtype setup systemd
+
+  # Host-keyed systemd drop-in (e.g. pinning Vulkan device on multi-GPU laptops).
+  # Only hosts with a file under files/voxtype/systemd/ get a drop-in; others
+  # have any stale link cleaned up. Restart only when the link actually changes.
+  voxtype_dropin_src="$MODULE_DIR/files/voxtype/systemd/${HOSTNAME}.conf"
+  voxtype_dropin_dst="$HOME/.config/systemd/user/voxtype.service.d/gpu.conf"
+  voxtype_changed=0
+  if [[ -f "$voxtype_dropin_src" ]]; then
+    if [[ "$(readlink "$voxtype_dropin_dst" 2>/dev/null)" != "$voxtype_dropin_src" ]]; then
+      mkdir -p "$(dirname "$voxtype_dropin_dst")"
+      ln -sfn "$voxtype_dropin_src" "$voxtype_dropin_dst"
+      voxtype_changed=1
+    fi
+  elif [[ -L "$voxtype_dropin_dst" ]]; then
+    rm -f "$voxtype_dropin_dst"
+    voxtype_changed=1
+  fi
+  if (( voxtype_changed )); then
+    systemctl --user daemon-reload
+    systemctl --user restart voxtype || true
+  fi
+
+  # GPU enable is sudo and only needed once. Skip when already active to keep
+  # re-apply runs sudo-free. `grep -q` would close the pipe and SIGPIPE
+  # voxtype, which `set -o pipefail` then surfaces as a guard failure — so
+  # we read the output into a variable instead.
+  voxtype_gpu_status="$(voxtype setup gpu --status 2>/dev/null || true)"
+  if [[ "$voxtype_gpu_status" != *"Active backend: GPU"* ]]; then
+    sudo voxtype setup gpu --enable
+  fi
 fi
 
 # --- Matugen first-run render --------------------------------------

@@ -205,13 +205,13 @@ HOSTNAME="$(hostname -s)"
 
 # --- 1. Device-keyed internal symlinks ------------------------------
 link_device_variant() {
-  local dir="$1" target_link="$2" fallback="$3"
-  local pick="$dir/${HOSTNAME}.conf"
-  [[ -f "$pick" ]] || pick="$dir/${fallback}.conf"
+  local dir="$1" target_link="$2" fallback="$3" ext="${4:-conf}"
+  local pick="$dir/${HOSTNAME}.${ext}"
+  [[ -f "$pick" ]] || pick="$dir/${fallback}.${ext}"
   ln -sfn "$(basename "$(dirname "$pick")")/$(basename "$pick")" "$target_link"
 }
 link_device_variant "$MODULE_DIR/files/hypr/monitors"   "$MODULE_DIR/files/hypr/monitors.conf"  "default"
-link_device_variant "$MODULE_DIR/files/voxtype/configs" "$MODULE_DIR/files/voxtype/config.toml" "default"
+link_device_variant "$MODULE_DIR/files/voxtype/configs" "$MODULE_DIR/files/voxtype/config.toml" "default" "toml"
 
 # --- 2. SDDM (sudo) -------------------------------------------------
 if [[ "$(readlink /etc/sddm.conf 2>/dev/null)" != "$MODULE_DIR/files/sddm.conf" ]]; then

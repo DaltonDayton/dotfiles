@@ -24,6 +24,20 @@ names = [
 manager = "aur"
 names = ["matugen-bin", "bibata-cursor-theme-bin", "grimblast-git", "python-pywalfox", "wlogout", "voxtype"]
 
+# archlaptop only: SoundWire mic firmware (rt715) + NVIDIA Optimus stack so
+# voxtype's Vulkan backend can target the dGPU instead of nouveau.
+[[packages]]
+manager = "pacman"
+hosts = ["archlaptop"]
+names = [
+    "sof-firmware",
+    "linux-headers",     # required for nvidia-open-dkms module build
+    "nvidia-open-dkms",
+    "nvidia-utils",
+    "nvidia-prime",
+    "vulkan-tools",
+]
+
 [[symlinks]]
 src = "files/hypr"
 dst = "~/.config/hypr"

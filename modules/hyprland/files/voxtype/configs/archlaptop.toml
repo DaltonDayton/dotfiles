@@ -17,6 +17,11 @@ max_duration_secs = 120
 # medium.en is faster on the RTX 2060 Max-Q than large-v3-turbo (~2s vs ~5s)
 model = "medium.en"
 language = "en"
+# Force the NVIDIA dGPU (Vulkan device 1). vulkaninfo --summary shows:
+#   GPU0 = Intel UHD, GPU1 = NVIDIA RTX 2060.
+# VOXTYPE_VULKAN_DEVICE=nvidia (the env-var filter) gets ignored on this rig;
+# gpu_device gives deterministic index selection.
+gpu_device = 1
 
 [output]
 mode = "type"
