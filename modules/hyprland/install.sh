@@ -3,6 +3,19 @@ set -euo pipefail
 
 MODULE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# --- Device-keyed internal symlinks --------------------------------
+# Pick the variant whose filename matches $HOSTNAME, falling back to default.
+# The link target is relative so it stays valid through the parent
+# files/hypr -> ~/.config/hypr symlink.
+link_device_variant() {
+  local dir="$1" target_link="$2" fallback="$3"
+  local pick="$dir/${HOSTNAME}.conf"
+  [[ -f "$pick" ]] || pick="$dir/${fallback}.conf"
+  ln -sfn "$(basename "$(dirname "$pick")")/$(basename "$pick")" "$target_link"
+}
+
+link_device_variant "$MODULE_DIR/files/hypr/monitors" "$MODULE_DIR/files/hypr/monitors.conf" "default"
+
 # --- Matugen first-run render --------------------------------------
 # Skip if colors already exist — runtime theme swaps go through a separate
 # user-bound script that calls matugen directly. Quill never re-renders.

@@ -38,7 +38,7 @@ Obsolete under the new architecture:
 | 3.5 | Extract `programs.conf` from `hyprland.conf` | ☑ done | `94963c4` (added beyond original plan) |
 | 4 | Extract `windowrules.conf` from `hyprland.conf` | ☑ done | `e4f9139` |
 | 5 | Add `hypridle.conf` | ☑ done | `e4f9139` (file + `hypridle` pkg + `exec-once`) |
-| 6 | Device-keyed monitor variants | ☐ todo | — |
+| 6 | Device-keyed monitor variants | ☑ done | hostname-keyed (archlinux/archlaptop/default), `link_device_variant` in install.sh |
 | 7 | Bibata cursor theme bundle | ☑ done via AUR | `bibata-cursor-theme-bin` pkg + env vars; no bundled `files/cursors/` |
 | 8 | voxtype configs | ☐ todo | — |
 | 9 | `voxtype-clipboard.sh` | ☐ todo | script staged untracked; land with 8 + 10 |

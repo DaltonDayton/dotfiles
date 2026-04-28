@@ -7,3 +7,6 @@
 # Add one line per new .tmpl file.
 modules/git/files/.gitconfig
 modules/neovim/files/nvim/lazy-lock.json
+
+# Internal device-keyed symlinks (set by modules/hyprland/install.sh).
+modules/hyprland/files/hypr/monitors.conf
