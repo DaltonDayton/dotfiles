@@ -47,3 +47,8 @@ output_path = '~/.config/wlogout/colors/matugen.css'
 [templates.tmux]
 input_path = '~/.config/matugen/templates/tmux-colors.conf'
 output_path = '~/.config/tmux/colors/matugen.conf'
+
+[templates.nvim]
+input_path = '~/.config/matugen/templates/nvim-colors.lua'
+output_path = '~/.config/nvim/colors/matugen.lua'
+post_hook = 'pkill -SIGUSR1 nvim 2>/dev/null || true'

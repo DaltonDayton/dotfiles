@@ -1,6 +1,8 @@
 # Theme Switcher — Design
 
 > **Status (2026-04-26):** Mechanism implemented and shipping on `startover`. Three themes ship today (`rose-pine`, `catppuccin`, `matugen`); the other 8 meridian themes (`e-ink`, `everforest-dark`, `gruvbox-dark`, `kanagawa`, `nightfox`, `noir`, `nord-darker`, `tokyo-night`) are pending follow-up authoring work — see the "Status" section in the implementation plan.
+>
+> **Status (2026-04-28):** nvim integration in progress per `docs/superpowers/plans/2026-04-28-nvim-theme-integration.md`. After it lands, the visible-shell set is hypr/waybar/kitty/rofi/swaync/wlogout/nvim.
 
 ## Context
 
@@ -29,11 +31,11 @@ The pipeline must:
 
 ## Scope
 
-**In scope (apps that get themed):** hypr, waybar, kitty, rofi, swaync, wlogout. (The "visible-shell" set — everything you actually see day-to-day on the Hyprland desktop.)
+**In scope (apps that get themed):** hypr, waybar, kitty, rofi, swaync, wlogout, nvim. (The "visible-shell" set — everything you actually see day-to-day on the Hyprland desktop.)
 
 **Out of scope:**
 
-- GTK theme name, VSCodium, Discord/vesktop, neovim, spicetify (no modules in the repo for those today).
+- GTK theme name, VSCodium, Discord/vesktop, spicetify (no modules in the repo for those today).
 - Light-mode variants. Every theme is dark; matugen mode is `dark`.
 - Per-host theme overrides. Active theme is global to the user.
 - Tests beyond manual smoke. The orchestration is bash; quill-side has no Go changes.
@@ -283,6 +285,7 @@ Per-app syntax:
 - waybar / swaync / wlogout: `@define-color bg0 #11111b;`
 - rofi: `* { bg0: #11111b; ... }`
 - kitty: `color0..color15` + `background` / `foreground` / `cursor` (kitty has its own keys; map terminal-color → ANSI16: `color0=bg0`, `color1=red`, `color2=green`, `color3=yellow`, `color4=blue`, `color5=purple`, `color6=aqua`, `color7=fg`, `color8..15` = bright variants)
+- nvim: each `themes/<name>/nvim.lua` returns `{ plugin = <lazy spec>, scheme = "..." }`; a dispatcher reads `~/.local/state/themes/current` and runs `vim.cmd.colorscheme(spec.scheme)`. Matugen renders a self-applying colorscheme at `~/.config/nvim/colors/matugen.lua`.
 
 Static themes already speak this scheme (the 10 existing waybar `custom/*.css` files are the reference). Hand-authoring the 50 new palette files is mechanical — same hex values, different syntax per app.
 
@@ -358,7 +361,7 @@ If a consumer config references a variable not in the canonical set, that app sh
 
 ## Out of scope (recap)
 
-- GTK / VSCodium / Discord / nvim / spicetify theming
+- GTK / VSCodium / Discord / spicetify theming
 - Light-mode variants
 - Per-host theme overrides
 - Automated tests of the bash orchestration

@@ -18,6 +18,7 @@ A Go CLI that declaratively manages the user's Arch Linux setup — packages, do
 | Quill core (Go CLI, action types, runner, TUI) | `docs/superpowers/specs/2026-04-21-quill-design.md` | `docs/superpowers/plans/2026-04-21-quill-implementation.md` |
 | `hyprland` mega-module (WM, bar, terminal, theming engine) | `docs/superpowers/specs/2026-04-25-hyprland-module-design.md` | `docs/superpowers/plans/2026-04-25-hyprland-module-implementation.md` |
 | Theme switcher (Super+D / Super+Shift+D, indirection layer, matugen-as-theme) | `docs/superpowers/specs/2026-04-25-theme-switcher-design.md` | `docs/superpowers/plans/2026-04-25-theme-switcher.md` |
+| Neovim theme integration (per-theme `nvim.lua`, dispatcher, SIGUSR1 reload) | (extends theme-switcher spec) | `docs/superpowers/plans/2026-04-28-nvim-theme-integration.md` |
 
 ## User context
 

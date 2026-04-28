@@ -23,6 +23,10 @@ fi
 mkdir -p "$STATE_DIR"
 touch "$WALLPAPERS_STATE"
 
+# Persist active theme up front so any reload triggers (notably the matugen
+# nvim post_hook firing during `matugen image`) read the new value.
+echo "$THEME" > "$CURRENT_STATE"
+
 # Detect mode (matugen or static) from meta.toml
 mode="static"
 if [[ -f "$THEME_DIR/meta.toml" ]] && grep -q '^mode = "matugen"' "$THEME_DIR/meta.toml"; then
@@ -138,9 +142,9 @@ else
     pkill swaync 2>/dev/null || true
     (swaync >/dev/null 2>&1 &)
   fi
+  pkill -SIGUSR1 nvim 2>/dev/null || true
 fi
 
 tmux source-file "$HOME/.config/tmux/tmux.conf" >/dev/null 2>&1 || true
 
-echo "$THEME" > "$CURRENT_STATE"
 notify-send "Theme" "$THEME" || true
