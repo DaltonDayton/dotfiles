@@ -83,5 +83,6 @@
     "enabled": true
   },
   "autoMemoryEnabled": true,
-  "theme": "dark"
+  "theme": "dark",
+  "skipAutoPermissionPrompt": true
 }
