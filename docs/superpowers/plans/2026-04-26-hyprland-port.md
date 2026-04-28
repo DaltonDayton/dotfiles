@@ -40,9 +40,9 @@ Obsolete under the new architecture:
 | 5 | Add `hypridle.conf` | ☑ done | `e4f9139` (file + `hypridle` pkg + `exec-once`) |
 | 6 | Device-keyed monitor variants | ☑ done | hostname-keyed (archlinux/archlaptop/default), `link_device_variant` in install.sh |
 | 7 | Bibata cursor theme bundle | ☑ done via AUR | `bibata-cursor-theme-bin` pkg + env vars; no bundled `files/cursors/` |
-| 8 | voxtype configs | ☐ todo | — |
-| 9 | `voxtype-clipboard.sh` | ☐ todo | script staged untracked; land with 8 + 10 |
-| 10 | voxtype submap (`hypr/conf.d/voxtype-submap.conf`) | ☐ todo | — |
+| 8 | voxtype configs | ☑ done | hostname-keyed; `voxtype` AUR + `wtype` pacman; setup block in install.sh |
+| 9 | `voxtype-clipboard.sh` | ☑ done | tracked at `files/hypr/scripts/voxtype-clipboard.sh` |
+| 10 | voxtype submap (`hypr/conf.d/voxtype-submap.conf`) | ☑ done | submap tracked in repo (not generated); sourced from `hyprland.conf` |
 | 11 | `sddm.conf` | ☐ todo | — |
 | 12 | `xorg-laptop.conf` (only if not Wayland-only) | ☐ todo | — |
 | 13 | SDDM theme bundle | ☐ todo | — |

@@ -1,0 +1,35 @@
+# Voxtype configuration
+# Docs: https://voxtype.io/docs/CONFIGURATION
+
+# Enable state file for waybar integration
+state_file = "auto"
+
+[hotkey]
+# Disabled — using Hyprland compositor keybindings instead
+enabled = false
+
+[audio]
+device = "default"
+sample_rate = 16000
+max_duration_secs = 120
+
+[whisper]
+# medium.en is faster on the RTX 2060 Max-Q than large-v3-turbo (~2s vs ~5s)
+model = "medium.en"
+language = "en"
+
+[output]
+mode = "type"
+type_delay_ms = 0
+output_delay_ms = 1000  # 1 second delay before typing (lets SUPER key release)
+
+# Compositor integration hooks (modifier key fix)
+pre_recording_command = "hyprctl dispatch submap voxtype_recording"
+pre_output_command = "hyprctl dispatch submap voxtype_suppress"
+post_output_command = "hyprctl dispatch submap reset"
+fallback_to_clipboard = true
+
+[output.notification]
+on_recording_start = true
+on_recording_stop = true  # Notify when recording stops (before transcription)
+on_transcription = true

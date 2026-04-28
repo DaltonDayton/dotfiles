@@ -13,7 +13,7 @@ names = [
     "bluez", "bluez-utils", "blueman",
     "grim", "slurp", "satty", "wl-clipboard", "wf-recorder",
     "cliphist",
-    "tesseract", "tesseract-data-eng", "libnotify",
+    "tesseract", "tesseract-data-eng", "libnotify", "wtype",
     "xdg-utils", "desktop-file-utils", "shared-mime-info", "archlinux-xdg-menu",
     "jq", "btop",
     "awww",
@@ -22,7 +22,7 @@ names = [
 
 [[packages]]
 manager = "aur"
-names = ["matugen-bin", "bibata-cursor-theme-bin", "grimblast-git", "python-pywalfox", "wlogout"]
+names = ["matugen-bin", "bibata-cursor-theme-bin", "grimblast-git", "python-pywalfox", "wlogout", "voxtype"]
 
 [[symlinks]]
 src = "files/hypr"
@@ -39,6 +39,10 @@ dst = "~/.config/kitty"
 [[symlinks]]
 src = "files/matugen"
 dst = "~/.config/matugen"
+
+[[symlinks]]
+src = "files/voxtype"
+dst = "~/.config/voxtype"
 
 [[symlinks]]
 src = "files/wallpapers"

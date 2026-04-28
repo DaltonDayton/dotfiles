@@ -15,6 +15,18 @@ link_device_variant() {
 }
 
 link_device_variant "$MODULE_DIR/files/hypr/monitors" "$MODULE_DIR/files/hypr/monitors.conf" "default"
+link_device_variant "$MODULE_DIR/files/voxtype/configs" "$MODULE_DIR/files/voxtype/config.toml" "default"
+
+# --- Voxtype first-run setup ---------------------------------------
+# Idempotent: --download skips a cached model; gpu --enable is a no-op when
+# already enabled; systemd is guarded by file existence. We deliberately
+# don't run `voxtype setup compositor hyprland` — files/hypr/conf.d/
+# voxtype-submap.conf is tracked in the repo and sourced from hyprland.conf.
+if command -v voxtype >/dev/null 2>&1; then
+  voxtype setup --download
+  sudo voxtype setup gpu --enable
+  [[ -f "$HOME/.config/systemd/user/voxtype.service" ]] || voxtype setup systemd
+fi
 
 # --- Matugen first-run render --------------------------------------
 # Skip if colors already exist — runtime theme swaps go through a separate
