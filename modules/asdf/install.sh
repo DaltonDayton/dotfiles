@@ -8,7 +8,12 @@ for plugin in nodejs ruby; do
     fi
 
     latest="$(asdf latest "$plugin")"
-    # asdf install no-ops when the version is already present.
-    asdf install "$plugin" "$latest"
+    # `asdf install` no-ops when the version is present, but still prints
+    # "version X of Y is already installed" — guard it explicitly so re-runs
+    # stay silent. `asdf list` marks the active version with a leading `*`,
+    # so strip leading spaces/asterisks before matching.
+    if ! asdf list "$plugin" 2>/dev/null | sed 's/^[ *]*//' | grep -qx "$latest"; then
+        asdf install "$plugin" "$latest"
+    fi
     asdf set -u "$plugin" "$latest"
 done

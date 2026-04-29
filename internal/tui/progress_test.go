@@ -82,6 +82,26 @@ func TestProgress_FailedSurfacesError(t *testing.T) {
 	}
 }
 
+func TestProgress_TickAdvancesSpinnerFrame(t *testing.T) {
+	m := newTestModel([]string{"git"}, map[string]int{"git": 2})
+	feed(m, runner.Event{Kind: runner.EventStart, Module: "git", Action: "symlink ~/.gitconfig"})
+
+	first := m.View()
+	if !strings.Contains(first, "[1/2] symlink ~/.gitconfig") {
+		t.Fatalf("running view missing detail: %s", first)
+	}
+
+	startFrame := spinnerFrames[m.frame%len(spinnerFrames)]
+	m.Update(tickMsg{})
+	nextFrame := spinnerFrames[m.frame%len(spinnerFrames)]
+	if startFrame == nextFrame {
+		t.Errorf("tick did not advance spinner frame: %q -> %q", startFrame, nextFrame)
+	}
+	if !strings.Contains(m.View(), nextFrame) {
+		t.Errorf("view missing post-tick spinner glyph %q: %s", nextFrame, m.View())
+	}
+}
+
 func TestProgress_UnknownModuleEventIgnored(t *testing.T) {
 	m := newTestModel([]string{"git"}, map[string]int{"git": 1})
 	feed(m, runner.Event{Kind: runner.EventStart, Module: "ghost", Action: "x"})

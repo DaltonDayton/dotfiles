@@ -1,6 +1,6 @@
 name        = "ai"
 description = "Claude Code and opencode — binaries, settings, and customizations"
-tags        = ["dev", "ai"]
+tags        = ["essential", "ai"]
 
 [[packages]]
 manager = "pacman"

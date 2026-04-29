@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/DaltonDayton/dotfiles/internal/module"
 )
@@ -30,4 +31,43 @@ func RunInstallSh(m *module.Module) error {
 		return fmt.Errorf("install.sh for %s failed: %w", m.Name, err)
 	}
 	return nil
+}
+
+// InstallShNeedsSudo reports whether the module's install.sh exists and
+// contains a sudo invocation outside of comments. Used to decide whether
+// to prime sudo before the TUI runs so install.sh doesn't surprise the
+// user with a password prompt at the end. Errors reading the script are
+// treated as "no sudo" — the script will simply prompt at runtime if it
+// turns out to need it.
+func InstallShNeedsSudo(m *module.Module) bool {
+	script := filepath.Join(m.Dir, "install.sh")
+	data, err := os.ReadFile(script)
+	if err != nil {
+		return false
+	}
+	for _, line := range strings.Split(string(data), "\n") {
+		trimmed := strings.TrimLeft(line, " \t")
+		if strings.HasPrefix(trimmed, "#") {
+			continue
+		}
+		if strings.Contains(trimmed, "sudo ") {
+			return true
+		}
+	}
+	return false
+}
+
+// PlanInstallShNeedsSudo reports whether any module in the plan has an
+// install.sh that invokes sudo. Mirrors PlanNeedsSudo for the post-TUI
+// script phase so callers can prime sudo once for both phases.
+func PlanInstallShNeedsSudo(plan []ModulePlan) bool {
+	for _, p := range plan {
+		if p.BuildErr != nil {
+			continue
+		}
+		if InstallShNeedsSudo(p.Module) {
+			return true
+		}
+	}
+	return false
 }

@@ -61,7 +61,7 @@ func newInstallCmd() *cobra.Command {
 			}
 
 			plan := runner.BuildPlan(ordered, ctx.Host)
-			if runner.PlanNeedsSudo(plan) {
+			if runner.PlanNeedsSudo(plan) || runner.PlanInstallShNeedsSudo(plan) {
 				if err := primeSudo(); err != nil {
 					return err
 				}

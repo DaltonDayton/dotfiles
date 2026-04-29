@@ -56,8 +56,8 @@ fi
 # don't run `voxtype setup compositor hyprland` — files/hypr/conf.d/
 # voxtype-submap.conf is tracked in the repo and sourced from hyprland.conf.
 if command -v voxtype >/dev/null 2>&1; then
-  voxtype setup --download
-  [[ -f "$HOME/.config/systemd/user/voxtype.service" ]] || voxtype setup systemd
+  voxtype setup --quiet --download
+  [[ -f "$HOME/.config/systemd/user/voxtype.service" ]] || voxtype setup --quiet systemd
 
   # Host-keyed systemd drop-in (e.g. pinning Vulkan device on multi-GPU laptops).
   # Only hosts with a file under files/voxtype/systemd/ get a drop-in; others
@@ -86,7 +86,7 @@ if command -v voxtype >/dev/null 2>&1; then
   # we read the output into a variable instead.
   voxtype_gpu_status="$(voxtype setup gpu --status 2>/dev/null || true)"
   if [[ "$voxtype_gpu_status" != *"Active backend: GPU"* ]]; then
-    sudo voxtype setup gpu --enable
+    sudo voxtype setup --quiet gpu --enable
   fi
 fi
 
