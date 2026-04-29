@@ -127,6 +127,13 @@ else
   write_one "$HOME/.config/wlogout/colors/colors.css"  "@import \"../../themes/${THEME}/wlogout.css\";"
   write_one "$HOME/.config/tmux/colors/colors.conf"    "source-file ~/.config/themes/${THEME}/tmux.conf"
 
+  # pywalfox reads from a fixed path and doesn't support indirection, so copy.
+  if [[ -f "$THEME_DIR/pywalfox.json" ]]; then
+    mkdir -p "$HOME/.cache/wal"
+    cp "$THEME_DIR/pywalfox.json" "$HOME/.cache/wal/colors.json"
+    pywalfox update >/dev/null 2>&1 || true
+  fi
+
   if [[ -n "$wallpaper" ]]; then
     awww img "$wallpaper" \
       --transition-type center --transition-fps 165 \
