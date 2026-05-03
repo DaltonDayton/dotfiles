@@ -55,7 +55,8 @@ modules/hyprland/files/themes/
 │   ├── wlogout.css           # @define-color bg0 ...; etc.
 │   └── wallpapers/
 │       ├── 01.jpg
-│       └── 02.jpg
+│       ├── 02.jpg
+│       └── local/            # gitignored; for wallpapers you don't want synced
 ├── gruvbox-dark/             # same shape
 ├── rose-pine/
 ├── nord/
@@ -103,9 +104,10 @@ Each app's main config sources its respective `colors/colors.<ext>` exactly once
 
 ### `theme-switcher.sh` (Super+D)
 
-1. List subdirectories of `~/.config/themes/` (excluding `.*`). Use `meta.toml`'s `display_name` for rofi labels if present, otherwise the dir name.
-2. Show rofi picker with the current theme marked (e.g. `● catppuccin-mocha`). Read current theme from `${XDG_STATE_HOME:-$HOME/.local/state}/themes/current`.
-3. On selection, call `apply-theme.sh <name>`.
+1. List subdirectories of `~/.config/themes/` (excluding `.*`). Use `meta.toml`'s `display_name` for rofi labels if present, otherwise the dir name. Mark the current theme with a `●` prefix (read from `${XDG_STATE_HOME:-$HOME/.local/state}/themes/current`).
+2. For each theme, resolve a tile icon: prefer the theme's last-used wallpaper (`<theme>:<path>` line in `wallpapers.txt`); fall back to the alphabetically-first wallpaper in `themes/<theme>/wallpapers/`.
+3. Show a rofi thumbnail grid using the same theme file as the wallpaper picker (`~/.config/rofi/wallpaper-picker.rasi`) and the same `-preview-cmd` thumbnail helper (`rofi-thumbnail.sh`). Selection resolves by index (`-format i`).
+4. On selection, call `apply-theme.sh <name>`.
 
 ### `apply-theme.sh <name>` (the workhorse)
 
@@ -129,7 +131,7 @@ Each app's main config sources its respective `colors/colors.<ext>` exactly once
 ### `wallpaper-picker.sh` (Super+Shift+D)
 
 1. Read current theme from `themes/current`.
-2. Build wallpaper pool (matugen → union of `themes/*/wallpapers/` plus `${MATUGEN_WALLPAPERS_DIR:-$HOME/Pictures/Wallpapers}`; otherwise → current theme's `wallpapers/`).
+2. Build wallpaper pool (matugen → union of `themes/*/wallpapers/` plus `${MATUGEN_WALLPAPERS_DIR:-$HOME/Pictures/Wallpapers}`, deduped by sha256 since a wallpaper claimed by multiple static themes exists as physical copies in each theme's dir; otherwise → current theme's `wallpapers/`). Both pools recurse, so `wallpapers/local/` files are included.
 3. Show rofi picker with `-show-icons` and a dedicated wallpaper theme (`~/.config/rofi/wallpaper-picker.rasi`). Thumbnails are generated through `-preview-cmd` (`rofi-thumbnail.sh`) so image cards render at a fixed rectangular aspect.
 4. On selection, persist `<theme>:<selected-path>` to `wallpapers.txt`.
 5. Apply the wallpaper:
