@@ -11,3 +11,6 @@ modules/neovim/files/nvim/lazy-lock.json
 # Internal device-keyed symlinks (set by modules/hyprland/install.sh).
 modules/hyprland/files/hypr/monitors.conf
 modules/hyprland/files/voxtype/config.toml
+
+# Local-only wallpapers (per-theme, not synced).
+modules/hyprland/files/themes/*/wallpapers/local/

@@ -34,7 +34,17 @@ fi
 declare -a pool=()
 if [[ "$mode" == "matugen" ]]; then
   matugen_extra_dir="${MATUGEN_WALLPAPERS_DIR:-$HOME/Pictures/Wallpapers}"
-  while IFS= read -r -d '' f; do pool+=("$f"); done < <(
+  # Dedupe by content hash: a wallpaper claimed by multiple static themes
+  # exists as physical copies in each theme's wallpapers/ dir; in matugen
+  # mode the union pool would otherwise show it once per theme.
+  declare -A seen_hashes=()
+  while IFS= read -r -d '' f; do
+    hash=$(sha256sum "$f" | cut -d' ' -f1)
+    if [[ -z "${seen_hashes[$hash]:-}" ]]; then
+      seen_hashes[$hash]=1
+      pool+=("$f")
+    fi
+  done < <(
     {
       find -L "$THEMES_DIR" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -print0
       if [[ -d "$matugen_extra_dir" ]]; then
