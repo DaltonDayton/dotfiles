@@ -2,6 +2,8 @@
 # Rofi wallpaper picker. In matugen mode, pool = union of every theme's
 # wallpapers/ and selection triggers `matugen image`. In static mode,
 # pool = current theme only and selection just changes the wallpaper.
+# By default `local/` subdirs are excluded; press Alt+L inside the picker
+# to re-launch with WALLPAPER_PICKER_INCLUDE_LOCAL=1 and reveal them.
 # Bound to Super+Shift+D.
 set -euo pipefail
 
@@ -16,6 +18,10 @@ rofi_theme_args=()
 if [[ -f "$ROFI_THEME" ]]; then
   rofi_theme_args=(-theme "$ROFI_THEME")
 fi
+
+INCLUDE_LOCAL="${WALLPAPER_PICKER_INCLUDE_LOCAL:-}"
+find_filter=()
+[[ -z "$INCLUDE_LOCAL" ]] && find_filter=(! -path '*/local/*')
 
 if [[ ! -f "$CURRENT_STATE" ]]; then
   notify-send "Wallpaper" "No active theme — run Super+D first" -u critical
@@ -46,15 +52,15 @@ if [[ "$mode" == "matugen" ]]; then
     fi
   done < <(
     {
-      find -L "$THEMES_DIR" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -print0
+      find -L "$THEMES_DIR" -type f "${find_filter[@]}" \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -print0
       if [[ -d "$matugen_extra_dir" ]]; then
-        find -L "$matugen_extra_dir" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -print0
+        find -L "$matugen_extra_dir" -type f "${find_filter[@]}" \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -print0
       fi
     } | sort -zu
   )
 else
   while IFS= read -r -d '' f; do pool+=("$f"); done < <(
-    find "$THEME_DIR/wallpapers" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -print0 2>/dev/null | sort -z
+    find "$THEME_DIR/wallpapers" -type f "${find_filter[@]}" \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -print0 2>/dev/null | sort -z
   )
 fi
 
@@ -69,6 +75,10 @@ current_wp=$(grep "^${THEME}:" "$WALLPAPERS_STATE" | head -n1 | cut -d':' -f2-)
 
 # Build rofi rows using -format i so selection resolves by index. This avoids
 # relying on NUL bytes in shell variables (bash strings cannot hold them).
+# Alt+L exits with status 10 (custom-1) so we can re-launch with local included.
+prompt="Wallpaper (PgDn/PgUp)"
+[[ -z "$INCLUDE_LOCAL" ]] && prompt="Wallpaper (Alt+L: local)"
+status=0
 selected_idx=$(
   {
     for i in "${!pool[@]}"; do
@@ -80,11 +90,15 @@ selected_idx=$(
       fi
       printf '%s\0icon\x1fthumbnail://%s?%s\n' "$label" "$wp" "$ROFI_THUMBNAIL_PROFILE"
     done
-  } | rofi -no-config -dmenu -i -show-icons -format i -p "Wallpaper (PgDn/PgUp)" \
+  } | rofi -no-config -dmenu -i -show-icons -format i -p "$prompt" \
+      -kb-custom-1 'Alt+l' \
       -preview-cmd "$ROFI_THUMBNAIL_CMD" \
       "${rofi_theme_args[@]}"
-)
+) || status=$?
 
+if (( status == 10 )); then
+  exec env WALLPAPER_PICKER_INCLUDE_LOCAL=1 "$0"
+fi
 [[ -z "$selected_idx" ]] && exit 0
 selected_path="${pool[$selected_idx]:-}"
 [[ -z "$selected_path" ]] && { notify-send "Wallpaper" "Could not resolve selection index: $selected_idx" -u critical; exit 1; }

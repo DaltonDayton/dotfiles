@@ -131,7 +131,7 @@ Each app's main config sources its respective `colors/colors.<ext>` exactly once
 ### `wallpaper-picker.sh` (Super+Shift+D)
 
 1. Read current theme from `themes/current`.
-2. Build wallpaper pool (matugen → union of `themes/*/wallpapers/` plus `${MATUGEN_WALLPAPERS_DIR:-$HOME/Pictures/Wallpapers}`, deduped by sha256 since a wallpaper claimed by multiple static themes exists as physical copies in each theme's dir; otherwise → current theme's `wallpapers/`). Both pools recurse, so `wallpapers/local/` files are included.
+2. Build wallpaper pool (matugen → union of `themes/*/wallpapers/` plus `${MATUGEN_WALLPAPERS_DIR:-$HOME/Pictures/Wallpapers}`, deduped by sha256 since a wallpaper claimed by multiple static themes exists as physical copies in each theme's dir; otherwise → current theme's `wallpapers/`). `wallpapers/local/` files are excluded by default; pressing **Alt+L** inside the picker re-launches with `WALLPAPER_PICKER_INCLUDE_LOCAL=1` and includes them.
 3. Show rofi picker with `-show-icons` and a dedicated wallpaper theme (`~/.config/rofi/wallpaper-picker.rasi`). Thumbnails are generated through `-preview-cmd` (`rofi-thumbnail.sh`) so image cards render at a fixed rectangular aspect.
 4. On selection, persist `<theme>:<selected-path>` to `wallpapers.txt`.
 5. Apply the wallpaper:
