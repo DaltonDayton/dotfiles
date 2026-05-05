@@ -92,7 +92,6 @@ if [[ "$mode" == "matugen" ]]; then
       matugen_input="$matugen_tmp"
     fi
 
-    # matugen post-hooks regenerate matugen.* and reload each app.
     # scheme-expressive spreads primary/secondary/tertiary across the hue
     # wheel — needed for role-based accent templates to get hue diversity.
     if ! matugen image "$matugen_input" --type scheme-expressive --prefer darkness; then
