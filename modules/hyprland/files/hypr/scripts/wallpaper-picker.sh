@@ -106,6 +106,7 @@ selected_path="${pool[$selected_idx]:-}"
 # Persist
 sed -i "/^${THEME}:/d" "$WALLPAPERS_STATE"
 printf '%s:%s\n' "$THEME" "$selected_path" >> "$WALLPAPERS_STATE"
+ln -sfn "$selected_path" "$STATE_DIR/current_wallpaper"
 
 # Apply
 if [[ "$mode" == "matugen" ]]; then
