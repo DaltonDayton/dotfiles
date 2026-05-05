@@ -93,8 +93,9 @@ if [[ "$mode" == "matugen" ]]; then
     fi
 
     # matugen post-hooks regenerate matugen.* and reload each app.
-    # scheme-rainbow gives the widest hue spread across primary/secondary/tertiary.
-    if ! matugen image "$matugen_input" --type scheme-rainbow --prefer darkness; then
+    # scheme-expressive spreads primary/secondary/tertiary across the hue
+    # wheel — needed for role-based accent templates to get hue diversity.
+    if ! matugen image "$matugen_input" --type scheme-expressive --prefer darkness; then
       [[ -n "$matugen_tmp" ]] && rm -f "$matugen_tmp"
       exit 1
     fi
