@@ -124,7 +124,7 @@ if [[ "$mode" == "matugen" ]]; then
     matugen_input="$matugen_tmp"
   fi
 
-  if ! matugen image "$matugen_input" --prefer darkness; then
+  if ! matugen image "$matugen_input" --type scheme-rainbow --prefer darkness; then
     [[ -n "$matugen_tmp" ]] && rm -f "$matugen_tmp"
     notify-send "Wallpaper" "Matugen failed for $(basename "$selected_path")" -u critical
     exit 1

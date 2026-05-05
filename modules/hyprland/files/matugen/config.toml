@@ -47,6 +47,7 @@ output_path = '~/.config/wlogout/colors/matugen.css'
 [templates.tmux]
 input_path = '~/.config/matugen/templates/tmux-colors.conf'
 output_path = '~/.config/tmux/colors/matugen.conf'
+post_hook = 'tmux source-file ~/.config/tmux/tmux.conf >/dev/null 2>&1 || true'
 
 [templates.nvim]
 input_path = '~/.config/matugen/templates/nvim-colors.lua'

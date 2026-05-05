@@ -92,8 +92,9 @@ if [[ "$mode" == "matugen" ]]; then
       matugen_input="$matugen_tmp"
     fi
 
-    # matugen post-hooks regenerate matugen.* and reload each app
-    if ! matugen image "$matugen_input" --prefer darkness; then
+    # matugen post-hooks regenerate matugen.* and reload each app.
+    # scheme-rainbow gives the widest hue spread across primary/secondary/tertiary.
+    if ! matugen image "$matugen_input" --type scheme-rainbow --prefer darkness; then
       [[ -n "$matugen_tmp" ]] && rm -f "$matugen_tmp"
       exit 1
     fi
@@ -150,8 +151,7 @@ else
     (swaync >/dev/null 2>&1 &)
   fi
   pkill -SIGUSR1 nvim 2>/dev/null || true
+  tmux source-file "$HOME/.config/tmux/tmux.conf" >/dev/null 2>&1 || true
 fi
-
-tmux source-file "$HOME/.config/tmux/tmux.conf" >/dev/null 2>&1 || true
 
 notify-send "Theme" "$THEME" || true
