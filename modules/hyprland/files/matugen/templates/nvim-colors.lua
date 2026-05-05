@@ -6,11 +6,11 @@ if vim.g.syntax_on then vim.cmd("syntax reset") end
 vim.g.colors_name = "matugen"
 
 local p = {
-  bg0    = "{{colors.surface.default.hex}}",
-  bg1    = "{{colors.surface_container_low.default.hex}}",
-  bg2    = "{{colors.surface_container.default.hex}}",
-  bg3    = "{{colors.surface_container_high.default.hex}}",
-  bg4    = "{{colors.surface_container_highest.default.hex}}",
+  bg0    = "{{palettes.neutral._5.hex}}",
+  bg1    = "{{palettes.neutral._10.hex}}",
+  bg2    = "{{palettes.neutral._15.hex}}",
+  bg3    = "{{palettes.neutral._20.hex}}",
+  bg4    = "{{palettes.neutral._25.hex}}",
   fg     = "{{colors.on_surface.default.hex}}",
   red    = "{{colors.error.default.hex}}",
   orange = "{{colors.tertiary.default.hex}}",
