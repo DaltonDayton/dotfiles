@@ -41,9 +41,9 @@
     "custom/pacman": {
         "format": "{}  ",
         "interval": 3600, // every hour
-        "exec": "checkupdates | wc -l", // # of updates
+        "exec": "$HOME/.config/waybar/scripts/pacman-updates.sh", // repo + AUR (cached, multi-monitor safe)
         "exec-if": "exit 0", // always run; consider advanced run conditions
-        "on-click": "kitty --hold 'sudo pacman -Syu'; pkill -SIGRTMIN+8 waybar", // update system
+        "on-click": "kitty -- bash -c 'yay -Syu --noconfirm; echo; read -n 1 -s -r -p \"Press any key to close...\"'; pkill -SIGRTMIN+8 waybar", // yay handles repo + AUR
         "signal": 8
     },
 

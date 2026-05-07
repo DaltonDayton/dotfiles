@@ -15,7 +15,7 @@ names = [
     "cliphist",
     "tesseract", "tesseract-data-eng", "libnotify", "wtype",
     "xdg-utils", "desktop-file-utils", "shared-mime-info", "archlinux-xdg-menu",
-    "jq", "btop",
+    "jq", "btop", "pacman-contrib",
     "awww",
     "nwg-look",
 ]
