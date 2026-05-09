@@ -1,5 +1,5 @@
 name = "python"
-description = "uv-managed Python (latest stable)"
+description = "uv (Python toolchain manager)"
 tags = ["dev"]
 
 [[packages]]

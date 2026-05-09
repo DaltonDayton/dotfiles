@@ -1,0 +1,15 @@
+name = "obsidian"
+description = "Obsidian + vault directories"
+tags = ["apps"]
+
+[[packages]]
+manager = "pacman"
+names = ["obsidian"]
+
+[[directories]]
+path = "~/vaults/Personal"
+mode = "0755"
+
+[[directories]]
+path = "~/vaults/Work"
+mode = "0755"

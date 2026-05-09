@@ -1,0 +1,11 @@
+name = "solaar"
+description = "Logitech Unifying receiver manager + udev rule"
+tags = ["apps"]
+
+[[packages]]
+manager = "pacman"
+names = ["solaar"]
+
+[[symlinks]]
+src = "files/config"
+dst = "~/.config/solaar"
