@@ -1,0 +1,7 @@
+name = "python"
+description = "uv-managed Python (latest stable)"
+tags = ["dev"]
+
+[[packages]]
+manager = "pacman"
+names = ["uv"]

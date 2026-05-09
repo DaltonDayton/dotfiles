@@ -95,6 +95,7 @@ eval "$(starship init zsh)"
 eval "$(atuin init zsh)"
 # eval "$(tv init zsh)"
 eval "$(zoxide init --cmd cd zsh)"
+command -v uv >/dev/null && eval "$(uv generate-shell-completion zsh)"
 
 
 
