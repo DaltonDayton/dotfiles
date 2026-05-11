@@ -1,0 +1,24 @@
+name = "razer"
+description = "OpenRazer driver + daemon and Polychromatic GUI for Razer peripherals"
+tags = ["apps"]
+hosts = ["archlinux"]
+
+[[packages]]
+manager = "pacman"
+names = [
+    "openrazer-driver-dkms",
+    "openrazer-daemon",
+    "python-openrazer",
+]
+
+[[packages]]
+manager = "aur"
+names = ["polychromatic-git"]
+
+# Enabled-only on first apply: the daemon refuses to start until the user is
+# in the 'openrazer' group, and that membership only takes effect on the next
+# login. The unit will auto-start once the user logs in fresh.
+[[services]]
+name = "openrazer-daemon.service"
+scope = "user"
+state = "enabled"
