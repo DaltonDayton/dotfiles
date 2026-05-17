@@ -78,6 +78,10 @@ dst = "~/.config/swaync"
 src = "files/wlogout"
 dst = "~/.config/wlogout"
 
+[[symlinks]]
+src = "files/systemd/user/hyprlock-watch.service"
+dst = "~/.config/systemd/user/hyprlock-watch.service"
+
 [[files]]
 dst = "~/.config/cliphist/config"
 content = "max-items=100\n"
@@ -90,4 +94,9 @@ state = "enabled"
 [[services]]
 scope = "system"
 name = "sddm.service"
+state = "enabled"
+
+[[services]]
+scope = "user"
+name = "hyprlock-watch.service"
 state = "enabled"
