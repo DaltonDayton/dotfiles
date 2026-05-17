@@ -47,14 +47,6 @@
         "signal": 8
     },
 
-    "custom/weather": {
-        "exec": "${HOME}/.config/waybar/scripts/get-weather.sh Clinton_Utah",
-        "return-type": "json",
-        "format": "{}",
-        "tooltip": true,
-        "interval": 3600
-    },
-
     "custom/cpu": {
         "interval": 2,
         "exec": "$HOME/.config/waybar/scripts/cpu.sh",

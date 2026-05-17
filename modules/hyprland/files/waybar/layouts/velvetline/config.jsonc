@@ -23,7 +23,6 @@
     "modules-right": [
         "idle_inhibitor",
         "custom/pacman",
-        "custom/weather",
         "pulseaudio",
         "bluetooth",
         "network",
