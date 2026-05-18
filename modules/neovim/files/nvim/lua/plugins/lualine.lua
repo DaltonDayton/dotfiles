@@ -20,15 +20,14 @@ return {
       end
     end
 
-    -- Function to display active LSP client(s)
-    local function lsp_clients()
-      local clients = vim.lsp.get_clients({ bufnr = 0 })
-      if #clients == 0 then return "" end
-      local names = {}
-      for _, client in ipairs(clients) do
-        table.insert(names, client.name)
-      end
-      return table.concat(names, ", ")
+    -- Compact LSP indicator: gear icon + count of attached clients.
+    -- Use :checkhealth lsp (or :lua vim.print(vim.lsp.get_clients()) to see names).
+    -- "\239\128\147" is the UTF-8 encoding of U+F013 (fa-cog) in nerd fonts. ⚙
+    local lsp_icon = "\239\128\147"
+    local function lsp_count()
+      local n = #vim.lsp.get_clients({ bufnr = 0 })
+      if n == 0 then return "" end
+      return lsp_icon .. " " .. n
     end
 
     lualine.setup({
@@ -60,7 +59,7 @@ return {
             lazy_status.updates,
             cond = lazy_status.has_updates,
           },
-          { lsp_clients },
+          { lsp_count },
           { "encoding" },
           { "fileformat" },
           { "filetype" },
