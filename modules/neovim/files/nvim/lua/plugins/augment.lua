@@ -1,27 +1,19 @@
 return {
   "augmentcode/augment.vim",
   event = "InsertEnter",
-  config = function()
-    -- vim.g.augment_workspace_folders = { "/home/dalton/.dotfiles/" }
+  -- These globals are read at plugin-load time (plugin/augment.vim runs
+  -- SetupKeybinds and reads workspace folders before config() executes), so
+  -- they must be set in init, not config. Setting them in config silently
+  -- has no effect.
+  init = function()
     local root_dir = vim.lsp.buf.list_workspace_folders()[1] or vim.fn.getcwd()
     vim.g.augment_workspace_folders = { root_dir }
-
     vim.g.augment_disable_tab_mapping = true
-    -- vim.keymap.set("i", "<C-y>", "<cmd>call augment#Accept()<CR>", { silent = true })
+  end,
+  config = function()
+    vim.keymap.set("i", "<C-y>", "<cmd>call augment#Accept()<CR>", { silent = true, desc = "Augment - Accept suggestion" })
   end,
   keys = {
-    {
-      "<leader>ae",
-      "<cmd>lua vim.g.augment_disable_completions = false<cr>",
-      mode = { "n" },
-      desc = "Augment - Enable completions",
-    },
-    {
-      "<leader>ad",
-      "<cmd>lua vim.g.augment_disable_completions = true<cr>",
-      mode = { "n" },
-      desc = "Augment - Disable completions",
-    },
     {
       "<leader>am",
       "<cmd>Augment chat<cr>",

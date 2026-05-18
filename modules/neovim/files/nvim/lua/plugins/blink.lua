@@ -83,7 +83,18 @@ return {
     -- C-k: Toggle signature help (if signature.enabled = true)
     --
     -- See :h blink-cmp-config-keymap for defining your own keymap
-    keymap = { preset = "enter" },
+    --
+    -- Custom on top of the "enter" preset: <Tab> selects-and-accepts the top
+    -- item (so the common "type, press Tab to accept top match" flow still
+    -- works with preselect = false). <CR> stays bound to `accept`, which the
+    -- docs note "will only trigger if an item is selected" — so after Emmet
+    -- expands `div` into `<div></div>` and the LSP re-pops the menu with
+    -- `</div>` available, Enter produces a newline instead of re-accepting,
+    -- because nothing is selected without preselect.
+    keymap = {
+      preset = "enter",
+      ["<Tab>"] = { "select_and_accept", "snippet_forward", "fallback" },
+    },
 
     signature = {
       enabled = true,
@@ -98,6 +109,16 @@ return {
 
     -- Automatically show documentation popup when highlighting completion items
     completion = {
+      list = {
+        selection = {
+          -- Manual mode: nothing is preselected and navigation does not
+          -- insert a preview. `accept` only fires when an item is explicitly
+          -- selected, so the menu the HTML LSP re-pops after an Emmet
+          -- expansion does not eat the next <CR>.
+          preselect = false,
+          auto_insert = false,
+        },
+      },
       menu = {
         border = "rounded",
         winblend = 0, -- Transparency: 0 = opaque, 100 = fully transparent
