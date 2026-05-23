@@ -98,6 +98,23 @@ eval "$(zoxide init --cmd cd zsh)"
 command -v uv >/dev/null && eval "$(uv generate-shell-completion zsh)"
 command -v sesh >/dev/null && eval "$(sesh completion zsh)"
 
+# sesh picker from any shell — creates/attaches tmux session at chosen target
+function s() {
+  local session
+  session=$(sesh list --icons | fzf \
+    --no-sort --ansi --border-label ' sesh ' --prompt '⚡  ' \
+    --header '  ^a all ^t tmux ^g configs ^x zoxide ^f find' \
+    --bind 'tab:down,btab:up' \
+    --bind 'ctrl-a:change-prompt(⚡  )+reload(sesh list --icons)' \
+    --bind 'ctrl-t:change-prompt(🪟  )+reload(sesh list -t --icons)' \
+    --bind 'ctrl-g:change-prompt(⚙️  )+reload(sesh list -c --icons)' \
+    --bind 'ctrl-x:change-prompt(📁  )+reload(sesh list -z --icons)' \
+    --bind 'ctrl-f:change-prompt(🔎  )+reload(fd -H -d 2 -t d . ~)' \
+    --preview-window 'right:55%' \
+    --preview 'sesh preview {}')
+  [[ -n "$session" ]] && sesh connect "$session"
+}
+
 
 
 
