@@ -1,0 +1,14 @@
+#:schema https://github.com/joshmedeski/sesh/raw/main/sesh.schema.json
+
+blacklist = ["scratch"]
+dir_length = 2
+sort_order = ["tmux", "config", "tmuxinator", "zoxide"]
+cache = true
+
+[default_session]
+preview_command = "eza --all --git --icons --color=always {}"
+
+[tui]
+prompt = "⚡  "
+placeholder = "Filter sessions..."
+show_icons = true
