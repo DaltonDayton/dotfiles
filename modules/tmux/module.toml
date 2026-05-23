@@ -1,12 +1,20 @@
 name = "tmux"
-description = "tmux + plugin manager + theme indirection"
+description = "tmux + plugin manager + theme indirection + sesh session manager"
 tags = ["essential"]
-depends_on = ["git"]
+depends_on = ["git", "shell"]
 
 [[packages]]
 manager = "pacman"
-names = ["tmux"]
+names = ["tmux", "gum", "fd"]
+
+[[packages]]
+manager = "aur"
+names = ["sesh-bin"]
 
 [[symlinks]]
 src = "files/tmux.conf"
 dst = "~/.config/tmux/tmux.conf"
+
+[[symlinks]]
+src = "files/sesh.toml"
+dst = "~/.config/sesh/sesh.toml"
