@@ -96,6 +96,7 @@ eval "$(atuin init zsh)"
 # eval "$(tv init zsh)"
 eval "$(zoxide init --cmd cd zsh)"
 command -v uv >/dev/null && eval "$(uv generate-shell-completion zsh)"
+command -v sesh >/dev/null && eval "$(sesh completion zsh)"
 
 
 
