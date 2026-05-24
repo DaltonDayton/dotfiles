@@ -118,6 +118,32 @@ function s() {
   [[ -n "$session" ]] && sesh connect "$session"
 }
 
+# sdev: pick a zoxide dir, open tmux session with 3 windows (ai, nvim, term)
+function sdev() {
+  local dir name
+  dir=$(zoxide query -l | fzf \
+    --no-sort --ansi --border-label ' sdev ' --prompt '🛠  ' \
+    --preview 'eza --all --git --icons --color=always {}' \
+    --preview-window 'right:55%')
+  [[ -z "$dir" ]] && return
+
+  name=$(basename "$dir" | tr -c 'A-Za-z0-9_-' '-' | sed 's/--*/-/g; s/^-//; s/-$//')
+
+  if ! tmux has-session -t="$name" 2>/dev/null; then
+    tmux new-session   -d -s "$name" -c "$dir" -n "ai"
+    tmux new-window    -t "$name:"   -c "$dir" -n "nvim" "nvim .; exec \$SHELL"
+    tmux new-window    -t "$name:"   -c "$dir" -n "term"
+    tmux select-window -t "$name:ai"
+  fi
+
+  if [[ -n "$TMUX" ]]; then
+    tmux switch-client -t "$name"
+  else
+    tmux attach -t "$name"
+  fi
+}
+
+
 
 
 
