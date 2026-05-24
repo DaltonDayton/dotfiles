@@ -50,7 +50,6 @@
       "Bash(chmod 777:*)"
     ],
     "ask": [
-      "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(git checkout:*)",
       "Bash(git switch:*)",
@@ -76,9 +75,17 @@
     "pyright-lsp@claude-plugins-official": true,
     "csharp-lsp@claude-plugins-official": true,
     "ruby-lsp@claude-plugins-official": true,
-    "context7@claude-plugins-official": true
+    "context7@claude-plugins-official": true,
+    "caveman@caveman": true
   },
-  "extraKnownMarketplaces": {},
+  "extraKnownMarketplaces": {
+    "caveman": {
+      "source": {
+        "source": "github",
+        "repo": "JuliusBrussee/caveman"
+      }
+    }
+  },
   "sandbox": {
     "enabled": true
   },
