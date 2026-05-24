@@ -3,7 +3,7 @@
 blacklist = ["scratch"]
 dir_length = 2
 sort_order = ["tmux", "config", "tmuxinator", "zoxide"]
-cache = true
+cache = false
 
 [default_session]
 preview_command = "eza --all --git --icons --color=always {}"
