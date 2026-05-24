@@ -3,6 +3,10 @@ export PATH="$HOME/.asdf/bin:$PATH"
 export PATH="$HOME/go/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 
+# Suppress zoxide doctor check (false positive in Claude Code shell snapshot,
+# which reorders init so zoxide is not last even though ~/.zshrc has it last).
+export _ZO_DOCTOR=0
+
 # ZINIT
 # =====
 # Set the directory we want to store zinit and plugins
@@ -94,7 +98,6 @@ eval "$(fzf --zsh)"
 eval "$(starship init zsh)"
 eval "$(atuin init zsh)"
 # eval "$(tv init zsh)"
-eval "$(zoxide init --cmd cd zsh)"
 command -v uv >/dev/null && eval "$(uv generate-shell-completion zsh)"
 command -v sesh >/dev/null && eval "$(sesh completion zsh)"
 
@@ -114,7 +117,6 @@ function s() {
     --preview 'sesh preview {}')
   [[ -n "$session" ]] && sesh connect "$session"
 }
-
 
 
 
@@ -331,3 +333,6 @@ function s() {
 # export PATH=/home/dalton/.opencode/bin:$PATH
 # eval "$(uv generate-shell-completion zsh)"
 export PATH="$HOME/bin:$PATH"
+
+# zoxide last — doctor warns if anything follows it
+eval "$(zoxide init --cmd cd zsh)"
