@@ -3,15 +3,10 @@
 -- ============================================================================
 -- This file handles:
 -- 1. Installing LSP servers via Mason
--- 2. Auto-configuring installed servers with their DEFAULT configs
+-- 2. Auto-enabling installed servers (mason-lspconfig v2 calls vim.lsp.enable)
 -- 3. Installing formatters and linters
 --
--- mason-lspconfig automatically calls lspconfig.{server}.setup() for all
--- servers listed in ensure_installed, using their default configurations.
---
--- If a server needs CUSTOM configuration, you have two options:
--- 1. Use lua/lsp.lua for manual vim.lsp.config() setup (runs during init)
--- 2. Use after/plugin/lsp/{server_name}.lua for overrides (runs after plugins load)
+-- For per-server config overrides, use after/lsp/{server_name}.lua.
 -- ============================================================================
 
 return {
@@ -32,19 +27,7 @@ return {
       },
     },
     dependencies = {
-      {
-        "mason-org/mason.nvim",
-        opts = {
-          {
-            "mason-org/mason-lspconfig.nvim",
-            opts = {},
-            dependencies = {
-              { "mason-org/mason.nvim", opts = {} },
-              "neovim/nvim-lspconfig",
-            },
-          },
-        },
-      },
+      { "mason-org/mason.nvim", opts = {} },
       "neovim/nvim-lspconfig",
     },
   },
@@ -64,7 +47,7 @@ return {
       },
     },
     dependencies = {
-      "williamboman/mason.nvim",
+      "mason-org/mason.nvim",
     },
   },
   {
@@ -89,7 +72,7 @@ return {
       })
     end,
     dependencies = {
-      "williamboman/mason.nvim",
+      "mason-org/mason.nvim",
     },
   },
 }
