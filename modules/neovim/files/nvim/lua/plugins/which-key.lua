@@ -6,17 +6,17 @@ return {
     vim.o.timeoutlen = 500
   end,
   opts = {
-    -- your configuration comes here
-    -- or leave it empty to use the default settings
-    -- refer to the configuration section below
+    preset = "helix",
   },
-  config = function()
-    require("which-key").setup()
+  config = function(_, opts)
+    require("which-key").setup(opts)
 
     -- Document key groups only - individual keybinds have their own desc where defind
     require("which-key").add({
-      -- LSP Navigation
+      -- Non-leader prefixes
       { "g", group = "[G]oto" },
+      { "[", group = "Previous" },
+      { "]", group = "Next" },
 
       -- Leader groups
       { "<leader>a", group = "[A]ugment (AI)" },
