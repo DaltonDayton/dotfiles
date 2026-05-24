@@ -40,7 +40,14 @@ vim.api.nvim_create_autocmd("LspAttach", {
     -- [d / ]d (diagnostic jump) and K (hover) provided by Neovim 0.11+ defaults
 
     opts.desc = "Restart LSP"
-    keymap.set("n", "<leader>cS", ":LspRestart<CR>", opts) -- mapping to restart lsp if necessary
+    keymap.set("n", "<leader>cS", function()
+      for _, client in ipairs(vim.lsp.get_clients({ bufnr = ev.buf })) do
+        local name, cfg = client.name, client.config
+        client:stop()
+        vim.defer_fn(function() vim.lsp.start(cfg) end, 100)
+        vim.notify("Restarted LSP: " .. name)
+      end
+    end, opts)
   end,
 })
 
@@ -58,4 +65,5 @@ vim.diagnostic.config({
     },
   },
   float = { border = "rounded" },
+  virtual_lines = { current_line = true },
 })

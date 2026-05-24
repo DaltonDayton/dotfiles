@@ -93,6 +93,11 @@ return {
     { "gR", function() Snacks.picker.lsp_references() end, nowait = true, desc = "References" },
     { "gI", function() Snacks.picker.lsp_implementations() end, desc = "Goto Implementation" },
     { "gy", function() Snacks.picker.lsp_type_definitions() end, desc = "Goto T[y]pe Definition" },
+    -- 0.11+ default gr* prefix routed through snacks pickers
+    { "grr", function() Snacks.picker.lsp_references() end, nowait = true, desc = "References" },
+    { "gri", function() Snacks.picker.lsp_implementations() end, desc = "Goto Implementation" },
+    { "grt", function() Snacks.picker.lsp_type_definitions() end, desc = "Goto Type Definition" },
+    { "gO", function() Snacks.picker.lsp_symbols() end, desc = "Document Symbols" },
     { "<leader>ci", function() Snacks.picker.lsp_incoming_calls() end, desc = "Incoming Calls" },
     { "<leader>co", function() Snacks.picker.lsp_outgoing_calls() end, desc = "Outgoing Calls" },
     { "<leader>ss", function() Snacks.picker.lsp_symbols() end, desc = "LSP Symbols" },
