@@ -33,6 +33,10 @@ vim.opt.signcolumn = "yes" -- Always show the sign column
 vim.opt.cmdheight = 0 -- Auto-hide command line when not in use
 vim.opt.winborder = "rounded" -- Default border for floating windows (LSP hover, signature, etc.)
 
+-- Folding (treesitter foldexpr set per-FileType in plugins/treesitter.lua)
+vim.opt.foldlevel = 99 -- Open all folds by default
+vim.opt.foldlevelstart = 99 -- Same on buffer open
+
 -- Backspace behavior
 vim.opt.backspace = "indent,eol,start" -- Allow backspace on indent, end of line, or insert mode start position
 
