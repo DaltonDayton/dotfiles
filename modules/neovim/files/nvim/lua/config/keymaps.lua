@@ -6,13 +6,7 @@ vim.opt.hlsearch = true
 
 vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
--- Buffer navigation
-vim.keymap.set("n", "]b", ":bnext<CR>", { desc = "Next buffer" })
-vim.keymap.set("n", "[b", ":bprevious<CR>", { desc = "Previous buffer" })
-
--- Buffer management
-vim.keymap.set("n", "<leader>bn", ":bnext<CR>", { desc = "Next buffer" })
-vim.keymap.set("n", "<leader>bp", ":bprevious<CR>", { desc = "Previous buffer" })
+-- Buffer navigation: [b / ]b provided by Neovim 0.11+ defaults
 vim.keymap.set("n", "<leader>bs", ":b#<CR>", { desc = "Switch to last buffer" })
 
 -- Window management
@@ -23,19 +17,13 @@ vim.keymap.set("n", "<leader>wx", "<cmd>close<CR>", { desc = "Close current wind
 vim.keymap.set("n", "<leader>wo", "<cmd>only<CR>", { desc = "Close other windows" })
 
 -- Tab management
-vim.keymap.set("n", "<leader>tN", "<cmd>tabnew<CR>", { desc = "New tab" })
+vim.keymap.set("n", "<leader>tt", "<cmd>tabnew<CR>", { desc = "New tab" })
 vim.keymap.set("n", "<leader>tc", "<cmd>tabclose<CR>", { desc = "Close tab" })
 vim.keymap.set("n", "<leader>tp", "<cmd>tabp<CR>", { desc = "Previous tab" })
 vim.keymap.set("n", "<leader>tn", "<cmd>tabn<CR>", { desc = "Next tab" })
 vim.keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open buffer in new tab" })
 
--- Quickfix navigation
-vim.keymap.set("n", "]q", ":cnext<CR>", { desc = "Next quickfix" })
-vim.keymap.set("n", "[q", ":cprevious<CR>", { desc = "Previous quickfix" })
-
--- Quickfix management
-vim.keymap.set("n", "<leader>qn", ":cnext<CR>", { desc = "Next quickfix" })
-vim.keymap.set("n", "<leader>qp", ":cprevious<CR>", { desc = "Previous quickfix" })
+-- Quickfix: [q / ]q provided by Neovim 0.11+ defaults
 vim.keymap.set("n", "<leader>qo", ":copen<CR>", { desc = "Open quickfix" })
 vim.keymap.set("n", "<leader>qc", ":cclose<CR>", { desc = "Close quickfix" })
 

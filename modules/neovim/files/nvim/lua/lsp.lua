@@ -21,14 +21,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(ev)
     -- Buffer local mappings.
     -- See `:help vim.lsp.*` for documentation on any of the below functions
-    -- Note: gd, gD, gR, gI, gy are defined in lua/plugins/snacks.lua using Snacks picker
+    -- Note: gd, gD, grr, gri, grt, gO are defined in lua/plugins/snacks.lua using Snacks picker
     local opts = { buffer = ev.buf, silent = true }
 
-    opts.desc = "See available code actions"
-    keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts) -- see available code actions, in visual mode will apply to selection
-
-    opts.desc = "Smart rename"
-    keymap.set("n", "<leader>cr", vim.lsp.buf.rename, opts) -- smart rename
+    -- gra (code action) and grn (rename) provided by Neovim 0.11+ defaults
 
     opts.desc = "Signature help"
     keymap.set("n", "<leader>cs", vim.lsp.buf.signature_help, opts)
