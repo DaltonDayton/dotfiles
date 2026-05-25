@@ -3,9 +3,6 @@ return {
   branch = "main",
   dependencies = { "nvim-treesitter/nvim-treesitter" },
   event = { "BufReadPre", "BufNewFile" },
-  init = function()
-    vim.g.no_plugin_maps = true
-  end,
   config = function()
     require("nvim-treesitter-textobjects").setup({
       select = {
