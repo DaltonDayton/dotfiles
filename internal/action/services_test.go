@@ -1,6 +1,9 @@
 package action
 
-import "testing"
+import (
+	"errors"
+	"testing"
+)
 
 type fakeSystemctl struct {
 	responses map[string]struct {
@@ -45,6 +48,27 @@ func TestService_checkAlreadyEnabled(t *testing.T) {
 	}
 	if !ok {
 		t.Fatal("expected Check=true for enabled service")
+	}
+}
+
+func TestService_checkLinkedNeedsEnable(t *testing.T) {
+	// A unit symlinked into the user unit dir reports "linked" with a nonzero
+	// exit — present but not yet enabled, so Check must return false (not error).
+	f := &fakeSystemctl{responses: map[string]struct {
+		out string
+		err error
+	}{
+		"--user is-enabled hyprlock-watch.service ": {out: "linked\n", err: errors.New("exit status 1")},
+	}}
+	withFake(t, f)
+
+	s := &Service{Name: "hyprlock-watch.service", Scope: "user", State: "enabled"}
+	ok, err := s.Check()
+	if err != nil {
+		t.Fatalf("expected no error for linked unit, got %v", err)
+	}
+	if ok {
+		t.Fatal("expected Check=false for linked-but-not-enabled service")
 	}
 }
 

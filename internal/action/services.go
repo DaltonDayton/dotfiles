@@ -36,9 +36,12 @@ func (s *Service) isEnabled() (bool, error) {
 	out, err := systemctl(args...)
 	out = strings.TrimSpace(out)
 	if err != nil {
-		// why: systemctl returns nonzero for "disabled"/"masked"/"static" — that's
-		// a normal "not in desired state" signal, not a tool failure.
-		if out == "disabled" || out == "masked" || out == "static" {
+		// why: systemctl returns nonzero for "disabled"/"masked"/"static"/"linked" —
+		// that's a normal "not in desired state" signal, not a tool failure. "linked"
+		// means the unit file is symlinked in but lacks WantedBy enablement symlinks,
+		// so enable still needs to run.
+		switch out {
+		case "disabled", "masked", "static", "linked", "linked-runtime":
 			return false, nil
 		}
 		return false, fmt.Errorf("is-enabled: %w (output: %s)", err, out)
