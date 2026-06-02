@@ -4,7 +4,7 @@ tags        = ["essential", "ai"]
 
 [[packages]]
 manager = "pacman"
-names   = ["opencode"]
+names   = ["opencode", "socat"]
 
 [[packages]]
 manager = "aur"
