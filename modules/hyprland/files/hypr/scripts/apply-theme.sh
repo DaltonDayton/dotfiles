@@ -35,6 +35,21 @@ if [[ -f "$THEME_DIR/meta.toml" ]] && grep -q '^mode = "matugen"' "$THEME_DIR/me
   mode="matugen"
 fi
 
+# System-wide light/dark follows the theme (themes declare appearance = "light"
+# in meta.toml; default dark). Matugen's own gtk-theme hook agrees: it runs
+# with --prefer darkness.
+appearance="dark"
+if [[ -f "$THEME_DIR/meta.toml" ]] && grep -q '^appearance = "light"' "$THEME_DIR/meta.toml"; then
+  appearance="light"
+fi
+if [[ "$appearance" == "light" ]]; then
+  gsettings set org.gnome.desktop.interface color-scheme 'prefer-light' 2>/dev/null || true
+  gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3' 2>/dev/null || true
+else
+  gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' 2>/dev/null || true
+  gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3-dark' 2>/dev/null || true
+fi
+
 # --- Build wallpaper pool -----------------------------------------------------
 declare -a pool=()
 if [[ "$mode" == "matugen" ]]; then
