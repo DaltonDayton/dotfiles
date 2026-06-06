@@ -4,7 +4,7 @@
   bg2:     #bcbcbc;
   bg3:     #aaaaaa;
   bg4:     #999999;
-  text:    #0a0a0a;
+  fg:    #0a0a0a;
   red:     #2b2b2b;
   orange:  #363636;
   yellow:  #555555;

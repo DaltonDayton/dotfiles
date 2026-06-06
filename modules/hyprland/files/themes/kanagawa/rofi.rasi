@@ -5,7 +5,7 @@
   bg3:     #363646;
   bg4:     #54546d;
 
-  text:    #dcd7ba;
+  fg:    #dcd7ba;
 
   red:     #e82424;
   orange:  #ffa066;
