@@ -22,7 +22,7 @@ modules/hyprland/files/wallpapers/    # tracked in git
     <flat image files>                # gitignored
 ```
 
-- New `[[symlinks]]` entry in the hyprland `module.toml`: `files/wallpapers` -> `~/.config/wallpapers`, same pattern as `~/.config/themes`.
+- The hyprland `module.toml` already symlinks `files/wallpapers` -> `~/.config/wallpapers` (the dir exists today holding `default.png`, the matugen bootstrap image, which stays untagged). No quill changes needed.
 - `.gitignore`: the per-theme rule `modules/hyprland/files/themes/*/wallpapers/local/` is replaced by `modules/hyprland/files/wallpapers/local/`.
 - Per-theme `wallpapers/` directories are removed; `themes/<name>/` keeps only config files.
 - The directory must not live inside `themes/`: the theme switcher enumerates `themes/*/` as themes and would render a bogus tile.
