@@ -1,0 +1,67 @@
+# filename: theme [theme ...]
+abstract.png: gruvbox-dark
+bamboo-grove.png: everforest-dark kanagawa
+beach_1.png: everforest-dark
+bliss-pixels.png: catppuccin
+blossom-street.jpg: catppuccin
+boat.jpg: catppuccin
+cafe.jpg: tokyo-night
+cat-sound.png: catppuccin
+cattppuccin_diamonds.jpg: catppuccin
+cat-waves.png: catppuccin
+cherryblossomisland.png: catppuccin rose-pine
+cherryblossomtrain.jpg: catppuccin rose-pine
+city.png: gruvbox-dark
+cobalt-tree.jpg: nord tokyo-night
+colorful_cityscape.jpg: catppuccin
+comfy-home.png: catppuccin
+corny-2.png: gruvbox-dark
+corny.png: gruvbox-dark
+cozy-cabin.jpg: nightfox
+crimson-kimono.jpg: nightfox tokyo-night
+dark-waves.jpg: e-ink noir
+default.png: catppuccin rose-pine
+doggocat.png: catppuccin
+dragon.jpg: everforest-dark kanagawa
+duotone-landscape.jpg: e-ink noir
+evening.png: nord
+evening-sky.png: catppuccin
+flowers.jpg: gruvbox-dark
+fog_forest_1.png: everforest-dark
+foggy_valley_2.png: everforest-dark
+forest.jpg: nord
+geometry.jpg: e-ink noir
+ginkgo-temple.jpg: gruvbox-dark
+heights.png: nord
+heracles.png: nord
+ice_castle.png: kanagawa nord
+japanese-houses.png: tokyo-night
+jellyfish.jpg: catppuccin
+lantern-dawn.png: kanagawa nord
+lavender-field.jpg: catppuccin everforest-dark rose-pine
+layered-waves.png: nightfox
+lines.jpg: e-ink noir
+lonely-fish.png: catppuccin
+maple-fan.png: everforest-dark gruvbox-dark
+monochrome-desert.jpeg: e-ink
+night-sky.jpg: e-ink noir
+pacman.png: catppuccin
+painting.jpg: kanagawa
+palms.png: nord
+paved-cabin.jpg: everforest-dark
+portrait.jpg: noir
+purple-sky.jpg: nightfox
+purple_valley.jpg: nightfox tokyo-night
+rooftop.jpg: catppuccin
+sakura.png: catppuccin
+snow-sakura.jpg: catppuccin rose-pine
+spaceman.jpg: gruvbox-dark
+spike.jpg: tokyo-night
+starry_mountain.png: catppuccin
+summer-garden.png: everforest-dark gruvbox-dark
+tetris.png: catppuccin
+tropic_island_day.jpg: catppuccin
+tropic_island_evening.jpg: catppuccin
+tropic_island_morning.jpg: catppuccin
+tropic_island_night.jpg: catppuccin
+waves.jpg: tokyo-night

@@ -12,5 +12,5 @@ modules/neovim/files/nvim/lazy-lock.json
 modules/hyprland/files/hypr/monitors.conf
 modules/hyprland/files/voxtype/config.toml
 
-# Local-only wallpapers (per-theme, not synced).
-modules/hyprland/files/themes/*/wallpapers/local/
+# Local-only wallpapers (not synced).
+modules/hyprland/files/wallpapers/local/
