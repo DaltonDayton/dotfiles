@@ -14,6 +14,8 @@ STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/themes"
 WALLPAPERS_STATE="$STATE_DIR/wallpapers.txt"
 CURRENT_STATE="$STATE_DIR/current"
 
+source "$HOME/.config/hypr/scripts/lib-wallpapers.sh"
+
 if [[ ! -d "$THEME_DIR" ]]; then
   notify-send "Theme error" "Unknown theme: $THEME" -u critical
   echo "unknown theme: $THEME" >&2
@@ -36,20 +38,17 @@ fi
 # --- Build wallpaper pool -----------------------------------------------------
 declare -a pool=()
 if [[ "$mode" == "matugen" ]]; then
-  # union of every theme's wallpapers/ + optional personal wallpaper dir
   matugen_extra_dir="${MATUGEN_WALLPAPERS_DIR:-$HOME/Pictures/Wallpapers}"
-  while IFS= read -r -d '' f; do pool+=("$f"); done < <(
+  mapfile -t pool < <(
     {
-      find -L "$THEMES_DIR" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -print0
+      wallpapers_all 1
       if [[ -d "$matugen_extra_dir" ]]; then
-        find -L "$matugen_extra_dir" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -print0
+        find -L "$matugen_extra_dir" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \)
       fi
-    } | sort -zu
+    } | sort -u
   )
 else
-  while IFS= read -r -d '' f; do pool+=("$f"); done < <(
-    find "$THEME_DIR/wallpapers" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -print0 2>/dev/null | sort -z
-  )
+  mapfile -t pool < <(wallpapers_for_theme "$THEME" 1)
 fi
 
 # --- Resolve wallpaper: last-used or first in pool ---------------------------
