@@ -3,7 +3,7 @@
   bg1:     #3b4252;
   bg2:     #434c5e;
   bg3:     #4c566a;
-  bg4:     #5f6c84;
+  bg4:     #616e88;
 
   text:    #d8dee9;
 
@@ -16,7 +16,7 @@
   purple:  #b48ead;
 
   grey0:   #616e88;
-  grey1:   #bfc5cd;
-  grey2:   #e4e9ef;
+  grey1:   #d8dee9;
+  grey2:   #e5e9f0;
 }
 

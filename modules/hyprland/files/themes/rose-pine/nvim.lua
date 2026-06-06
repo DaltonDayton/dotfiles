@@ -6,10 +6,10 @@ return {
     priority = 1000,
     config = function()
       require("rose-pine").setup({
-        variant = "moon",
+        variant = "main",
         styles = { transparency = true },
       })
     end,
   },
-  scheme = "rose-pine-moon",
+  scheme = "rose-pine-main",
 }

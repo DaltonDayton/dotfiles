@@ -31,7 +31,7 @@ for d in "${dirs[@]}"; do
 
   icon=""
   if [[ -f "$WALLPAPERS_STATE" ]]; then
-    last=$(grep "^${d}:" "$WALLPAPERS_STATE" | head -n1 | cut -d':' -f2-)
+    last=$(grep "^${d}:" "$WALLPAPERS_STATE" | head -n1 | cut -d':' -f2- || true)
     [[ -n "$last" && -f "$last" ]] && icon="$last"
   fi
   if [[ -z "$icon" ]]; then

@@ -71,7 +71,7 @@ fi
 
 mkdir -p "$STATE_DIR"
 touch "$WALLPAPERS_STATE"
-current_wp=$(grep "^${THEME}:" "$WALLPAPERS_STATE" | head -n1 | cut -d':' -f2-)
+current_wp=$(grep "^${THEME}:" "$WALLPAPERS_STATE" | head -n1 | cut -d':' -f2- || true)
 
 # Build rofi rows using -format i so selection resolves by index. This avoids
 # relying on NUL bytes in shell variables (bash strings cannot hold them).

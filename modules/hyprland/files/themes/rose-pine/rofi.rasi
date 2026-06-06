@@ -2,8 +2,8 @@
     bg0:    #191724;
     bg1:    #1f1d2e;
     bg2:    #26233a;
-    bg3:    #2a273f;
-    bg4:    #332e4e;
+    bg3:    #403d52;
+    bg4:    #524f67;
 
     fg:     #e0def4;
 
@@ -12,7 +12,7 @@
     yellow: #f6c177;
     green:  #9ccfd8;
     aqua:   #31748f;
-    blue:   #569fba;
+    blue:   #31748f;
     purple: #c4a7e7;
 
     grey0:  #6e6a86;

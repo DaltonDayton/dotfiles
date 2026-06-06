@@ -4,10 +4,10 @@ return {
     lazy = false,
     priority = 1000,
     config = function()
-      require("tokyonight").setup({ style = "moon", transparent = true })
+      require("tokyonight").setup({ style = "night", transparent = true })
     end,
   },
-  scheme = "tokyonight-moon",
+  scheme = "tokyonight-night",
   post = function()
     local function clear_bg(group)
       local hl = vim.api.nvim_get_hl(0, { name = group, link = false })
