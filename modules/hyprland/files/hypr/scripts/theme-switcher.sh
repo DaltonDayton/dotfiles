@@ -12,6 +12,7 @@ APPLY="$HOME/.config/hypr/scripts/apply-theme.sh"
 ROFI_THEME="$HOME/.config/rofi/wallpaper-picker.rasi"
 ROFI_THUMBNAIL_PROFILE="r280x158-v1"
 ROFI_THUMBNAIL_CMD="$HOME/.config/hypr/scripts/rofi-thumbnail.sh \"{input}\" \"{output}\" \"{size}\" 280 158"
+source "$HOME/.config/hypr/scripts/lib-wallpapers.sh"
 rofi_theme_args=()
 [[ -f "$ROFI_THEME" ]] && rofi_theme_args=(-theme "$ROFI_THEME")
 
@@ -35,7 +36,7 @@ for d in "${dirs[@]}"; do
     [[ -n "$last" && -f "$last" ]] && icon="$last"
   fi
   if [[ -z "$icon" ]]; then
-    icon=$(find -L "$THEMES_DIR/$d/wallpapers" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) 2>/dev/null | sort | head -n1)
+    icon=$(wallpapers_for_theme "$d" 1 | head -n1 || true)
   fi
 
   labels+=("$label")
