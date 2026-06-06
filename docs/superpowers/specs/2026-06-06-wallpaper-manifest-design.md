@@ -1,7 +1,7 @@
 # Wallpaper manifest design
 
 Date: 2026-06-06
-Status: approved
+Status: implemented
 
 ## Problem
 
@@ -22,7 +22,7 @@ modules/hyprland/files/wallpapers/    # tracked in git
     <flat image files>                # gitignored
 ```
 
-- The hyprland `module.toml` already symlinks `files/wallpapers` -> `~/.config/wallpapers` (the dir exists today holding `default.png`, the matugen bootstrap image, which stays untagged). No quill changes needed.
+- The hyprland `module.toml` already symlinks `files/wallpapers` -> `~/.config/wallpapers` (the dir exists today holding `default.png`, the matugen bootstrap image). No quill changes needed. Migration note: `default.png` turned out to be byte-identical to a wallpaper catppuccin and rose-pine shipped, so it carries their manifest line; the duplicate copy was dropped.
 - `.gitignore`: the per-theme rule `modules/hyprland/files/themes/*/wallpapers/local/` is replaced by `modules/hyprland/files/wallpapers/local/`.
 - Per-theme `wallpapers/` directories are removed; `themes/<name>/` keeps only config files.
 - The directory must not live inside `themes/`: the theme switcher enumerates `themes/*/` as themes and would render a bogus tile.
