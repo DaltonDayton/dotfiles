@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
-# Rofi wallpaper picker. In matugen mode, pool = union of every theme's
-# wallpapers/ and selection triggers `matugen image`. In static mode,
-# pool = current theme only and selection just changes the wallpaper.
-# By default `local/` subdirs are excluded; press Alt+L inside the picker
-# to re-launch with WALLPAPER_PICKER_INCLUDE_LOCAL=1 and reveal them.
+# Rofi wallpaper picker, manifest-driven (see lib-wallpapers.sh). In matugen
+# mode, pool = every image in ~/.config/wallpapers (+ optional extra dir) and
+# selection triggers `matugen image`. In static mode, pool = images the
+# manifest assigns to the current theme and selection just changes the
+# wallpaper. By default wallpapers/local/ is excluded; press Alt+L inside the
+# picker to re-launch with WALLPAPER_PICKER_INCLUDE_LOCAL=1 and reveal it.
 # Bound to Super+Shift+D.
 set -euo pipefail
 
 THEMES_DIR="$HOME/.config/themes"
+source "$HOME/.config/hypr/scripts/lib-wallpapers.sh"
 STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/themes"
 WALLPAPERS_STATE="$STATE_DIR/wallpapers.txt"
 CURRENT_STATE="$STATE_DIR/current"
@@ -20,8 +22,6 @@ if [[ -f "$ROFI_THEME" ]]; then
 fi
 
 INCLUDE_LOCAL="${WALLPAPER_PICKER_INCLUDE_LOCAL:-}"
-find_filter=()
-[[ -z "$INCLUDE_LOCAL" ]] && find_filter=(! -path '*/local/*')
 
 if [[ ! -f "$CURRENT_STATE" ]]; then
   notify-send "Wallpaper" "No active theme — run Super+D first" -u critical
@@ -40,28 +40,16 @@ fi
 declare -a pool=()
 if [[ "$mode" == "matugen" ]]; then
   matugen_extra_dir="${MATUGEN_WALLPAPERS_DIR:-$HOME/Pictures/Wallpapers}"
-  # Dedupe by content hash: a wallpaper claimed by multiple static themes
-  # exists as physical copies in each theme's wallpapers/ dir; in matugen
-  # mode the union pool would otherwise show it once per theme.
-  declare -A seen_hashes=()
-  while IFS= read -r -d '' f; do
-    hash=$(sha256sum "$f" | cut -d' ' -f1)
-    if [[ -z "${seen_hashes[$hash]:-}" ]]; then
-      seen_hashes[$hash]=1
-      pool+=("$f")
-    fi
-  done < <(
+  mapfile -t pool < <(
     {
-      find -L "$THEMES_DIR" -type f "${find_filter[@]}" \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -print0
+      wallpapers_all "$INCLUDE_LOCAL"
       if [[ -d "$matugen_extra_dir" ]]; then
-        find -L "$matugen_extra_dir" -type f "${find_filter[@]}" \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -print0
+        find -L "$matugen_extra_dir" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \)
       fi
-    } | sort -zu
+    } | sort -u
   )
 else
-  while IFS= read -r -d '' f; do pool+=("$f"); done < <(
-    find "$THEME_DIR/wallpapers" -type f "${find_filter[@]}" \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -print0 2>/dev/null | sort -z
-  )
+  mapfile -t pool < <(wallpapers_for_theme "$THEME" "$INCLUDE_LOCAL")
 fi
 
 if (( ${#pool[@]} == 0 )); then
