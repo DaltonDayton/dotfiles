@@ -75,6 +75,7 @@ func newApplyCmd() *cobra.Command {
 			}
 
 			fmt.Printf("\nApplied: %d  Skipped: %d  Failed: %d\n", applied, skipped, failed)
+			printPendingTodos(cmd.OutOrStdout(), runner.PendingTodos(plan))
 			if failed > 0 {
 				return fmt.Errorf("%d actions failed", failed)
 			}

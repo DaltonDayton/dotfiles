@@ -110,6 +110,7 @@ func newInstallCmd() *cobra.Command {
 			}
 
 			_ = state.SaveSelection(statePath, selected)
+			printPendingTodos(cmd.OutOrStdout(), runner.PendingTodos(plan))
 			if scriptErrs > 0 {
 				return fmt.Errorf("%d install.sh scripts failed", scriptErrs)
 			}
