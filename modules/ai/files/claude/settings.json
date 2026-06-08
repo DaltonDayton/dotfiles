@@ -90,6 +90,6 @@
     "enabled": true
   },
   "autoMemoryEnabled": true,
-  "theme": "dark",
+  "theme": "auto",
   "skipAutoPermissionPrompt": true
 }
