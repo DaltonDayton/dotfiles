@@ -9,3 +9,7 @@ names = ["git", "github-cli", "openssh", "bat", "man-db"]
 [[symlinks]]
 src = "files/.gitconfig.tmpl"
 dst = "~/.gitconfig"
+
+[[todos]]
+message = "Run `gh auth login` (choose SSH) to create and upload your signing key to GitHub."
+check = "gh auth status"

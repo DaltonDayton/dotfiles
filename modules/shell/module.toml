@@ -29,3 +29,7 @@ dst = "~/.config/starship.toml"
 [[symlinks]]
 src = "files/yazi"
 dst = "~/.config/yazi"
+
+[[todos]]
+message = "Log out and back in so your login shell change to zsh takes effect."
+check = '[ "$SHELL" = "$(command -v zsh)" ]'
