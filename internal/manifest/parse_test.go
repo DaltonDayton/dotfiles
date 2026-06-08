@@ -93,3 +93,35 @@ func TestParseHost_emptyVarsMapIsNonNil(t *testing.T) {
 		t.Error("Vars map should be non-nil even when TOML omits [vars]")
 	}
 }
+
+func TestParseModule_todos(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "module.toml")
+	content := `
+name = "git"
+
+[[todos]]
+message = "Run gh auth login"
+check = "gh auth status"
+
+[[todos]]
+message = "Always shown"
+`
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	m, err := ParseModule(path)
+	if err != nil {
+		t.Fatalf("ParseModule: %v", err)
+	}
+	if len(m.Todos) != 2 {
+		t.Fatalf("Todos = %+v, want 2", m.Todos)
+	}
+	if m.Todos[0].Message != "Run gh auth login" || m.Todos[0].Check != "gh auth status" {
+		t.Errorf("Todos[0] = %+v", m.Todos[0])
+	}
+	if m.Todos[1].Check != "" {
+		t.Errorf("Todos[1].Check = %q, want empty", m.Todos[1].Check)
+	}
+}

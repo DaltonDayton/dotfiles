@@ -16,6 +16,7 @@ type Module struct {
 	Files       []File      `toml:"files"`
 	Services    []Service   `toml:"services"`
 	Directories []Directory `toml:"directories"`
+	Todos       []Todo      `toml:"todos"`
 }
 
 type Packages struct {
@@ -60,6 +61,13 @@ type Directory struct {
 	Path  string   `toml:"path"`
 	Mode  string   `toml:"mode"`
 	Hosts []string `toml:"hosts"`
+}
+
+// Todo is a manual follow-up step printed after a run when its Check fails.
+// It does not mutate the system — actions and install.sh do that.
+type Todo struct {
+	Message string `toml:"message"`
+	Check   string `toml:"check"` // shell cmd; exit 0 = done. Empty = always shown.
 }
 
 // Host mirrors hosts/<name>.toml.
