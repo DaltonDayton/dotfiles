@@ -42,3 +42,20 @@ func TestPendingTodos(t *testing.T) {
 		t.Errorf("got[1] = %+v", got[1])
 	}
 }
+
+func TestPendingTodos_allSatisfied(t *testing.T) {
+	orig := checkTodo
+	defer func() { checkTodo = orig }()
+	checkTodo = func(cmd string) error { return nil }
+
+	plan := []ModulePlan{
+		{Module: &module.Module{Module: &manifest.Module{
+			Name:  "git",
+			Todos: []manifest.Todo{{Message: "done", Check: "whatever"}},
+		}}},
+	}
+
+	if got := PendingTodos(plan); len(got) != 0 {
+		t.Errorf("all satisfied: got %+v, want empty", got)
+	}
+}

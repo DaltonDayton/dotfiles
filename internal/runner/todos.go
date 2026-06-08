@@ -1,11 +1,19 @@
 package runner
 
-import "os/exec"
+import (
+	"io"
+	"os/exec"
+)
 
 // checkTodo reports whether a todo's check is satisfied (nil = satisfied,
-// so the todo is hidden). Overridable for tests.
+// so the todo is hidden). Overridable for tests. Output is discarded — the
+// check is a pass/fail probe, not a diagnostic, so its chatter (e.g. gh's
+// "not logged in" message) must not leak before the Manual steps block.
 var checkTodo = func(cmd string) error {
-	return exec.Command("sh", "-c", cmd).Run()
+	c := exec.Command("sh", "-c", cmd)
+	c.Stdout = io.Discard
+	c.Stderr = io.Discard
+	return c.Run()
 }
 
 // PendingTodo is a manual step that still needs the user's attention.
