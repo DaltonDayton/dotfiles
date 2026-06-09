@@ -16,6 +16,7 @@ names = [
     "tesseract", "tesseract-data-eng", "libnotify", "wtype",
     "xdg-utils", "desktop-file-utils", "shared-mime-info", "archlinux-xdg-menu",
     "jq", "btop", "pacman-contrib",
+    "brightnessctl",
     "awww",
     "nwg-look",
 ]
