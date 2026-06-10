@@ -19,10 +19,11 @@ A Go CLI that declaratively manages the user's Arch Linux setup — packages, do
 | `hyprland` mega-module (WM, bar, terminal, theming engine) | `docs/superpowers/specs/2026-04-25-hyprland-module-design.md` | `docs/superpowers/plans/2026-04-25-hyprland-module-implementation.md` |
 | Theme switcher (Super+D / Super+Shift+D, indirection layer, matugen-as-theme) | `docs/superpowers/specs/2026-04-25-theme-switcher-design.md` | `docs/superpowers/plans/2026-04-25-theme-switcher.md` |
 | Neovim theme integration (per-theme `nvim.lua`, dispatcher, SIGUSR1 reload) | (extends theme-switcher spec) | `docs/superpowers/plans/2026-04-28-nvim-theme-integration.md` |
+| WSL/Ubuntu foundation + shell module | `docs/superpowers/specs/2026-06-08-wsl-ubuntu-foundation-shell-design.md` | `docs/superpowers/plans/2026-06-08-wsl-ubuntu-foundation-shell.md` |
 
 ## User context
 
-- Primary OS: **Arch Linux** (desktop + laptop). Also uses **WSL/Ubuntu** for some work; v1 doesn't target WSL but the architecture should not preclude it (package manager is already abstracted per-action).
+- Primary OS: **Arch Linux** (desktop + laptop). Also uses **WSL/Ubuntu** for some work; Ubuntu is a **supported (in-progress) target** managed by the same module/host model — OS detection, an `apt` driver, and the `shell` module are done; Arch remains the primary platform.
 - **Learning Go** — prefers idiomatic, widely-used patterns over clever abstractions. When introducing a Go pattern the user may not have seen, a short one-line comment explaining *why* is welcome; `what` it does should be self-evident from the code.
 - Shell: **zsh**. Window manager: **Hyprland**. AUR helper: **yay** (bootstrapped from source by `quill install` if missing).
 - Editor preferences live inside the `neovim` module (`modules/neovim/files/nvim/`).
@@ -101,7 +102,7 @@ Don't skip the plan for multi-step changes. One-line fixes are fine to do inline
 
 ## Things that are explicitly out of scope (v1)
 
-- WSL / non-Arch Linux / macOS support
+- macOS / non-Arch-non-Ubuntu distros
 - Secrets management (age/sops)
 - `quill remove` / uninstall paths
 - Go-plugin escape hatch (shell is enough)
