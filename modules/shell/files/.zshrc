@@ -361,4 +361,4 @@ function sdev() {
 export PATH="$HOME/bin:$PATH"
 
 # zoxide last — doctor warns if anything follows it
-eval "$(zoxide init --cmd cd zsh)"
+command -v zoxide >/dev/null && eval "$(zoxide init --cmd cd zsh)"
