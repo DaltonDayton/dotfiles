@@ -10,7 +10,11 @@ import (
 // ensureAURHelper installs yay from source if missing. Runs as a pre-flight
 // step before any module action so declarative AUR packages can trust yay
 // is on PATH. Idempotent: skipped silently when yay is already installed.
-func ensureAURHelper() error {
+// No-op on non-Arch systems — yay/makepkg/pacman don't exist there.
+func ensureAURHelper(osName string) error {
+	if osName != "arch" {
+		return nil
+	}
 	if _, err := exec.LookPath("yay"); err == nil {
 		return nil
 	}
