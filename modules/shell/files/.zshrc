@@ -95,8 +95,8 @@ alias mkdir='mkdir -p'
 # Shell integrations
 # ==================
 eval "$(fzf --zsh)"
-eval "$(starship init zsh)"
-eval "$(atuin init zsh)"
+command -v starship >/dev/null && eval "$(starship init zsh)"
+command -v atuin    >/dev/null && eval "$(atuin init zsh)"
 # eval "$(tv init zsh)"
 command -v uv >/dev/null && eval "$(uv generate-shell-completion zsh)"
 command -v sesh >/dev/null && eval "$(sesh completion zsh)"

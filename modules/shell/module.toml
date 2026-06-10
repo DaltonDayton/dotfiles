@@ -18,6 +18,10 @@ names = [
     "nvtop",
 ]
 
+[[packages]]
+manager = "apt"
+names = ["zsh", "less", "fzf", "nvtop", "bat"]
+
 [[symlinks]]
 src = "files/.zshrc"
 dst = "~/.zshrc"
