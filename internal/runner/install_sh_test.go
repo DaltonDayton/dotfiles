@@ -9,36 +9,48 @@ import (
 	"github.com/DaltonDayton/dotfiles/internal/module"
 )
 
-func TestRunInstallSh_executesWhenPresent(t *testing.T) {
+// The script writes $QUILL_OS/$QUILL_HOST and "$0"-style proof-of-bash to a
+// file we then read back. Bashisms ([[ ]]) confirm we did NOT run under dash.
+func TestRunInstallSh_ExportsOSAndUsesBash(t *testing.T) {
 	dir := t.TempDir()
-	marker := filepath.Join(dir, "ran")
-	script := "#!/bin/sh\ntouch " + marker + "\n"
-	os.WriteFile(filepath.Join(dir, "install.sh"), []byte(script), 0o755)
-
-	m := &module.Module{Dir: dir, Module: &manifest.Module{Name: "t"}}
-	if err := RunInstallSh(m); err != nil {
+	out := filepath.Join(dir, "out.txt")
+	script := "#!/usr/bin/env bash\n" +
+		"if [[ -n \"$QUILL_OS\" ]]; then echo \"os=$QUILL_OS host=$QUILL_HOST bash=yes\" > \"" + out + "\"; fi\n"
+	if err := os.WriteFile(filepath.Join(dir, "install.sh"), []byte(script), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := os.Stat(marker); err != nil {
-		t.Fatalf("install.sh did not run: %v", err)
+
+	m := &module.Module{Dir: dir, Module: &manifest.Module{Name: "x"}}
+	if err := RunInstallSh(m, "ubuntu", "Dalton"); err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := os.ReadFile(out)
+	if err != nil {
+		t.Fatalf("script did not run as bash with env: %v", err)
+	}
+	want := "os=ubuntu host=Dalton bash=yes\n"
+	if string(got) != want {
+		t.Fatalf("got %q, want %q", string(got), want)
 	}
 }
 
-func TestRunInstallSh_noopWhenMissing(t *testing.T) {
-	dir := t.TempDir()
-	m := &module.Module{Dir: dir, Module: &manifest.Module{Name: "t"}}
-	if err := RunInstallSh(m); err != nil {
-		t.Fatal(err)
+func TestRunInstallSh_AbsentScriptIsNoError(t *testing.T) {
+	m := &module.Module{Dir: t.TempDir(), Module: &manifest.Module{Name: "x"}}
+	if err := RunInstallSh(m, "arch", "h"); err != nil {
+		t.Fatalf("absent install.sh should be nil, got %v", err)
 	}
 }
 
 func TestRunInstallSh_reportsScriptFailure(t *testing.T) {
 	dir := t.TempDir()
 	script := "#!/bin/sh\nexit 7\n"
-	os.WriteFile(filepath.Join(dir, "install.sh"), []byte(script), 0o755)
+	if err := os.WriteFile(filepath.Join(dir, "install.sh"), []byte(script), 0o755); err != nil {
+		t.Fatal(err)
+	}
 
 	m := &module.Module{Dir: dir, Module: &manifest.Module{Name: "t"}}
-	if err := RunInstallSh(m); err == nil {
+	if err := RunInstallSh(m, "arch", "h"); err == nil {
 		t.Fatal("expected error when install.sh exits non-zero")
 	}
 }

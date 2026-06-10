@@ -12,18 +12,27 @@ import (
 
 // RunInstallSh runs <moduleDir>/install.sh if present. Absence is not an error.
 // The script is responsible for its own idempotency (self-check inside).
+// The script must be executable (quill does not chmod it); a non-executable
+// script will surface as an exec permission error at runtime.
 //
 // Stdio is inherited from the parent: scripts may need a real TTY for things
 // like `sudo` inside yay/makepkg (Arch's default sudoers ties cached creds to
 // the calling TTY). Callers must ensure they aren't competing for the
 // terminal — e.g., run install.sh only after any TUI has exited.
-func RunInstallSh(m *module.Module) error {
+func RunInstallSh(m *module.Module, osName, hostName string) error {
 	script := filepath.Join(m.Dir, "install.sh")
 	if _, err := os.Stat(script); err != nil {
 		return nil
 	}
-	cmd := exec.Command("sh", script)
+	// Invoke the script directly so its #!/usr/bin/env bash shebang governs.
+	// (Previously this ran `sh script`, which is bash on Arch but dash on
+	// Ubuntu — silently breaking the scripts' [[ ]] / array bashisms.)
+	cmd := exec.Command(script)
 	cmd.Dir = m.Dir
+	cmd.Env = append(os.Environ(),
+		"QUILL_OS="+osName,
+		"QUILL_HOST="+hostName,
+	)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

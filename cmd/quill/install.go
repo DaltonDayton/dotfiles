@@ -103,7 +103,7 @@ func newInstallCmd() *cobra.Command {
 				if p.BuildErr != nil {
 					continue
 				}
-				if err := runner.RunInstallSh(p.Module); err != nil {
+				if err := runner.RunInstallSh(p.Module, ctx.OS, ctx.Host.Name); err != nil {
 					fmt.Fprintln(cmd.ErrOrStderr(), err)
 					scriptErrs++
 				}
