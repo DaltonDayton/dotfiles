@@ -1,0 +1,6 @@
+name    = "Dalton"
+modules = ["git", "shell", "tmux", "neovim", "ai", "python", "asdf"]
+
+[vars]
+git_email       = "50755420+DaltonDayton@users.noreply.github.com"
+git_signing_key = "~/.ssh/id_ed25519"
