@@ -7,8 +7,20 @@ REPO_URL="${DOTFILES_REPO_URL:-https://github.com/DaltonDayton/dotfiles.git}"
 REPO_DIR="${DOTFILES_DIR:-$HOME/.dotfiles}"
 REPO_BRANCH="${DOTFILES_BRANCH:-main}"
 
-echo "==> Installing prerequisites (git, go, base-devel)"
-sudo pacman -Sy --needed --noconfirm git go base-devel
+echo "==> Installing prerequisites"
+case "$(. /etc/os-release && echo "$ID")" in
+  arch)
+    sudo pacman -Sy --needed --noconfirm git go base-devel
+    ;;
+  ubuntu)
+    sudo apt-get update
+    sudo apt-get install -y git golang-go build-essential curl
+    ;;
+  *)
+    echo "unsupported distro (need arch or ubuntu)" >&2
+    exit 1
+    ;;
+esac
 
 if [ ! -d "$REPO_DIR/.git" ]; then
     echo "==> Cloning $REPO_URL (branch $REPO_BRANCH) into $REPO_DIR"
