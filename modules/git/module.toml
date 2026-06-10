@@ -6,6 +6,10 @@ tags = ["essential"]
 manager = "pacman"
 names = ["git", "github-cli", "openssh", "bat", "man-db"]
 
+[[packages]]
+manager = "apt"
+names = ["git", "openssh-client", "bat", "man-db"]
+
 [[symlinks]]
 src = "files/.gitconfig.tmpl"
 dst = "~/.gitconfig"
