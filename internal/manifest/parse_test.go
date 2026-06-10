@@ -94,6 +94,26 @@ func TestParseHost_emptyVarsMapIsNonNil(t *testing.T) {
 	}
 }
 
+func TestParseModule_OSField(t *testing.T) {
+	dir := t.TempDir()
+	p := filepath.Join(dir, "module.toml")
+	if err := os.WriteFile(p, []byte(`
+name = "x"
+[[commands]]
+run = "echo hi"
+os = ["ubuntu"]
+`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	m, err := ParseModule(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(m.Commands) != 1 || len(m.Commands[0].OS) != 1 || m.Commands[0].OS[0] != "ubuntu" {
+		t.Fatalf("OS not parsed: %+v", m.Commands)
+	}
+}
+
 func TestParseModule_todos(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "module.toml")

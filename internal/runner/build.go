@@ -12,19 +12,27 @@ import (
 )
 
 // BuildActions translates a Module's declarative entries into an ordered
-// []action.Action filtered to this host.
+// []action.Action filtered to this host and OS.
 // Execution order: directories → packages → symlinks → files → commands → services.
-func BuildActions(m *module.Module, host *manifest.Host) ([]action.Action, error) {
+func BuildActions(m *module.Module, host *manifest.Host, osName string) ([]action.Action, error) {
 	var acts []action.Action
 
 	for _, d := range m.Directories {
 		if !hostMatch(d.Hosts, host.Name) {
 			continue
 		}
+		if !osMatch(d.OS, osName) {
+			continue
+		}
 		acts = append(acts, &action.Directory{Path: expandHome(d.Path), Mode: d.Mode})
 	}
 	for _, p := range m.Packages {
 		if !hostMatch(p.Hosts, host.Name) {
+			continue
+		}
+		// Gate on p.Manager BEFORE normalizing "" / "aur" → "yay" so the
+		// manager value still carries its OS signal at decision time.
+		if !osAllowsManager(osName, p.Manager) || !osMatch(p.OS, osName) {
 			continue
 		}
 		mgr := p.Manager
@@ -37,6 +45,9 @@ func BuildActions(m *module.Module, host *manifest.Host) ([]action.Action, error
 	}
 	for _, s := range m.Symlinks {
 		if !hostMatch(s.Hosts, host.Name) {
+			continue
+		}
+		if !osMatch(s.OS, osName) {
 			continue
 		}
 		src := filepath.Join(m.Dir, s.Src)
@@ -65,6 +76,9 @@ func BuildActions(m *module.Module, host *manifest.Host) ([]action.Action, error
 		if !hostMatch(f.Hosts, host.Name) {
 			continue
 		}
+		if !osMatch(f.OS, osName) {
+			continue
+		}
 		content := f.Content
 		if f.ContentFrom != "" {
 			data, err := os.ReadFile(filepath.Join(m.Dir, f.ContentFrom))
@@ -79,10 +93,16 @@ func BuildActions(m *module.Module, host *manifest.Host) ([]action.Action, error
 		if !hostMatch(c.Hosts, host.Name) {
 			continue
 		}
+		if !osMatch(c.OS, osName) {
+			continue
+		}
 		acts = append(acts, &action.Command{Run: c.Run, CheckCmd: c.Check})
 	}
 	for _, s := range m.Services {
 		if !hostMatch(s.Hosts, host.Name) {
+			continue
+		}
+		if !osMatch(s.OS, osName) {
 			continue
 		}
 		acts = append(acts, &action.Service{Name: s.Name, Scope: s.Scope, State: s.State})
@@ -100,6 +120,36 @@ func hostMatch(hosts []string, hostName string) bool {
 		}
 	}
 	return false
+}
+
+// osMatch reports whether an action's optional os filter includes the current
+// OS. An empty list means "all OSes" — the regression guard that keeps every
+// existing module behaving exactly as before.
+func osMatch(osList []string, current string) bool {
+	if len(osList) == 0 {
+		return true
+	}
+	for _, o := range osList {
+		if o == current {
+			return true
+		}
+	}
+	return false
+}
+
+// osAllowsManager reports whether a package manager applies to the current OS.
+// The manager IS the OS signal: pacman/yay/aur are Arch-only, apt is
+// Ubuntu-only, flatpak runs anywhere.
+func osAllowsManager(osName, manager string) bool {
+	switch manager {
+	case "pacman", "yay", "aur":
+		return osName == "arch"
+	case "apt":
+		return osName == "ubuntu"
+	case "flatpak", "":
+		return true
+	}
+	return true // unknown managers are not OS-gated here
 }
 
 func expandHome(p string) string {

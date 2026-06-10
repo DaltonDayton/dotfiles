@@ -10,6 +10,97 @@ import (
 	"github.com/DaltonDayton/dotfiles/internal/module"
 )
 
+func TestBuildActions_PackageManagerGatedByOS(t *testing.T) {
+	m := &module.Module{
+		Dir: t.TempDir(),
+		Module: &manifest.Module{
+			Name: "x",
+			Packages: []manifest.Packages{
+				{Manager: "pacman", Names: []string{"fd"}},
+				{Manager: "apt", Names: []string{"fd-find"}},
+			},
+		},
+	}
+	host := &manifest.Host{Name: "h"}
+
+	arch, err := BuildActions(m, host, "arch")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := pkgManagers(arch); len(got) != 1 || got[0] != "pacman" {
+		t.Fatalf("arch managers = %v, want [pacman]", got)
+	}
+
+	ubuntu, err := BuildActions(m, host, "ubuntu")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := pkgManagers(ubuntu); len(got) != 1 || got[0] != "apt" {
+		t.Fatalf("ubuntu managers = %v, want [apt]", got)
+	}
+}
+
+func TestBuildActions_OSGateOnNonPackageActions(t *testing.T) {
+	m := &module.Module{
+		Dir: t.TempDir(),
+		Module: &manifest.Module{
+			Name: "x",
+			Commands: []manifest.Command{
+				{Run: "echo arch", OS: []string{"arch"}},
+				{Run: "echo ubuntu", OS: []string{"ubuntu"}},
+				{Run: "echo both"},
+			},
+		},
+	}
+	host := &manifest.Host{Name: "h"}
+
+	got, err := BuildActions(m, host, "ubuntu")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var runs []string
+	for _, a := range got {
+		if c, ok := a.(*action.Command); ok {
+			runs = append(runs, c.Run)
+		}
+	}
+	want := []string{"echo ubuntu", "echo both"}
+	if len(runs) != len(want) || runs[0] != want[0] || runs[1] != want[1] {
+		t.Fatalf("commands = %v, want %v", runs, want)
+	}
+}
+
+// Regression: an Arch-only module (no os fields, only pacman) must produce the
+// exact same actions on os="arch" as before OS gating existed.
+func TestBuildActions_ArchRegression(t *testing.T) {
+	m := &module.Module{
+		Dir: t.TempDir(),
+		Module: &manifest.Module{
+			Name:     "x",
+			Packages: []manifest.Packages{{Manager: "pacman", Names: []string{"git"}}},
+			Commands: []manifest.Command{{Run: "echo hi"}},
+		},
+	}
+	got, err := BuildActions(m, &manifest.Host{Name: "h"}, "arch")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 2 {
+		t.Fatalf("want 2 actions, got %d", len(got))
+	}
+}
+
+// pkgManagers extracts the Manager of every Packages action, in order.
+func pkgManagers(acts []action.Action) []string {
+	var out []string
+	for _, a := range acts {
+		if p, ok := a.(*action.Packages); ok {
+			out = append(out, p.Manager)
+		}
+	}
+	return out
+}
+
 func TestBuildActions_filtersByHostAndExpandsSymlinks(t *testing.T) {
 	dir := t.TempDir()
 	os.MkdirAll(filepath.Join(dir, "files"), 0o755)
@@ -26,7 +117,7 @@ func TestBuildActions_filtersByHostAndExpandsSymlinks(t *testing.T) {
 		},
 	}
 	host := &manifest.Host{Name: "laptop"}
-	acts, err := BuildActions(m, host)
+	acts, err := BuildActions(m, host, "arch")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -54,7 +145,7 @@ func TestBuildActions_rendersTemplateSymlink(t *testing.T) {
 		},
 	}
 	host := &manifest.Host{Name: "host", Vars: map[string]string{"email": "a@b"}}
-	acts, err := BuildActions(m, host)
+	acts, err := BuildActions(m, host, "arch")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -86,7 +177,7 @@ func TestBuildActions_managerDefaultsToYay(t *testing.T) {
 			},
 		}
 		host := &manifest.Host{Name: "h"}
-		acts, err := BuildActions(m, host)
+		acts, err := BuildActions(m, host, "arch")
 		if err != nil {
 			t.Fatalf("input=%q: %v", input, err)
 		}
@@ -112,7 +203,7 @@ func TestBuildActions_respectsOrder(t *testing.T) {
 		},
 	}
 	host := &manifest.Host{Name: "h"}
-	acts, err := BuildActions(m, host)
+	acts, err := BuildActions(m, host, "arch")
 	if err != nil {
 		t.Fatal(err)
 	}

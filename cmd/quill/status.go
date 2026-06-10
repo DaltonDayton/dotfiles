@@ -22,7 +22,7 @@ func newStatusCmd() *cobra.Command {
 			}
 			ordered = runner.FilterByHost(ordered, ctx.Host.Name)
 			for _, m := range ordered {
-				acts, err := runner.BuildActions(m, ctx.Host)
+				acts, err := runner.BuildActions(m, ctx.Host, ctx.OS)
 				if err != nil {
 					fmt.Printf("%-20s ERROR: %v\n", m.Name, err)
 					continue

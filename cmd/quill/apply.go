@@ -26,7 +26,7 @@ func newApplyCmd() *cobra.Command {
 			}
 			ordered = runner.FilterByHost(ordered, ctx.Host.Name)
 
-			plan := runner.BuildPlan(ordered, ctx.Host)
+			plan := runner.BuildPlan(ordered, ctx.Host, ctx.OS)
 			if runner.PlanNeedsSudo(plan) || runner.PlanInstallShNeedsSudo(plan) {
 				if err := primeSudo(); err != nil {
 					return err

@@ -20,26 +20,31 @@ type Module struct {
 }
 
 type Packages struct {
-	// Manager is "pacman" | "aur" | "yay" | "flatpak". Optional — empty
+	// Manager is "pacman" | "aur" | "yay" | "flatpak" | "apt". Optional — empty
 	// defaults to "yay", which handles both official repos and AUR. Use
 	// "pacman" to force official-repo-only (faster, no AUR network round
 	// trip), or "aur" to flag AUR-sourced packages explicitly. "aur" is a
 	// logical alias that resolves to yay.
+	// Manager implies the target OS (pacman/yay/aur → Arch, apt → Ubuntu,
+	// flatpak → any), so the os[] field is rarely needed on a packages block.
 	Manager string   `toml:"manager"`
 	Names   []string `toml:"names"`
 	Hosts   []string `toml:"hosts"`
+	OS      []string `toml:"os"`
 }
 
 type Symlink struct {
 	Src   string   `toml:"src"`
 	Dst   string   `toml:"dst"`
 	Hosts []string `toml:"hosts"`
+	OS    []string `toml:"os"`
 }
 
 type Command struct {
 	Run   string   `toml:"run"`
 	Check string   `toml:"check"`
 	Hosts []string `toml:"hosts"`
+	OS    []string `toml:"os"`
 }
 
 type File struct {
@@ -48,6 +53,7 @@ type File struct {
 	ContentFrom string   `toml:"content_from"`
 	Mode        string   `toml:"mode"`
 	Hosts       []string `toml:"hosts"`
+	OS          []string `toml:"os"`
 }
 
 type Service struct {
@@ -55,12 +61,14 @@ type Service struct {
 	Scope string   `toml:"scope"` // "user" | "system"
 	State string   `toml:"state"` // "enabled" | "started" | "enabled+started"
 	Hosts []string `toml:"hosts"`
+	OS    []string `toml:"os"`
 }
 
 type Directory struct {
 	Path  string   `toml:"path"`
 	Mode  string   `toml:"mode"`
 	Hosts []string `toml:"hosts"`
+	OS    []string `toml:"os"`
 }
 
 // Todo is a manual follow-up step printed after a run when its Check fails.
