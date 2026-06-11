@@ -20,6 +20,7 @@ var pkgDrivers = map[string]PackageDriver{
 	"pacman":  &pacmanDriver{},
 	"yay":     &yayDriver{},
 	"flatpak": &flatpakDriver{},
+	"apt":     &aptDriver{},
 }
 
 // Packages installs a list of packages using the named manager. Idempotent:
@@ -63,7 +64,7 @@ func (p *Packages) Check() (bool, error) {
 // control to the TUI.
 func (p *Packages) NeedsSudo() bool {
 	switch p.Manager {
-	case "pacman", "yay":
+	case "pacman", "yay", "apt":
 		return true
 	}
 	return false
@@ -135,6 +136,25 @@ func (flatpakDriver) IsInstalled(name string) (bool, error) {
 func (flatpakDriver) Install(names []string) error {
 	args := append([]string{"install", "-y"}, names...)
 	return exec.Command("flatpak", args...).Run()
+}
+
+type aptDriver struct{}
+
+func (aptDriver) IsInstalled(name string) (bool, error) {
+	// dpkg -s exits 0 for an installed package, non-zero otherwise.
+	err := exec.Command("dpkg", "-s", name).Run()
+	if err == nil {
+		return true, nil
+	}
+	if _, ok := err.(*exec.ExitError); ok {
+		return false, nil
+	}
+	return false, err
+}
+
+func (aptDriver) Install(names []string) error {
+	args := append([]string{"apt-get", "install", "-y"}, names...)
+	return runSudo(args...)
 }
 
 // runSudo uses sudo -n so a missing cached credential errors out instead of

@@ -75,11 +75,18 @@ func TestPackages_NeedsSudo(t *testing.T) {
 		"yay":     true,
 		"flatpak": false,
 		"unknown": false,
+		"apt":     true,
 	}
 	for mgr, want := range cases {
 		p := &Packages{Manager: mgr}
 		if got := p.NeedsSudo(); got != want {
 			t.Errorf("NeedsSudo(%q) = %v, want %v", mgr, got, want)
 		}
+	}
+}
+
+func TestAptDriverRegistered(t *testing.T) {
+	if _, ok := pkgDrivers["apt"]; !ok {
+		t.Fatal(`pkgDrivers missing "apt"`)
 	}
 }
