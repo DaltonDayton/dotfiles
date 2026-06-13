@@ -18,6 +18,9 @@ vim.opt.tabstop = 4 -- Number of spaces that a <Tab> in the file counts for
 -- Text wrapping
 vim.opt.wrap = false -- Disable line wrapping
 
+-- Diff
+vim.opt.diffopt:append("inline:word") -- Word-level intra-line diff highlighting (0.12 default is inline:char)
+
 -- Search settings
 vim.opt.ignorecase = true -- Ignore case when searching
 vim.opt.smartcase = true -- Case-sensitive search when mixed case is used
