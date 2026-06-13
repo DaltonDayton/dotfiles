@@ -96,6 +96,9 @@ alias mkdir='mkdir -p'
 # ==================
 eval "$(fzf --zsh)"
 command -v starship >/dev/null && eval "$(starship init zsh)"
+# atuin installer (Ubuntu) drops its binary in ~/.atuin/bin — put it on PATH
+# before init. Guard skips on Arch where atuin comes from the package manager.
+[ -f "$HOME/.atuin/bin/env" ] && . "$HOME/.atuin/bin/env"
 command -v atuin    >/dev/null && eval "$(atuin init zsh)"
 # eval "$(tv init zsh)"
 command -v uv >/dev/null && eval "$(uv generate-shell-completion zsh)"
