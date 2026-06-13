@@ -19,7 +19,7 @@ return {
       { "]", group = "Next" },
 
       -- Leader groups
-      { "<leader>a", group = "[A]ugment (AI)" },
+      { "<leader>a", group = "[A]I" },
       { "<leader>a_", hidden = true },
       { "<leader>b", group = "[B]uffer" },
       { "<leader>b_", hidden = true },
