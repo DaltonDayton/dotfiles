@@ -4,14 +4,14 @@ return {
     { "saghen/blink.compat", version = "2.*" }, -- 99's blink completion source is an nvim-cmp-compat shim
   },
   keys = {
-    { "<leader>av", function() require("99").visual() end, mode = "v", desc = "Edit selection (99)" },
-    { "<leader>as", function() require("99").search() end, desc = "Search project (99)" },
-    { "<leader>ao", function() require("99").open() end, desc = "Open last result (99)" },
-    { "<leader>ax", function() require("99").stop_all_requests() end, desc = "Stop requests (99)" },
-    { "<leader>al", function() require("99").view_logs() end, desc = "View logs (99)" },
+    { "<leader>iv", function() require("99").visual() end, mode = "v", desc = "Edit selection" },
+    { "<leader>is", function() require("99").search() end, desc = "Search project" },
+    { "<leader>io", function() require("99").open() end, desc = "Open last result" },
+    { "<leader>ix", function() require("99").stop_all_requests() end, desc = "Stop requests" },
+    { "<leader>il", function() require("99").view_logs() end, desc = "View logs" },
     -- telescope-free model picker (99's built-in select_model needs telescope; we use snacks' vim.ui.select)
     {
-      "<leader>am",
+      "<leader>im",
       function()
         local _99 = require("99")
         -- 99's hardcoded Claude model list is stale; prepend newer ids it omits.
@@ -32,7 +32,7 @@ return {
           end)
         end)
       end,
-      desc = "Select model (99)",
+      desc = "Select model",
     },
   },
   config = function()

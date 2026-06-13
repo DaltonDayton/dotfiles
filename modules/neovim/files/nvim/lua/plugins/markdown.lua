@@ -3,6 +3,7 @@ return {
     "MeanderingProgrammer/render-markdown.nvim",
     main = "render-markdown",
     opts = {
+      file_types = { "markdown", "codecompanion" }, -- also render the CodeCompanion chat buffer
       ignore = function()
         local path = vim.fn.expand("%:p")
         local vaults = vim.fn.expand("~") .. "/vaults/"
