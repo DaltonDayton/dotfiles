@@ -52,6 +52,7 @@ return {
       "help",
       "html",
       "javascript",
+      "javascriptreact",
       "json",
       "lua",
       "markdown",
