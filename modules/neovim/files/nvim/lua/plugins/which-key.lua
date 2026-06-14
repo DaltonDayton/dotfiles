@@ -19,7 +19,7 @@ return {
       { "]", group = "Next" },
 
       -- Leader groups
-      { "<leader>a", group = "[A]I (CC)" },
+      { "<leader>a", group = "[A]I (CodeCompanion)" },
       { "<leader>a_", hidden = true },
       { "<leader>ap", group = "[P]rompts" },
       { "<leader>ap_", hidden = true },
@@ -39,7 +39,7 @@ return {
       { "<leader>gh_", hidden = true },
       { "<leader>ght", group = "[T]oggle (Git)" },
       { "<leader>ght_", hidden = true },
-      { "<leader>i", group = "[I] AI (99)" },
+      { "<leader>i", group = "A[I] (99)" },
       { "<leader>i_", hidden = true },
       { "<leader>m", group = "[M]arks (Harpoon)" },
       { "<leader>m_", hidden = true },
