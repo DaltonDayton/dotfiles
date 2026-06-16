@@ -52,4 +52,28 @@ return {
       })
     end,
   },
+  {
+    -- browser preview for docs too big to read inline; renders mermaid natively in the browser
+    "toppair/peek.nvim",
+    build = "deno task --quiet build:fast",
+    ft = { "markdown" },
+    keys = {
+      {
+        "<leader>mp",
+        function()
+          local peek = require("peek")
+          if peek.is_open() then
+            peek.close()
+          else
+            peek.open()
+          end
+        end,
+        ft = "markdown",
+        desc = "Markdown preview (browser)",
+      },
+    },
+    config = function()
+      require("peek").setup({ app = "browser" }) -- open in the default browser, not peek's webview window
+    end,
+  },
 }
