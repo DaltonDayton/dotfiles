@@ -11,6 +11,10 @@ names = ["tmux", "gum", "fd"]
 manager = "aur"
 names = ["sesh-bin"]
 
+[[packages]]
+manager = "apt"
+names = ["tmux", "fd-find"]
+
 [[symlinks]]
 src = "files/tmux.conf"
 dst = "~/.config/tmux/tmux.conf"
