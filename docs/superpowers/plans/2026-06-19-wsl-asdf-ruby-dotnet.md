@@ -51,7 +51,7 @@ block, add exactly:
 manager = "apt"
 names = [
   "dotnet-sdk-8.0",
-  "autoconf", "patch", "build-essential", "libssl-dev", "libyaml-dev",
+  "autoconf", "patch", "build-essential", "rustc", "libssl-dev", "libyaml-dev",
   "libreadline-dev", "zlib1g-dev", "libgmp-dev", "libncurses-dev",
   "libffi-dev", "libgdbm-dev", "libdb-dev", "uuid-dev",
 ]
@@ -59,7 +59,9 @@ names = [
 
 `dotnet-sdk-8.0` provides `dotnet` (Ubuntu 24.04 native repo — no Microsoft repo
 needed). The rest is the `ruby-build` dependency chain so asdf can compile ruby
-from source. Do NOT touch the pacman or aur blocks.
+from source (`rustc` enables YJIT; modern package names — `libncurses-dev`,
+`libreadline-dev` — not the obsolete `*5-dev`/`*6-dev` variants). Do NOT touch the
+pacman or aur blocks.
 
 - [ ] **Step 3: Add ruby to the Ubuntu plugin set in install.sh**
 

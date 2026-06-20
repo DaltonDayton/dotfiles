@@ -58,7 +58,7 @@ block). Keep the pacman and aur blocks unchanged (they gate to Arch).
 manager = "apt"
 names = [
   "dotnet-sdk-8.0",
-  "autoconf", "patch", "build-essential", "libssl-dev", "libyaml-dev",
+  "autoconf", "patch", "build-essential", "rustc", "libssl-dev", "libyaml-dev",
   "libreadline-dev", "zlib1g-dev", "libgmp-dev", "libncurses-dev",
   "libffi-dev", "libgdbm-dev", "libdb-dev", "uuid-dev",
 ]
@@ -69,6 +69,12 @@ names = [
   documented Ubuntu/Debian suggested-build-environment list) so the asdf `ruby`
   plugin can compile ruby from source. `build-essential` is likely already
   present from `bootstrap.sh`, but apt is idempotent so listing it is harmless.
+- `rustc` is included so the ruby compile enables YJIT (Ruby's Rust-based JIT,
+  available on 3.2+). Without it the build still succeeds — `./configure` detects
+  rustc's absence and silently disables YJIT — but YJIT is worth having on a dev
+  box, so it is listed. Modern package names are used throughout (`libncurses-dev`,
+  `libreadline-dev` — not the obsolete `libncurses5-dev`/`libreadline6-dev` from
+  old ruby-build docs, which no longer exist on 24.04).
 
 ### `modules/asdf/install.sh`
 
