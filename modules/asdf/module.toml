@@ -10,3 +10,12 @@ names = ["dotnet-sdk", "libyaml"]
 [[packages]]
 manager = "aur"
 names = ["asdf-vm"]
+
+[[packages]]
+manager = "apt"
+names = [
+  "dotnet-sdk-8.0",
+  "autoconf", "patch", "build-essential", "rustc", "libssl-dev", "libyaml-dev",
+  "libreadline-dev", "zlib1g-dev", "libgmp-dev", "libncurses-dev",
+  "libffi-dev", "libgdbm-dev", "libdb-dev", "uuid-dev",
+]

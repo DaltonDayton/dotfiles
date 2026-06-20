@@ -10,7 +10,7 @@ case "$QUILL_OS" in
     command -v go >/dev/null || sudo apt-get install -y golang-go
     command -v asdf >/dev/null || go install github.com/asdf-vm/asdf/cmd/asdf@latest
     export PATH="$HOME/go/bin:$PATH"   # go install target, for this script run
-    plugins="nodejs"
+    plugins="nodejs ruby"
     ;;
   *)
     echo "unsupported QUILL_OS=$QUILL_OS" >&2
