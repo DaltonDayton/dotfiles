@@ -7,6 +7,10 @@ depends_on = ["git", "asdf"]
 manager = "pacman"
 names = ["neovim", "lazygit", "ripgrep", "fd", "unzip", "tree-sitter-cli"]
 
+[[packages]]
+manager = "apt"
+names = ["ripgrep", "fd-find", "unzip"]
+
 [[symlinks]]
 src = "files/nvim"
 dst = "~/.config/nvim"
