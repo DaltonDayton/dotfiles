@@ -235,12 +235,14 @@ case "$QUILL_OS" in
     # not a single binary — extract to ~/.local/nvim and symlink the launcher.
     if [ ! -x "$HOME/.local/nvim/bin/nvim" ]; then
       tmp="$(mktemp -d)"
+      # EXIT (not RETURN — this is top-level, not a function) cleans the temp
+      # dir even if curl/tar aborts under set -e.
+      trap 'rm -rf "$tmp"' EXIT
       curl -fsSL -o "$tmp/nvim.tar.gz" \
         https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
       tar -xzf "$tmp/nvim.tar.gz" -C "$tmp"
       rm -rf "$HOME/.local/nvim"
       mv "$tmp/nvim-linux-x86_64" "$HOME/.local/nvim"
-      rm -rf "$tmp"
     fi
     ln -sf "$HOME/.local/nvim/bin/nvim" "$LOCAL_BIN/nvim"
 
