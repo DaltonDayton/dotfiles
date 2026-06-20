@@ -69,6 +69,8 @@ mkdir -p "$LOCAL_BIN"
 # repo $1 into $LOCAL_BIN, extracting tar.gz/zip and copying out binaries $3...
 fetch_gh_release() {
   repo="$1"; asset_re="$2"; shift 2
+  # `|| true`: grep exits non-zero on no match, which set -e would otherwise
+  # treat as fatal before the guard below runs.
   url="$(curl -fsSL "https://api.github.com/repos/$repo/releases/latest" \
     | grep -oE "https://[^\"]*$asset_re" | head -n1 || true)"
   [ -n "$url" ] || { echo "no release asset for $repo matching $asset_re" >&2; return 1; }
@@ -81,6 +83,8 @@ fetch_gh_release() {
     *.zip)          unzip -q "$file" -d "$tmp" ;;
   esac
   for bin in "$@"; do
+    # -print -quit stops at the first match without SIGPIPE (a `| head` pipe
+    # would SIGPIPE find, which pipefail+set -e would treat as fatal).
     found="$(find "$tmp" -type f -name "$bin" -perm -u+x -print -quit)"
     [ -n "$found" ] || found="$(find "$tmp" -type f -name "$bin" -print -quit)"
     if [ -n "$found" ]; then
@@ -196,6 +200,8 @@ mkdir -p "$LOCAL_BIN"
 # repo $1 into $LOCAL_BIN, extracting tar.gz/zip and copying out binaries $3...
 fetch_gh_release() {
   repo="$1"; asset_re="$2"; shift 2
+  # `|| true`: grep exits non-zero on no match, which set -e would otherwise
+  # treat as fatal before the guard below runs.
   url="$(curl -fsSL "https://api.github.com/repos/$repo/releases/latest" \
     | grep -oE "https://[^\"]*$asset_re" | head -n1 || true)"
   [ -n "$url" ] || { echo "no release asset for $repo matching $asset_re" >&2; return 1; }
@@ -208,6 +214,8 @@ fetch_gh_release() {
     *.zip)          unzip -q "$file" -d "$tmp" ;;
   esac
   for bin in "$@"; do
+    # -print -quit stops at the first match without SIGPIPE (a `| head` pipe
+    # would SIGPIPE find, which pipefail+set -e would treat as fatal).
     found="$(find "$tmp" -type f -name "$bin" -perm -u+x -print -quit)"
     [ -n "$found" ] || found="$(find "$tmp" -type f -name "$bin" -print -quit)"
     if [ -n "$found" ]; then
