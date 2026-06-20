@@ -1,6 +1,9 @@
 package action
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 type fakeDriver struct {
 	installed     map[string]bool
@@ -88,5 +91,31 @@ func TestPackages_NeedsSudo(t *testing.T) {
 func TestAptDriverRegistered(t *testing.T) {
 	if _, ok := pkgDrivers["apt"]; !ok {
 		t.Fatal(`pkgDrivers missing "apt"`)
+	}
+}
+
+// apt-get install is atomic and fails the whole batch on a single 404, which
+// happens when the local index is stale (Ubuntu rotated a package version).
+// Install must refresh the index first.
+func TestAptDriver_InstallRefreshesIndexFirst(t *testing.T) {
+	var calls [][]string
+	orig := runSudo
+	runSudo = func(args ...string) error {
+		calls = append(calls, args)
+		return nil
+	}
+	t.Cleanup(func() { runSudo = orig })
+
+	if err := (aptDriver{}).Install([]string{"foo", "bar"}); err != nil {
+		t.Fatal(err)
+	}
+	if len(calls) != 2 {
+		t.Fatalf("expected 2 sudo calls (update then install), got %d: %v", len(calls), calls)
+	}
+	if got := strings.Join(calls[0], " "); got != "apt-get update" {
+		t.Errorf("first call = %q, want \"apt-get update\"", got)
+	}
+	if got := strings.Join(calls[1], " "); got != "apt-get install -y foo bar" {
+		t.Errorf("second call = %q, want \"apt-get install -y foo bar\"", got)
 	}
 }

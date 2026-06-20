@@ -153,14 +153,20 @@ func (aptDriver) IsInstalled(name string) (bool, error) {
 }
 
 func (aptDriver) Install(names []string) error {
+	// Refresh the index first. apt-get install is atomic, so a single stale
+	// entry (Ubuntu rotates a package version and pulls the old .deb) 404s and
+	// aborts the whole batch — taking unrelated packages down with it.
+	if err := runSudo("apt-get", "update"); err != nil {
+		return err
+	}
 	args := append([]string{"apt-get", "install", "-y"}, names...)
 	return runSudo(args...)
 }
 
 // runSudo uses sudo -n so a missing cached credential errors out instead of
 // blocking on a password prompt. Users are expected to `sudo -v` before
-// running quill apply.
-func runSudo(args ...string) error {
+// running quill apply. It is a var so tests can record invocations.
+var runSudo = func(args ...string) error {
 	full := append([]string{"-n", "--"}, args...)
 	out, err := exec.Command("sudo", full...).CombinedOutput()
 	if err != nil {
