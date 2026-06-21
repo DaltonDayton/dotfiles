@@ -9,7 +9,8 @@ names = [
     "hyprland", "hyprpaper", "hypridle", "hyprlock", "hyprlauncher",
     "hyprpicker", "hyprpolkitagent", "qt5-wayland", "qt6-wayland",
     "waybar", "rofi", "kitty", "swaync", "sddm",
-    "pipewire-pulse", "pavucontrol",
+    "pipewire", "pipewire-pulse", "wireplumber", "pavucontrol",
+    "xdg-desktop-portal", "xdg-desktop-portal-hyprland", "xdg-desktop-portal-gtk",
     "bluez", "bluez-utils", "blueman",
     "grim", "slurp", "satty", "wl-clipboard", "wf-recorder",
     "cliphist",
@@ -83,6 +84,10 @@ dst = "~/.config/wlogout"
 src = "files/systemd/user/hyprlock-watch.service"
 dst = "~/.config/systemd/user/hyprlock-watch.service"
 
+[[symlinks]]
+src = "files/systemd/user/hyprland-session.target"
+dst = "~/.config/systemd/user/hyprland-session.target"
+
 [[files]]
 dst = "~/.config/cliphist/config"
 content = "max-items=100\n"
@@ -95,9 +100,4 @@ state = "enabled"
 [[services]]
 scope = "system"
 name = "sddm.service"
-state = "enabled"
-
-[[services]]
-scope = "user"
-name = "hyprlock-watch.service"
 state = "enabled"
