@@ -15,6 +15,18 @@ src = "files/claude/settings.json"
 dst = "~/.claude/settings.json"
 
 [[symlinks]]
+src = "files/claude/CLAUDE.md"
+dst = "~/.claude/CLAUDE.md"
+
+[[symlinks]]
+src = "files/claude/rules"
+dst = "~/.claude/rules"
+
+[[symlinks]]
+src = "files/claude/stacks"
+dst = "~/.claude/stacks"
+
+[[symlinks]]
 src = "files/opencode/opencode.json"
 dst = "~/.config/opencode/opencode.json"
 

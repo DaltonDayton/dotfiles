@@ -1,0 +1,19 @@
+# <Project name>
+
+Drop this at a repo root as `CLAUDE.md`. Keep it tiny: pull in the stack,
+then add only what's true about *this* repo. (Universal rules load from
+`~/.claude/CLAUDE.md` automatically.)
+
+@~/.claude/stacks/react.md
+
+## This project
+- Run: `pnpm dev` . Test: `pnpm test` . Build: `pnpm build`
+- State lives in `src/store`; never prop-drill past 2 levels.
+- API client is generated; don't hand-edit `src/api/generated/`.
+- Never touch `migrations/` that are already committed.
+
+<!--
+Monorepo instead? Skip the @import above. Put react in frontend/CLAUDE.md
+and django in backend/CLAUDE.md, so each loads only when Claude works in that
+subtree, keeping this root lean.
+-->
