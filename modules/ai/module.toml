@@ -1,6 +1,7 @@
 name        = "ai"
 description = "Claude Code and opencode — binaries, settings, and customizations"
 tags        = ["essential", "ai"]
+depends_on  = ["asdf"]
 
 [[packages]]
 manager = "pacman"
@@ -9,6 +10,10 @@ names   = ["opencode", "socat"]
 [[packages]]
 manager = "aur"
 names   = ["claude-code"]
+
+[[packages]]
+manager = "apt"
+names = ["socat"]
 
 [[symlinks]]
 src = "files/claude/settings.json"
