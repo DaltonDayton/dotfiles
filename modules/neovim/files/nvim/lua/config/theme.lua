@@ -6,12 +6,35 @@ local STATE = STATE_DIR .. "/themes/current"
 local THEMES_DIR = vim.fn.expand("~/.config/themes")
 local DEFAULT = "rose-pine"
 
+-- Default colorscheme when there is no theme-switcher host (no ~/.config/themes,
+-- e.g. WSL/non-Hyprland). Mirrors modules/hyprland/files/themes/catppuccin/nvim.lua.
+local FALLBACK = {
+  plugin = {
+    "catppuccin/nvim",
+    name = "catppuccin",
+    lazy = false,
+    priority = 1000,
+    config = function()
+      require("catppuccin").setup({ transparent_background = true })
+    end,
+  },
+  scheme = "catppuccin-mocha",
+}
+
 function M.current()
   local f = io.open(STATE, "r")
   if not f then return DEFAULT end
   local name = f:read("*l")
   f:close()
   return (name and name:gsub("%s+$", "")) or DEFAULT
+end
+
+function M.themed_host()
+  return vim.uv.fs_stat(THEMES_DIR) ~= nil
+end
+
+function M.fallback_spec()
+  return vim.deepcopy(FALLBACK)
 end
 
 function M.list()
@@ -47,6 +70,11 @@ local function plugin_id(spec)
 end
 
 function M.apply()
+  if not M.themed_host() then
+    pcall(function() require("lazy").load({ plugins = { "catppuccin" } }) end)
+    pcall(vim.cmd.colorscheme, FALLBACK.scheme)
+    return
+  end
   local name = M.current()
   if name == "matugen" then
     -- dofile() (not :colorscheme matugen) so wallpaper changes that regenerate

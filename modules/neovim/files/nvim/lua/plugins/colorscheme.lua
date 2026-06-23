@@ -4,6 +4,15 @@
 -- them via `require("lazy").load(...)` on theme switch.
 
 local theme = require("config.theme")
+
+-- No theme-switcher host (no ~/.config/themes): install just catppuccin so the
+-- dispatcher's fallback in config/theme.lua has a colorscheme to load.
+-- fallback_spec() returns the theme wrapper { plugin = {...}, scheme = ... };
+-- this file returns lazy *plugin* specs, so hand lazy the inner .plugin.
+if not theme.themed_host() then
+  return { theme.fallback_spec().plugin }
+end
+
 local active = theme.current()
 
 local specs = {}
