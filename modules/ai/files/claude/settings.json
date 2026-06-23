@@ -144,7 +144,7 @@
     }
   },
   "sandbox": {
-    "enabled": true
+    "enabled": false
   },
   "autoMemoryEnabled": true,
   "theme": "auto",
