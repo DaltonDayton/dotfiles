@@ -5,3 +5,7 @@ tags = ["dev"]
 [[packages]]
 manager = "pacman"
 names = ["uv"]
+
+[[packages]]
+manager = "apt"
+names = ["python3-venv", "python3-pip"]
