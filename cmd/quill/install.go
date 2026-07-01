@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/DaltonDayton/dotfiles/internal/module"
+	"github.com/DaltonDayton/dotfiles/internal/profile"
 	"github.com/DaltonDayton/dotfiles/internal/runner"
 	"github.com/DaltonDayton/dotfiles/internal/state"
 	"github.com/DaltonDayton/dotfiles/internal/tui"
@@ -22,29 +24,26 @@ func newInstallCmd() *cobra.Command {
 				return err
 			}
 
-			prof, err := loadProfileByOS(ctx.RepoRoot, ctx.OS)
+			osName, machine, err := tui.PickProfile(ctx.OS)
 			if err != nil {
 				return err
 			}
-
-			profilePath := filepath.Join(ctx.RepoRoot, "profiles", prof.Name+".toml")
-			fmt.Println(tui.Banner(prof.Name, profilePath))
+			prof, err := profile.Load(filepath.Join(ctx.RepoRoot, "profiles"), osName, machine)
+			if err != nil {
+				return err
+			}
+			ctx.OS = osName // the pick drives gating
 
 			statePath, _ := state.DefaultPath()
-			savedState, _ := state.LoadState(statePath)
-			var preselectedNames []string
-			if savedState != nil {
-				preselectedNames = savedState.Modules
+			saved, _ := state.LoadState(statePath)
+			candidates := prof.Modules
+			if saved != nil && len(saved.Modules) > 0 {
+				candidates = saved.Modules
 			}
-			if len(preselectedNames) == 0 {
-				preselectedNames = prof.Modules
-			}
-			preselected := map[string]bool{}
-			for _, n := range preselectedNames {
-				preselected[n] = true
-			}
+			valid := module.FilterValid(ctx.Modules, osName, machine)
+			preselected := module.Preselect(valid, candidates)
 
-			selected, err := tui.SelectModules(ctx.Modules, preselected)
+			selected, err := tui.SelectModules(valid, preselected)
 			if err != nil {
 				return err
 			}
@@ -60,7 +59,7 @@ func newInstallCmd() *cobra.Command {
 			ordered = runner.FilterByHost(ordered, prof.Name)
 
 			var proceed bool
-			summary := fmt.Sprintf("Will apply %d modules on host %s. Proceed?", len(ordered), prof.Name)
+			summary := fmt.Sprintf("Will apply %d modules on profile %s. Proceed?", len(ordered), prof.Name)
 			if err := huh.NewConfirm().Title(summary).Value(&proceed).Run(); err != nil {
 				return err
 			}
@@ -118,7 +117,7 @@ func newInstallCmd() *cobra.Command {
 				}
 			}
 
-			_ = state.SaveState(statePath, &state.Selection{Modules: selected})
+			_ = state.SaveState(statePath, &state.Selection{OS: osName, Machine: machine, Modules: selected})
 			printPendingTodos(cmd.OutOrStdout(), runner.PendingTodos(plan))
 			if scriptErrs > 0 {
 				return fmt.Errorf("%d install.sh scripts failed", scriptErrs)
