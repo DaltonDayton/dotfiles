@@ -1,6 +1,8 @@
 name = "razer"
 description = "OpenRazer driver + daemon and Polychromatic GUI for Razer peripherals"
-tags = ["apps"]
+tags    = ["apps"]
+os      = ["arch"]
+machine = ["desktop"]
 hosts = ["archlinux"]
 
 [[packages]]

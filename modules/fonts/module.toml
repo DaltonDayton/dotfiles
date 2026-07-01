@@ -1,6 +1,7 @@
 name = "fonts"
 description = "system + terminal + UI fonts"
 tags = ["essential"]
+os   = ["arch"]
 
 [[packages]]
 manager = "pacman"

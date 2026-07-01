@@ -1,6 +1,8 @@
 name = "gaming"
 description = "Wine, DXVK, Vulkan tooling, Steam, lib32 runtimes"
-tags = ["gaming"]
+tags    = ["gaming"]
+os      = ["arch"]
+machine = ["desktop"]
 hosts = ["archlinux"]
 
 [[packages]]

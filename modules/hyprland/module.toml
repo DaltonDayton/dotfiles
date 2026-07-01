@@ -1,6 +1,7 @@
 name = "hyprland"
 description = "Hyprland desktop session: WM, bar, terminal, theming"
 tags = ["essential", "desktop"]
+os   = ["arch"]
 depends_on = ["fonts"]
 
 [[packages]]

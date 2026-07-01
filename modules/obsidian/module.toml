@@ -1,6 +1,7 @@
 name = "obsidian"
 description = "Obsidian + vault directories"
 tags = ["apps"]
+os   = ["arch"]
 
 [[packages]]
 manager = "pacman"

@@ -1,6 +1,7 @@
 name = "solaar"
 description = "Logitech Unifying receiver manager + udev rule"
 tags = ["apps"]
+os   = ["arch"]
 
 [[packages]]
 manager = "pacman"
