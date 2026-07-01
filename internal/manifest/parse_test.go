@@ -130,6 +130,28 @@ os = ["ubuntu"]
 	}
 }
 
+func TestParseModule_osMachineFields(t *testing.T) {
+	dir := t.TempDir()
+	p := filepath.Join(dir, "module.toml")
+	if err := os.WriteFile(p, []byte(`
+name = "gaming"
+os = ["arch"]
+machine = ["desktop"]
+`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	m, err := ParseModule(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(m.OS) != 1 || m.OS[0] != "arch" {
+		t.Fatalf("module OS not parsed: %+v", m.OS)
+	}
+	if len(m.Machine) != 1 || m.Machine[0] != "desktop" {
+		t.Fatalf("module Machine not parsed: %+v", m.Machine)
+	}
+}
+
 func TestParseModule_todos(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "module.toml")

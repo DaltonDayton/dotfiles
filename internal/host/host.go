@@ -1,3 +1,3 @@
-// Package host resolves which host profile applies on the current machine
-// and loads the corresponding hosts/<name>.toml file.
+// Package host detects the current machine's OS (see os.go). Profile files
+// under profiles/ are resolved elsewhere; hostname-based lookup was removed.
 package host
