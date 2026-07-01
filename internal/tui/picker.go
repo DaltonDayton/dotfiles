@@ -10,7 +10,7 @@ func PickProfile(defaultOS string) (string, string, error) {
 		osChoice = "ubuntu"
 	}
 	if err := huh.NewSelect[string]().
-		Title("Which OS?").
+		Title(Title.Render("Which OS?")).
 		Options(
 			huh.NewOption("Arch", "arch"),
 			huh.NewOption("WSL", "ubuntu"),
@@ -23,7 +23,7 @@ func PickProfile(defaultOS string) (string, string, error) {
 	}
 	machine := "desktop"
 	if err := huh.NewSelect[string]().
-		Title("Desktop or Laptop?").
+		Title(Title.Render("Desktop or Laptop?")).
 		Options(
 			huh.NewOption("Desktop", "desktop"),
 			huh.NewOption("Laptop", "laptop"),
