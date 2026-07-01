@@ -45,7 +45,7 @@ return {
         },
       },
       filters = {
-        custom = { ".DS_Store" },
+        custom = { ".DS_Store", "%.test%." },
       },
       git = {
         ignore = false,

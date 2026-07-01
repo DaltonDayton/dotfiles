@@ -33,6 +33,9 @@ vim.keymap.set("n", "<C-Down>", ":resize +2<CR>", { desc = "Decrease window heig
 vim.keymap.set("n", "<C-Left>", ":vertical resize +2<CR>", { desc = "Decrease window width" })
 vim.keymap.set("n", "<C-Right>", ":vertical resize -2<CR>", { desc = "Increase window width" })
 
+-- Insert mode: open new line above current line
+vim.keymap.set("i", "<A-o>", "<Esc>ko", { desc = "Open line above (insert mode)" })
+
 -- Core
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move text down" })
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move text up" })
