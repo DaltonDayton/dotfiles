@@ -2,13 +2,19 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
 
+	"github.com/DaltonDayton/dotfiles/internal/host"
+	"github.com/DaltonDayton/dotfiles/internal/profile"
 	"github.com/DaltonDayton/dotfiles/internal/runner"
+	"github.com/DaltonDayton/dotfiles/internal/state"
+	"github.com/DaltonDayton/dotfiles/internal/tui"
 	"github.com/spf13/cobra"
 )
 
 func newApplyCmd() *cobra.Command {
-	return &cobra.Command{
+	var flagOS, flagMachine string
+	cmd := &cobra.Command{
 		Use:   "apply [modules...]",
 		Short: "Apply host profile (or listed modules) without prompts",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -17,10 +23,34 @@ func newApplyCmd() *cobra.Command {
 				return err
 			}
 
-			prof, err := loadProfileByOS(ctx.RepoRoot, ctx.OS)
+			statePath, _ := state.DefaultPath()
+			saved, _ := state.LoadState(statePath)
+
+			var osName, machine string
+			switch {
+			case flagOS != "":
+				osName, machine = profile.NormalizeOS(flagOS), flagMachine
+			case saved != nil && saved.OS != "":
+				osName, machine = saved.OS, saved.Machine
+			default:
+				// first-run: prompt once, then persist below so future runs are silent
+				osName, machine, err = tui.PickProfile(host.DetectOS())
+				if err != nil {
+					return err
+				}
+			}
+			prof, err := profile.Load(filepath.Join(ctx.RepoRoot, "profiles"), osName, machine)
 			if err != nil {
 				return err
 			}
+			ctx.OS = osName
+
+			// persist so future apply/status runs are non-interactive
+			mods := prof.Modules
+			if saved != nil && len(saved.Modules) > 0 {
+				mods = saved.Modules
+			}
+			_ = state.SaveState(statePath, &state.Selection{OS: osName, Machine: machine, Modules: mods})
 
 			names := args
 			if len(names) == 0 {
@@ -88,4 +118,7 @@ func newApplyCmd() *cobra.Command {
 			return nil
 		},
 	}
+	cmd.Flags().StringVar(&flagOS, "os", "", "profile OS: arch|wsl (overrides saved)")
+	cmd.Flags().StringVar(&flagMachine, "machine", "", "profile machine: desktop|laptop (arch only)")
+	return cmd
 }

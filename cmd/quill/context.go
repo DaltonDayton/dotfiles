@@ -8,12 +8,13 @@ import (
 	"github.com/DaltonDayton/dotfiles/internal/host"
 	"github.com/DaltonDayton/dotfiles/internal/manifest"
 	"github.com/DaltonDayton/dotfiles/internal/module"
+	"github.com/DaltonDayton/dotfiles/internal/profile"
+	"github.com/DaltonDayton/dotfiles/internal/state"
 )
 
 type appCtx struct {
 	RepoRoot string
 	Modules  []*module.Module
-	Profile  *manifest.Profile
 	OS       string
 }
 
@@ -30,17 +31,22 @@ func loadCtx() (*appCtx, error) {
 	if osName == "unknown" {
 		fmt.Fprintln(os.Stderr, "warning: could not determine OS from /etc/os-release; OS-specific actions will be skipped")
 	}
-	return &appCtx{RepoRoot: root, Modules: mods, Profile: nil, OS: osName}, nil
+	return &appCtx{RepoRoot: root, Modules: mods, OS: osName}, nil
 }
 
-// loadProfileByOS is temporary scaffolding for Task 1 so install/apply still
-// resolve a profile before the picker (Tasks 6-7) lands. Arch → arch-desktop.
-func loadProfileByOS(root, osName string) (*manifest.Profile, error) {
-	name := "wsl"
-	if osName == "arch" {
-		name = "arch-desktop"
+// resolveProfileNonInteractive picks the profile without prompting: saved state
+// if present, else the detected OS with a default machine (arch → desktop).
+// Used by status (always) and by apply when it has saved state.
+func resolveProfileNonInteractive(root string, saved *state.Selection) (*manifest.Profile, string, string, error) {
+	osName, machine := host.DetectOS(), ""
+	if saved != nil && saved.OS != "" {
+		osName, machine = saved.OS, saved.Machine
 	}
-	return manifest.ParseProfile(filepath.Join(root, "profiles", name+".toml"))
+	if osName == "arch" && machine == "" {
+		machine = "desktop"
+	}
+	p, err := profile.Load(filepath.Join(root, "profiles"), osName, machine)
+	return p, osName, machine, err
 }
 
 // resolveRepoRoot prefers --repo, then the directory that contains the running

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/DaltonDayton/dotfiles/internal/runner"
+	"github.com/DaltonDayton/dotfiles/internal/state"
 	"github.com/spf13/cobra"
 )
 
@@ -17,10 +18,13 @@ func newStatusCmd() *cobra.Command {
 				return err
 			}
 
-			prof, err := loadProfileByOS(ctx.RepoRoot, ctx.OS)
+			sp, _ := state.DefaultPath()
+			saved, _ := state.LoadState(sp)
+			prof, osName, _, err := resolveProfileNonInteractive(ctx.RepoRoot, saved)
 			if err != nil {
 				return err
 			}
+			ctx.OS = osName
 
 			ordered, err := runner.ResolveDeps(ctx.Modules, prof.Modules)
 			if err != nil {
