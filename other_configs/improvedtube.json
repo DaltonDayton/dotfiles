@@ -1,0 +1,27 @@
+{
+  "always_show_progress_bar": true,
+  "below_player_pip": false,
+  "channel_trailer_autoplay": false,
+  "disable_thumbnail_playback": false,
+  "duration_with_speed": true,
+  "forced_theater_mode": true,
+  "lastDarkTheme": "black",
+  "player_autoplay": false,
+  "player_color": "pink",
+  "player_forced_playback_speed": true,
+  "player_forced_volume": true,
+  "player_playback_speed": 2,
+  "player_remaining_duration": true,
+  "player_volume": 75,
+  "remove_history_shorts": true,
+  "remove_home_page_shorts": true,
+  "remove_shorts_reel_search_results": true,
+  "remove_subscriptions_shorts": true,
+  "remove_trending_shorts": true,
+  "theme": "black",
+  "theme_primary_color": [200, 200, 200],
+  "theme_text_color": [25, 25, 25],
+  "up_next_autoplay": false,
+  "youtube_home_page": "/feed/subscriptions"
+}
+
