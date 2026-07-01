@@ -1,4 +1,6 @@
-name = "archlinux"
+name    = "arch-desktop"
+os      = "arch"
+machine = "desktop"
 modules = ["git", "shell", "tmux", "fonts", "asdf", "python", "neovim", "hyprland", "ai", "obsidian", "solaar", "gaming", "razer"]
 
 [vars]

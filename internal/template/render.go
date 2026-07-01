@@ -10,17 +10,17 @@ import (
 	"github.com/DaltonDayton/dotfiles/internal/manifest"
 )
 
-// Render executes src as a Go text/template against h.
+// Render executes src as a Go text/template against p.
 //
 // why: missingkey=error makes typos in .tmpl files fail loudly — a silent
 // "<no value>" substitution would produce a broken config that looks fine.
-func Render(src string, h *manifest.Host) (string, error) {
+func Render(src string, p *manifest.Profile) (string, error) {
 	tmpl, err := template.New("render").Option("missingkey=error").Parse(src)
 	if err != nil {
 		return "", fmt.Errorf("parse template: %w", err)
 	}
 	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, h); err != nil {
+	if err := tmpl.Execute(&buf, p); err != nil {
 		return "", fmt.Errorf("execute template: %w", err)
 	}
 	return buf.String(), nil

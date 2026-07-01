@@ -22,13 +22,18 @@ func newInstallCmd() *cobra.Command {
 				return err
 			}
 
-			profilePath := filepath.Join(ctx.RepoRoot, "hosts", ctx.Host.Name+".toml")
-			fmt.Println(tui.Banner(ctx.Host.Name, profilePath))
+			prof, err := loadProfileByOS(ctx.RepoRoot, ctx.OS)
+			if err != nil {
+				return err
+			}
+
+			profilePath := filepath.Join(ctx.RepoRoot, "profiles", prof.Name+".toml")
+			fmt.Println(tui.Banner(prof.Name, profilePath))
 
 			statePath, _ := state.DefaultPath()
 			preselectedNames, _ := state.LoadSelection(statePath)
 			if len(preselectedNames) == 0 {
-				preselectedNames = ctx.Host.Modules
+				preselectedNames = prof.Modules
 			}
 			preselected := map[string]bool{}
 			for _, n := range preselectedNames {
@@ -48,10 +53,10 @@ func newInstallCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			ordered = runner.FilterByHost(ordered, ctx.Host.Name)
+			ordered = runner.FilterByHost(ordered, prof.Name)
 
 			var proceed bool
-			summary := fmt.Sprintf("Will apply %d modules on host %s. Proceed?", len(ordered), ctx.Host.Name)
+			summary := fmt.Sprintf("Will apply %d modules on host %s. Proceed?", len(ordered), prof.Name)
 			if err := huh.NewConfirm().Title(summary).Value(&proceed).Run(); err != nil {
 				return err
 			}
@@ -60,7 +65,7 @@ func newInstallCmd() *cobra.Command {
 				return nil
 			}
 
-			plan := runner.BuildPlan(ordered, ctx.Host, ctx.OS)
+			plan := runner.BuildPlan(ordered, prof, ctx.OS)
 			if runner.PlanNeedsSudo(plan) || runner.PlanInstallShNeedsSudo(plan) {
 				if err := primeSudo(); err != nil {
 					return err
@@ -103,7 +108,7 @@ func newInstallCmd() *cobra.Command {
 				if p.BuildErr != nil {
 					continue
 				}
-				if err := runner.RunInstallSh(p.Module, ctx.OS, ctx.Host.Name); err != nil {
+				if err := runner.RunInstallSh(p.Module, ctx.OS, prof.Name); err != nil {
 					fmt.Fprintln(cmd.ErrOrStderr(), err)
 					scriptErrs++
 				}

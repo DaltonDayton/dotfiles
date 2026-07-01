@@ -13,7 +13,7 @@ import (
 type appCtx struct {
 	RepoRoot string
 	Modules  []*module.Module
-	Host     *manifest.Host
+	Profile  *manifest.Profile
 	OS       string
 }
 
@@ -26,19 +26,21 @@ func loadCtx() (*appCtx, error) {
 	if err != nil {
 		return nil, fmt.Errorf("load modules: %w", err)
 	}
-	hostname, err := host.Detect()
-	if err != nil {
-		return nil, err
-	}
-	h, err := host.Load(filepath.Join(root, "hosts"), hostname)
-	if err != nil {
-		return nil, err
-	}
 	osName := host.DetectOS()
 	if osName == "unknown" {
 		fmt.Fprintln(os.Stderr, "warning: could not determine OS from /etc/os-release; OS-specific actions will be skipped")
 	}
-	return &appCtx{RepoRoot: root, Modules: mods, Host: h, OS: osName}, nil
+	return &appCtx{RepoRoot: root, Modules: mods, Profile: nil, OS: osName}, nil
+}
+
+// loadProfileByOS is temporary scaffolding for Task 1 so install/apply still
+// resolve a profile before the picker (Tasks 6-7) lands. Arch → arch-desktop.
+func loadProfileByOS(root, osName string) (*manifest.Profile, error) {
+	name := "wsl"
+	if osName == "arch" {
+		name = "arch-desktop"
+	}
+	return manifest.ParseProfile(filepath.Join(root, "profiles", name+".toml"))
 }
 
 // resolveRepoRoot prefers --repo, then the directory that contains the running

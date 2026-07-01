@@ -16,13 +16,19 @@ func newStatusCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			ordered, err := runner.ResolveDeps(ctx.Modules, ctx.Host.Modules)
+
+			prof, err := loadProfileByOS(ctx.RepoRoot, ctx.OS)
 			if err != nil {
 				return err
 			}
-			ordered = runner.FilterByHost(ordered, ctx.Host.Name)
+
+			ordered, err := runner.ResolveDeps(ctx.Modules, prof.Modules)
+			if err != nil {
+				return err
+			}
+			ordered = runner.FilterByHost(ordered, prof.Name)
 			for _, m := range ordered {
-				acts, err := runner.BuildActions(m, ctx.Host, ctx.OS)
+				acts, err := runner.BuildActions(m, prof, ctx.OS)
 				if err != nil {
 					fmt.Printf("%-20s ERROR: %v\n", m.Name, err)
 					continue

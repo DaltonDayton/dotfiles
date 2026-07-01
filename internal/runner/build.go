@@ -14,11 +14,11 @@ import (
 // BuildActions translates a Module's declarative entries into an ordered
 // []action.Action filtered to this host and OS.
 // Execution order: directories → packages → symlinks → files → commands → services.
-func BuildActions(m *module.Module, host *manifest.Host, osName string) ([]action.Action, error) {
+func BuildActions(m *module.Module, profile *manifest.Profile, osName string) ([]action.Action, error) {
 	var acts []action.Action
 
 	for _, d := range m.Directories {
-		if !hostMatch(d.Hosts, host.Name) {
+		if !hostMatch(d.Hosts, profile.Name) {
 			continue
 		}
 		if !osMatch(d.OS, osName) {
@@ -27,7 +27,7 @@ func BuildActions(m *module.Module, host *manifest.Host, osName string) ([]actio
 		acts = append(acts, &action.Directory{Path: expandHome(d.Path), Mode: d.Mode})
 	}
 	for _, p := range m.Packages {
-		if !hostMatch(p.Hosts, host.Name) {
+		if !hostMatch(p.Hosts, profile.Name) {
 			continue
 		}
 		// Gate on p.Manager BEFORE normalizing "" / "aur" → "yay" so the
@@ -44,7 +44,7 @@ func BuildActions(m *module.Module, host *manifest.Host, osName string) ([]actio
 		acts = append(acts, &action.Packages{Manager: mgr, Names: p.Names})
 	}
 	for _, s := range m.Symlinks {
-		if !hostMatch(s.Hosts, host.Name) {
+		if !hostMatch(s.Hosts, profile.Name) {
 			continue
 		}
 		if !osMatch(s.OS, osName) {
@@ -60,7 +60,7 @@ func BuildActions(m *module.Module, host *manifest.Host, osName string) ([]actio
 			if err != nil {
 				return nil, err
 			}
-			rendered, err := template.Render(string(raw), host)
+			rendered, err := template.Render(string(raw), profile)
 			if err != nil {
 				return nil, err
 			}
@@ -73,7 +73,7 @@ func BuildActions(m *module.Module, host *manifest.Host, osName string) ([]actio
 		acts = append(acts, &action.Symlink{Src: src, Dst: dst, ConflictPolicy: action.ConflictBackup})
 	}
 	for _, f := range m.Files {
-		if !hostMatch(f.Hosts, host.Name) {
+		if !hostMatch(f.Hosts, profile.Name) {
 			continue
 		}
 		if !osMatch(f.OS, osName) {
@@ -90,7 +90,7 @@ func BuildActions(m *module.Module, host *manifest.Host, osName string) ([]actio
 		acts = append(acts, &action.File{Dst: expandHome(f.Dst), Content: content, Mode: f.Mode})
 	}
 	for _, c := range m.Commands {
-		if !hostMatch(c.Hosts, host.Name) {
+		if !hostMatch(c.Hosts, profile.Name) {
 			continue
 		}
 		if !osMatch(c.OS, osName) {
@@ -99,7 +99,7 @@ func BuildActions(m *module.Module, host *manifest.Host, osName string) ([]actio
 		acts = append(acts, &action.Command{Run: c.Run, CheckCmd: c.Check})
 	}
 	for _, s := range m.Services {
-		if !hostMatch(s.Hosts, host.Name) {
+		if !hostMatch(s.Hosts, profile.Name) {
 			continue
 		}
 		if !osMatch(s.OS, osName) {

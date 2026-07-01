@@ -52,7 +52,7 @@ func TestParseModule_missingNameIsError(t *testing.T) {
 	}
 }
 
-func TestParseHost_happyPath(t *testing.T) {
+func TestParseProfile_happyPath(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "laptop.toml")
 	content := `
@@ -66,9 +66,9 @@ monitor = "eDP-1,preferred,auto,1.0"
 		t.Fatal(err)
 	}
 
-	h, err := ParseHost(path)
+	h, err := ParseProfile(path)
 	if err != nil {
-		t.Fatalf("ParseHost: %v", err)
+		t.Fatalf("ParseProfile: %v", err)
 	}
 	if h.Name != "laptop" {
 		t.Errorf("Name = %q, want laptop", h.Name)
@@ -78,12 +78,12 @@ monitor = "eDP-1,preferred,auto,1.0"
 	}
 }
 
-func TestParseHost_emptyVarsMapIsNonNil(t *testing.T) {
+func TestParseProfile_emptyVarsMapIsNonNil(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "minimal.toml")
 	os.WriteFile(path, []byte(`name = "minimal"`), 0o644)
 
-	h, err := ParseHost(path)
+	h, err := ParseProfile(path)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -91,6 +91,22 @@ func TestParseHost_emptyVarsMapIsNonNil(t *testing.T) {
 	// panic on write, and forcing it non-nil lets callers append freely.
 	if h.Vars == nil {
 		t.Error("Vars map should be non-nil even when TOML omits [vars]")
+	}
+}
+
+func TestParseProfile_osMachine(t *testing.T) {
+	dir := t.TempDir()
+	p := filepath.Join(dir, "wsl.toml")
+	os.WriteFile(p, []byte("name=\"wsl\"\nos=\"ubuntu\"\nmodules=[\"git\"]\n"), 0o644)
+	prof, err := ParseProfile(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if prof.OS != "ubuntu" || len(prof.Modules) != 1 {
+		t.Fatalf("got %+v", prof)
+	}
+	if prof.Machine != "" {
+		t.Fatalf("machine should be empty, got %q", prof.Machine)
 	}
 }
 

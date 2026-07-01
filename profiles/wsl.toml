@@ -1,4 +1,5 @@
-name    = "Dalton"
+name    = "wsl"
+os      = "ubuntu"
 modules = ["git", "shell", "tmux", "neovim", "ai", "python", "asdf"]
 
 [vars]

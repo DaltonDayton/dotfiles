@@ -9,6 +9,8 @@ type Module struct {
 	Tags        []string `toml:"tags"`
 	DependsOn   []string `toml:"depends_on"`
 	Hosts       []string `toml:"hosts"`
+	OS          []string `toml:"os"`
+	Machine     []string `toml:"machine"`
 
 	Packages    []Packages  `toml:"packages"`
 	Symlinks    []Symlink   `toml:"symlinks"`
@@ -78,9 +80,11 @@ type Todo struct {
 	Check   string `toml:"check"` // shell cmd; exit 0 = done. Empty = always shown.
 }
 
-// Host mirrors hosts/<name>.toml.
-type Host struct {
+// Profile mirrors profiles/<name>.toml — the OS/machine combo the user picks.
+type Profile struct {
 	Name    string            `toml:"name"`
+	OS      string            `toml:"os"`      // "arch" | "ubuntu"
+	Machine string            `toml:"machine"` // "desktop" | "laptop" | "" (WSL)
 	Modules []string          `toml:"modules"`
 	Vars    map[string]string `toml:"vars"`
 }

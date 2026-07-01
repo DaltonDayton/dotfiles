@@ -1,4 +1,6 @@
-name = "archlaptop"
+name    = "arch-laptop"
+os      = "arch"
+machine = "laptop"
 modules = ["git", "shell", "tmux", "fonts", "asdf", "python", "neovim", "hyprland", "ai", "obsidian", "solaar"]
 
 [vars]

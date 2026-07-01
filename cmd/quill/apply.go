@@ -16,17 +16,23 @@ func newApplyCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
+
+			prof, err := loadProfileByOS(ctx.RepoRoot, ctx.OS)
+			if err != nil {
+				return err
+			}
+
 			names := args
 			if len(names) == 0 {
-				names = ctx.Host.Modules
+				names = prof.Modules
 			}
 			ordered, err := runner.ResolveDeps(ctx.Modules, names)
 			if err != nil {
 				return err
 			}
-			ordered = runner.FilterByHost(ordered, ctx.Host.Name)
+			ordered = runner.FilterByHost(ordered, prof.Name)
 
-			plan := runner.BuildPlan(ordered, ctx.Host, ctx.OS)
+			plan := runner.BuildPlan(ordered, prof, ctx.OS)
 			if runner.PlanNeedsSudo(plan) || runner.PlanInstallShNeedsSudo(plan) {
 				if err := primeSudo(); err != nil {
 					return err
@@ -68,7 +74,7 @@ func newApplyCmd() *cobra.Command {
 				if p.BuildErr != nil {
 					continue
 				}
-				if err := runner.RunInstallSh(p.Module, ctx.OS, ctx.Host.Name); err != nil {
+				if err := runner.RunInstallSh(p.Module, ctx.OS, prof.Name); err != nil {
 					fmt.Printf("  ✗ %s: install.sh failed (%v)\n", p.Module.Name, err)
 					failed++
 				}

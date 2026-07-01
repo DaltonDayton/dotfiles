@@ -18,17 +18,17 @@ func ParseModule(path string) (*Module, error) {
 	return &m, nil
 }
 
-// ParseHost reads and decodes a hosts/<name>.toml file.
-func ParseHost(path string) (*Host, error) {
-	var h Host
-	if _, err := toml.DecodeFile(path, &h); err != nil {
+// ParseProfile reads and decodes a profiles/<name>.toml file.
+func ParseProfile(path string) (*Profile, error) {
+	var p Profile
+	if _, err := toml.DecodeFile(path, &p); err != nil {
 		return nil, fmt.Errorf("decode %s: %w", path, err)
 	}
-	if h.Name == "" {
-		return nil, fmt.Errorf("%s: host is missing required field 'name'", path)
+	if p.Name == "" {
+		return nil, fmt.Errorf("%s: profile is missing required field 'name'", path)
 	}
-	if h.Vars == nil {
-		h.Vars = map[string]string{}
+	if p.Vars == nil {
+		p.Vars = map[string]string{}
 	}
-	return &h, nil
+	return &p, nil
 }

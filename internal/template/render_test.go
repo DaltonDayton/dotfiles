@@ -7,7 +7,7 @@ import (
 )
 
 func TestRender_substitutesHostVars(t *testing.T) {
-	h := &manifest.Host{
+	h := &manifest.Profile{
 		Name: "laptop",
 		Vars: map[string]string{"monitor": "eDP-1,preferred,auto,1.0"},
 	}
@@ -22,7 +22,7 @@ func TestRender_substitutesHostVars(t *testing.T) {
 }
 
 func TestRender_exposesHostName(t *testing.T) {
-	h := &manifest.Host{Name: "desktop"}
+	h := &manifest.Profile{Name: "desktop"}
 	got, err := Render("host={{ .Name }}", h)
 	if err != nil {
 		t.Fatalf("Render: %v", err)
@@ -33,7 +33,7 @@ func TestRender_exposesHostName(t *testing.T) {
 }
 
 func TestRender_missingVarIsError(t *testing.T) {
-	h := &manifest.Host{Name: "laptop", Vars: map[string]string{}}
+	h := &manifest.Profile{Name: "laptop", Vars: map[string]string{}}
 	_, err := Render("{{ .Vars.nope }}", h)
 	if err == nil {
 		t.Fatal("expected error for missing var")

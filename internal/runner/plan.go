@@ -17,10 +17,10 @@ type ModulePlan struct {
 // BuildPlan resolves every module's actions up front. A per-module BuildErr
 // is stored on the plan entry rather than short-circuiting — callers surface
 // it during apply so the user sees which module failed to plan.
-func BuildPlan(mods []*module.Module, host *manifest.Host, osName string) []ModulePlan {
+func BuildPlan(mods []*module.Module, profile *manifest.Profile, osName string) []ModulePlan {
 	out := make([]ModulePlan, len(mods))
 	for i, m := range mods {
-		acts, err := BuildActions(m, host, osName)
+		acts, err := BuildActions(m, profile, osName)
 		out[i] = ModulePlan{Module: m, Actions: acts, BuildErr: err}
 	}
 	return out

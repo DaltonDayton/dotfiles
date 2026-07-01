@@ -21,7 +21,7 @@ func TestBuildActions_PackageManagerGatedByOS(t *testing.T) {
 			},
 		},
 	}
-	host := &manifest.Host{Name: "h"}
+	host := &manifest.Profile{Name: "h"}
 
 	arch, err := BuildActions(m, host, "arch")
 	if err != nil {
@@ -52,7 +52,7 @@ func TestBuildActions_OSGateOnNonPackageActions(t *testing.T) {
 			},
 		},
 	}
-	host := &manifest.Host{Name: "h"}
+	host := &manifest.Profile{Name: "h"}
 
 	got, err := BuildActions(m, host, "ubuntu")
 	if err != nil {
@@ -81,7 +81,7 @@ func TestBuildActions_ArchRegression(t *testing.T) {
 			Commands: []manifest.Command{{Run: "echo hi"}},
 		},
 	}
-	got, err := BuildActions(m, &manifest.Host{Name: "h"}, "arch")
+	got, err := BuildActions(m, &manifest.Profile{Name: "h"}, "arch")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -116,7 +116,7 @@ func TestBuildActions_filtersByHostAndExpandsSymlinks(t *testing.T) {
 			},
 		},
 	}
-	host := &manifest.Host{Name: "laptop"}
+	host := &manifest.Profile{Name: "laptop"}
 	acts, err := BuildActions(m, host, "arch")
 	if err != nil {
 		t.Fatal(err)
@@ -144,7 +144,7 @@ func TestBuildActions_rendersTemplateSymlink(t *testing.T) {
 			},
 		},
 	}
-	host := &manifest.Host{Name: "host", Vars: map[string]string{"email": "a@b"}}
+	host := &manifest.Profile{Name: "host", Vars: map[string]string{"email": "a@b"}}
 	acts, err := BuildActions(m, host, "arch")
 	if err != nil {
 		t.Fatal(err)
@@ -176,7 +176,7 @@ func TestBuildActions_managerDefaultsToYay(t *testing.T) {
 				Packages: []manifest.Packages{{Manager: input, Names: []string{"x"}}},
 			},
 		}
-		host := &manifest.Host{Name: "h"}
+		host := &manifest.Profile{Name: "h"}
 		acts, err := BuildActions(m, host, "arch")
 		if err != nil {
 			t.Fatalf("input=%q: %v", input, err)
@@ -202,7 +202,7 @@ func TestBuildActions_respectsOrder(t *testing.T) {
 			Services:    []manifest.Service{{Name: "u", Scope: "user", State: "enabled"}},
 		},
 	}
-	host := &manifest.Host{Name: "h"}
+	host := &manifest.Profile{Name: "h"}
 	acts, err := BuildActions(m, host, "arch")
 	if err != nil {
 		t.Fatal(err)
