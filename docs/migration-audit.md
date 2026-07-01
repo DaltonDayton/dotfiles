@@ -4,10 +4,11 @@
 
 | | Original (`~/.dotfiles/arch/modules/`) | New (`/home/dalton/Development/.dotfiles/modules/`) |
 |---|---|---|
-| Modules | `asdf, claude-code, fonts, gaming, git, hyprland, insync, kitty, misc, neovim, nvidia, obsidian, python, shell, solaar, theme, tmux` | `ai, asdf, fonts, gaming, git, hyprland, neovim, obsidian, python, shell, solaar, tmux` |
-| Host manifest | hardcoded in `install.sh` | `hosts/archlinux.toml`, `hosts/archlaptop.toml` |
-| Both hosts enable | — | `git, shell, tmux, fonts, asdf, python, neovim, hyprland, ai, obsidian, solaar` |
-| Desktop only | — | `gaming` (`hosts/archlinux.toml`) |
+| Modules | `asdf, claude-code, fonts, gaming, git, hyprland, insync, kitty, misc, neovim, nvidia, obsidian, python, shell, solaar, theme, tmux` | `ai, asdf, fonts, gaming, git, hyprland, neovim, obsidian, python, razer, shell, solaar, tmux` |
+| Profile manifest | hardcoded in `install.sh` | `profiles/arch-desktop.toml`, `profiles/arch-laptop.toml`, `profiles/wsl.toml` |
+| All Arch profiles enable | — | `git, shell, tmux, fonts, asdf, python, neovim, hyprland, ai, obsidian, solaar` |
+| Desktop only | — | `gaming, razer` (`profiles/arch-desktop.toml`) |
+| WSL (`profiles/wsl.toml`) enables | — | `git, shell, tmux, neovim, ai, python, asdf` (os-gated to `ubuntu`) |
 
 ---
 
@@ -36,7 +37,7 @@ All resolved.
 
 | Piece | Status |
 |---|---|
-| Laptop NVIDIA packages (`nvidia-open-dkms`, `nvidia-utils`, `nvidia-prime`, `vulkan-tools`) | ✅ ported (hyprland module, `hosts = ["archlaptop"]`) |
+| Laptop NVIDIA packages (`nvidia-open-dkms`, `nvidia-utils`, `nvidia-prime`, `vulkan-tools`) | ✅ ported (hyprland module, `hosts = ["arch-laptop"]`) |
 | Xorg iGPU drop-in (`/etc/X11/xorg.conf.d/20-nvidia-ignore.conf`) | ✅ ported (`hyprland/install.sh`) |
 | `/etc/modprobe.d/nvidia-modeset.conf` (`nvidia_drm.modeset=1`) | ⏭ skipped (defaults sufficient) |
 | `mkinitcpio.conf` MODULES early-KMS edit | ⏭ skipped (defaults sufficient) |
@@ -58,7 +59,7 @@ All resolved.
 | Module | Status |
 |---|---|
 | `insync` | ⏭ dropped — user no longer uses it |
-| `gaming` | ✅ ported as `modules/gaming/` (`hosts = ["archlinux"]`) |
+| `gaming` | ✅ ported as `modules/gaming/` (`os = ["arch"]`, `machine = ["desktop"]`) |
 | `obsidian` | ✅ ported as `modules/obsidian/` (both hosts) |
 | `solaar` | ✅ ported as `modules/solaar/` (both hosts; `install.sh` symlinks the udev rule) |
 | `misc` | ⏭ skipped — empty placeholder in original |
@@ -70,18 +71,15 @@ All resolved.
 | `other_configs/alacritty.toml` | alacritty not in any host; kitty replaced it |
 | `other_configs/improvedtube.json` | browser extension config, not dotfiles concern |
 | `scripts/clearnvimcache.sh`, `scripts/list-explicit-packages.sh` | one-off utilities; keep outside `quill` |
-| `wsl_ubuntu/` | explicitly out of scope per `CLAUDE.md` |
+| `wsl_ubuntu/` | ✅ ported — WSL is now in-scope. Old split `arch/` + `wsl_ubuntu/` trees collapsed into unified os-gated modules; WSL uses `profiles/wsl.toml` (git, shell, tmux, neovim, ai, python, asdf). Single config source, no cross-OS drift. |
 | `shared_configs/claude/CLAUDE.md.template` | per-project bootstrap template, doesn't belong in the user-level `ai` module |
 
 ---
 
 ## 4. Remaining work
 
-Migration content-complete as of 2026-05-09. Before merging `startover` → `main`:
+Migration content-complete. WSL/Ubuntu support and the OS/machine profile picker landed after the original audit; both are ported and verified.
 
-- End-to-end verification on both hosts: `./bin/quill apply` clean and idempotent on `archlinux` and `archlaptop`. Smoke-test the new modules interactively (sudo required):
-  - `./bin/quill apply solaar`
-  - `./bin/quill apply gaming` (archlinux only — heavy install: ~30 pacman packages + AUR build of `faugus-launcher`)
-  - `./bin/quill apply obsidian` (already verified idempotent on this machine)
-- Fresh-bootstrap sanity check (`bootstrap.sh` → `quill install` flow).
-- Decide merge strategy (preserve 144-commit history vs squash to a single rewrite cut-over).
+- ✅ End-to-end verification: `quill apply` clean and idempotent on arch-desktop, arch-laptop, and WSL (confirmed 2026-07-01).
+- ✅ Build + `go test ./...` green.
+- Merge strategy: preserve history via fast-forward (linear), cut over `startover` → `main`.
