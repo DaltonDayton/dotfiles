@@ -6,9 +6,9 @@ A Go CLI that declaratively manages the user's Arch Linux setup — packages, do
 
 **Code:**
 - **Go binary entry:** `cmd/quill/main.go`
-- **Internal packages:** `internal/{manifest,module,host,template,action,runner,state,tui}`
+- **Internal packages:** `internal/{manifest,module,host,profile,template,action,runner,state,tui}`
 - **Modules (dotfile units):** `modules/<name>/module.toml` + `files/` + optional `install.sh`
-- **Host profiles:** `hosts/<hostname>.toml`
+- **Profiles (os/machine combos):** `profiles/<name>.toml` (e.g. `arch-desktop`, `arch-laptop`, `wsl`)
 - **Bootstrap entry:** `bootstrap.sh`
 
 **Specs and plans** (always read the plan before implementing a task — it specifies exact code, file paths, and test shapes):
@@ -23,7 +23,7 @@ A Go CLI that declaratively manages the user's Arch Linux setup — packages, do
 
 ## User context
 
-- Primary OS: **Arch Linux** (desktop + laptop). Also uses **WSL/Ubuntu** for some work; Ubuntu is a **supported (in-progress) target** managed by the same module/host model — OS detection, an `apt` driver, and the `shell` module are done; Arch remains the primary platform.
+- Primary OS: **Arch Linux** (desktop + laptop). Also uses **WSL/Ubuntu** for some work; Ubuntu is a **supported (in-progress) target** managed by the same module/profile model — OS detection, an `apt` driver, and the `shell` module are done; Arch remains the primary platform.
 - **Learning Go** — prefers idiomatic, widely-used patterns over clever abstractions. When introducing a Go pattern the user may not have seen, a short one-line comment explaining *why* is welcome; `what` it does should be self-evident from the code.
 - Shell: **zsh**. Window manager: **Hyprland**. AUR helper: **yay** (bootstrapped from source by `quill install` if missing).
 - Editor preferences live inside the `neovim` module (`modules/neovim/files/nvim/`).
@@ -60,7 +60,7 @@ gofmt -w .
 # run
 ./bin/quill list
 ./bin/quill status
-./bin/quill apply            # non-interactive, host-manifest modules
+./bin/quill apply            # non-interactive, profile modules
 ./bin/quill apply git        # specific module(s)
 ./bin/quill install          # interactive TUI
 ./bin/quill path             # install to ~/.local/bin + patch .zshrc
@@ -77,9 +77,9 @@ gofmt -w .
 ## When adding a new module
 
 1. `mkdir modules/<name>` and write `modules/<name>/module.toml`.
-2. Put any files to symlink under `modules/<name>/files/`. Use `.tmpl` suffix for templated files (host vars available as `{{ .Vars.whatever }}`, hostname as `{{ .Name }}`).
+2. Put any files to symlink under `modules/<name>/files/`. Use `.tmpl` suffix for templated files (profile vars available as `{{ .Vars.whatever }}`, profile name as `{{ .Name }}`).
 3. If the module needs imperative logic, add `modules/<name>/install.sh` (`chmod +x`).
-4. Add the module name to the relevant `hosts/<hostname>.toml` modules list.
+4. Add the module name to the relevant `profiles/<name>.toml` modules list, and set the module's `os`/`machine` fields so the install picker filters it correctly.
 5. Smoke-test: `./bin/quill apply <name>` → rerun to confirm idempotency.
 
 ## Agent workflow
