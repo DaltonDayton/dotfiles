@@ -8,7 +8,7 @@ type Module struct {
 	Description string   `toml:"description"`
 	Tags        []string `toml:"tags"`
 	DependsOn   []string `toml:"depends_on"`
-	Hosts       []string `toml:"hosts"`
+	Hosts       []string `toml:"hosts"` // profile names (e.g. "arch-laptop") this gates to; empty = any
 	OS          []string `toml:"os"`
 	Machine     []string `toml:"machine"`
 

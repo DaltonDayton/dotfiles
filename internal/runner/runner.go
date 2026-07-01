@@ -51,7 +51,9 @@ func ResolveDeps(all []*module.Module, selected []string) ([]*module.Module, err
 }
 
 // FilterByHost drops modules whose Hosts list excludes hostName. An empty
-// Hosts list means "any host".
+// Hosts list means "any host". hostName is the resolved PROFILE name
+// (e.g. "arch-desktop", "wsl") — so a module's hosts=[...] values must match a
+// profile file name, not a machine hostname.
 func FilterByHost(mods []*module.Module, hostName string) []*module.Module {
 	var kept []*module.Module
 	for _, m := range mods {

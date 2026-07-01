@@ -3,7 +3,6 @@ description = "OpenRazer driver + daemon and Polychromatic GUI for Razer periphe
 tags    = ["apps"]
 os      = ["arch"]
 machine = ["desktop"]
-hosts = ["archlinux"]
 
 [[packages]]
 manager = "pacman"
