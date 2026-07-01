@@ -31,7 +31,11 @@ func newInstallCmd() *cobra.Command {
 			fmt.Println(tui.Banner(prof.Name, profilePath))
 
 			statePath, _ := state.DefaultPath()
-			preselectedNames, _ := state.LoadSelection(statePath)
+			savedState, _ := state.LoadState(statePath)
+			var preselectedNames []string
+			if savedState != nil {
+				preselectedNames = savedState.Modules
+			}
 			if len(preselectedNames) == 0 {
 				preselectedNames = prof.Modules
 			}
@@ -114,7 +118,7 @@ func newInstallCmd() *cobra.Command {
 				}
 			}
 
-			_ = state.SaveSelection(statePath, selected)
+			_ = state.SaveState(statePath, &state.Selection{Modules: selected})
 			printPendingTodos(cmd.OutOrStdout(), runner.PendingTodos(plan))
 			if scriptErrs > 0 {
 				return fmt.Errorf("%d install.sh scripts failed", scriptErrs)

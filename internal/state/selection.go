@@ -10,13 +10,15 @@ import (
 	"path/filepath"
 )
 
-type selectionFile struct {
+type Selection struct {
+	OS      string   `json:"os"`
+	Machine string   `json:"machine"`
 	Modules []string `json:"modules"`
 }
 
-// LoadSelection reads the selection JSON at path. A missing file is not an
-// error — it returns nil slice + nil error (first run).
-func LoadSelection(path string) ([]string, error) {
+// LoadState reads the selection JSON at path. A missing file returns
+// (nil, nil) — first run.
+func LoadState(path string) (*Selection, error) {
 	data, err := os.ReadFile(path)
 	if errors.Is(err, os.ErrNotExist) {
 		return nil, nil
@@ -24,18 +26,18 @@ func LoadSelection(path string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var s selectionFile
+	var s Selection
 	if err := json.Unmarshal(data, &s); err != nil {
 		return nil, err
 	}
-	return s.Modules, nil
+	return &s, nil
 }
 
-func SaveSelection(path string, modules []string) error {
+func SaveState(path string, s *Selection) error {
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return err
 	}
-	data, err := json.MarshalIndent(selectionFile{Modules: modules}, "", "  ")
+	data, err := json.MarshalIndent(s, "", "  ")
 	if err != nil {
 		return err
 	}
