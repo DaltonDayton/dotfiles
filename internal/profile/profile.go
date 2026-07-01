@@ -41,5 +41,9 @@ func Load(profilesDir, osName, machine string) (*manifest.Profile, error) {
 	if err != nil {
 		return nil, err
 	}
-	return manifest.ParseProfile(filepath.Join(profilesDir, base+".toml"))
+	p, err := manifest.ParseProfile(filepath.Join(profilesDir, base+".toml"))
+	if err != nil {
+		return nil, fmt.Errorf("load profile %q: %w", base, err)
+	}
+	return p, nil
 }
