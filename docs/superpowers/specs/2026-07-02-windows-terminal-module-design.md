@@ -224,8 +224,21 @@ module.toml (os gate, curl+unzip)
 
 ## Testing
 
-Consistent with the project: `install.sh` scripts are not covered by Go unit
-tests; their contract is self-checked idempotency. Verification is manual:
+Two committed shell harnesses cover the logic (no Go tests, matching the
+project's install.sh convention):
+
+- `test_merge.sh` exercises `wt-merge.py` (deep-merge, scheme upsert,
+  idempotency, fail-loud on bad JSON).
+- `test_install.sh` exercises install.sh's control flow against a fixture tree:
+  the clean skip path, the font download and font-already-present paths, the
+  settings merge with a single backup, the no-op rerun, and the exit-1
+  fail-loud path on unparseable settings. It redirects the settings search via
+  the `QUILL_WT_GLOB` override and shadows `curl`/`unzip`/`reg.exe` with PATH
+  stubs, so it touches no network, no real fonts dir, and no registry. The
+  harness is mutation-checked: reintroducing either dev-surfaced regression
+  (the `set -e` skip abort or the EXIT-trap `local tmp` bug) makes it fail.
+
+End-to-end verification on the real WSL box remains manual:
 
 1. `./bin/quill apply windows-terminal` on the WSL box — confirm the Catppuccin
    scheme, font, padding, opacity, and focus mode apply in a fresh Windows
@@ -256,3 +269,9 @@ Add `windows-terminal` to the `modules` list in `profiles/wsl.toml`.
   skip path.
 - Font registration relies on WSL interop (`reg.exe`). With interop disabled the
   fonts still copy but register only on next Windows login.
+- The merge uses a strict JSON parser. Windows Terminal tolerates `//` and
+  `/* */` comments in `settings.json`; if the user's file contains them the run
+  fails loud (exit 1) rather than applying, to avoid corrupting the file. Comment
+  stripping is deliberately not attempted: `//` also appears inside string values
+  (e.g. the `$help` URL), so a naive stripper would mangle valid content. Users
+  with a commented settings.json must remove the comments first.

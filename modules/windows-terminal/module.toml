@@ -1,0 +1,7 @@
+name = "windows-terminal"
+description = "Catppuccin + quill aesthetic for Windows Terminal (WSL)"
+os = ["ubuntu"]
+
+[[packages]]
+manager = "apt"
+names = ["curl", "unzip", "python3"]
