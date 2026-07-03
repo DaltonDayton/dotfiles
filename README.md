@@ -21,5 +21,7 @@ curl -fsSL https://raw.githubusercontent.com/DaltonDayton/dotfiles/main/bootstra
 
 ## Modules
 
-Hyprland desktop usage (theme/wallpaper keybinds, waybar layout switching) lives in
-[`modules/hyprland/README.md`](./modules/hyprland/README.md).
+Most modules are self-describing via their `module.toml`. Two have hands-on usage notes:
+
+- [`modules/hyprland/README.md`](./modules/hyprland/README.md) — theme/wallpaper keybinds, waybar layout switching.
+- [`modules/windows-terminal/README.md`](./modules/windows-terminal/README.md) — cross-boundary settings merge, font install, backup/restore.
