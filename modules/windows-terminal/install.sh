@@ -38,7 +38,6 @@ install_font() {
     return 0
   fi
 
-  local tmp
   tmp="$(mktemp -d)"
   trap 'rm -rf "$tmp"' EXIT
   echo "windows-terminal: downloading CascadiaCode nerd font v$NERD_FONTS_VERSION..."
