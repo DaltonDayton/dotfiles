@@ -77,6 +77,22 @@ main() {
   winuser_dir="$(echo "$settings" | cut -d/ -f1-5)"
 
   install_font "$winuser_dir"
+
+  # Merge our fragment into the existing settings.json. wt-merge.py fails
+  # loud (exit 1) if the existing file is not valid JSON, so set -e aborts
+  # before we touch anything.
+  local merged
+  merged="$(python3 "$SCRIPT_DIR/files/wt-merge.py" "$SCRIPT_DIR/files/wt-fragment.json" "$settings")"
+
+  if [ "$merged" = "$(cat "$settings")" ]; then
+    echo "windows-terminal: already up to date."
+    exit 0
+  fi
+
+  local backup="$settings.quill-backup"
+  [ -f "$backup" ] || cp "$settings" "$backup"
+  printf '%s\n' "$merged" > "$settings"
+  echo "windows-terminal: settings.json updated (backup at $backup)."
 }
 
 main "$@"
