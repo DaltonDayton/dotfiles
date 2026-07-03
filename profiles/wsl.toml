@@ -1,6 +1,6 @@
 name    = "wsl"
 os      = "ubuntu"
-modules = ["git", "shell", "tmux", "neovim", "ai", "python", "asdf"]
+modules = ["git", "shell", "tmux", "neovim", "ai", "python", "asdf", "windows-terminal"]
 
 [vars]
 git_email       = "50755420+DaltonDayton@users.noreply.github.com"
