@@ -40,24 +40,26 @@ install_font() {
 
   local tmp
   tmp="$(mktemp -d)"
-  trap 'rm -rf "$tmp"' RETURN
+  trap 'rm -rf "$tmp"' EXIT
   echo "windows-terminal: downloading CascadiaCode nerd font v$NERD_FONTS_VERSION..."
   curl -fL -o "$tmp/CascadiaCode.zip" \
     "https://github.com/ryanoasis/nerd-fonts/releases/download/v$NERD_FONTS_VERSION/CascadiaCode.zip"
   unzip -o -q "$tmp/CascadiaCode.zip" -d "$tmp/extract"
 
   mkdir -p "$fonts_dir"
+  local have_reg=0
+  command -v reg.exe >/dev/null 2>&1 && have_reg=1
   for w in "${FONT_WEIGHTS[@]}"; do
     file="CaskaydiaCoveNerdFont-$w.ttf"
     cp -f "$tmp/extract/$file" "$fonts_dir/$file"
-    if command -v reg.exe >/dev/null 2>&1; then
+    if [ "$have_reg" -eq 1 ]; then
       reg.exe add "HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts" \
         /v "CaskaydiaCove NF $w (TrueType)" /t REG_SZ \
         /d "C:\\Users\\$win_user_name\\AppData\\Local\\Microsoft\\Windows\\Fonts\\$file" \
         /f >/dev/null
     fi
   done
-  if ! command -v reg.exe >/dev/null 2>&1; then
+  if [ "$have_reg" -eq 0 ]; then
     echo "windows-terminal: reg.exe not found (WSL interop disabled); fonts copied, will register on next Windows login." >&2
   fi
   echo "windows-terminal: font installed."
@@ -65,7 +67,7 @@ install_font() {
 
 main() {
   local settings
-  settings="$(locate_settings)"
+  settings="$(locate_settings)" || true
   if [ -z "$settings" ]; then
     echo "windows-terminal: Windows Terminal not found, skipping."
     exit 0
