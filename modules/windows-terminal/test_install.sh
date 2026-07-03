@@ -18,6 +18,9 @@ fail() { echo "FAIL: $1"; exit 1; }
 
 # Build a stub bin dir. curl touches its -o target; unzip creates the extract
 # dir with the four ttf files install.sh copies; reg.exe is a no-op.
+# Scope note: these stubs verify install.sh's control flow, not font-artifact
+# correctness. The real CascadiaCode.zip layout, member filenames, and a bad
+# NERD_FONTS_VERSION (404) are covered only by the manual E2E smoke test.
 make_stubs() {
   local bin="$1"
   mkdir -p "$bin"
@@ -92,8 +95,14 @@ t="$(mktemp -d)"; bin="$t/bin"; make_stubs "$bin"
 settings="$(make_tree "$t")"
 fd="$(fonts_dir_for "$settings")"; mkdir -p "$fd"
 for w in "${WEIGHTS[@]}"; do : > "$fd/CaskaydiaCoveNerdFont-$w.ttf"; done
-# Remove the curl stub so any download attempt would hard-fail the test.
-rm "$bin/curl"
+# Make curl a hard failure so a regressed font-present check that tries to
+# download fails deterministically offline (the real curl is still on PATH).
+cat > "$bin/curl" <<'SH'
+#!/usr/bin/env bash
+echo "curl should not run when fonts are already present" >&2
+exit 1
+SH
+chmod +x "$bin/curl"
 run "$settings" "$bin"
 [ "$RC" -eq 0 ] || fail "font-present: expected exit 0, got $RC ($OUT)"
 echo "$OUT" | grep -q "font already installed." || fail "font-present: missing skip message"
