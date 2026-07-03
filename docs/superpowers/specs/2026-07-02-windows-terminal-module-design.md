@@ -7,7 +7,11 @@ Date: 2026-07-02
 Give quill an optional `windows-terminal` module that reproduces the quill
 terminal aesthetic (Catppuccin Mocha colors, CaskaydiaCove Nerd Font at 11pt,
 25px padding, 90% opacity, focus mode / no tab bar) inside the user's Windows
-Terminal, when quill runs under WSL. The module mirrors the look currently set
+Terminal, when quill runs under WSL. Focus mode is a deliberate feature: it
+hides the tab bar *and* the title bar, giving a bare, chrome-free window that is
+the closest Windows Terminal gets to a stripped kitty window. The module also
+installs the CaskaydiaCove Nerd Font on the Windows host (per-user, no admin) so
+the configured font actually renders. The module mirrors the look currently set
 in kitty on the Arch profiles (`modules/hyprland/files/kitty/kitty.conf` +
 `modules/hyprland/files/themes/catppuccin/kitty.conf`).
 
@@ -19,8 +23,8 @@ everything else in that file. Catppuccin Mocha only (no theme switcher, no
 porting of the other kitty themes).
 
 **Out:** live theme switching, multiple selectable schemes, unpackaged/portable
-Windows Terminal installs, and any Windows-side font installation (quill runs in
-WSL and cannot reach the Windows font store; a todo reminds the user).
+Windows Terminal installs, and system-wide (all-users) font installation. The
+font is installed per-user only, which needs no admin.
 
 ## Why an `install.sh`, not declarative actions
 
@@ -49,17 +53,17 @@ name = "windows-terminal"
 description = "Catppuccin + quill aesthetic for Windows Terminal (WSL)"
 os = ["ubuntu"]
 
-[[todos]]
-message = "Install 'CaskaydiaCove Nerd Font' on the Windows host (not WSL) so Windows Terminal can render it. Download: https://github.com/ryanoasis/nerd-fonts/releases (CascadiaCode)."
+[[packages]]
+manager = "apt"
+names = ["curl", "unzip"]
 ```
 
-The module declares no packages/symlinks/files/commands — all work happens in
-`install.sh`. `os = ["ubuntu"]` gates it out of the Arch profiles in the install
+The `curl`/`unzip` packages are the only declarative work; they are the tools
+the font-download step needs. Everything else happens in `install.sh`.
+`os = ["ubuntu"]` gates the module out of the Arch profiles in the install
 picker; the script additionally self-skips when Windows Terminal is not present,
-covering bare (non-WSL) Ubuntu.
-
-The `[[todos]]` has no `check` (there is no reliable way to query the Windows
-font store from WSL), so it always prints as a reminder after a run.
+covering bare (non-WSL) Ubuntu. Because declarative actions run before any
+`install.sh`, `curl` and `unzip` are guaranteed present when the script runs.
 
 ### `modules/windows-terminal/files/wt-fragment.json`
 
@@ -141,8 +145,30 @@ Executable, `set -euo pipefail`. Flow:
    `/mnt/c/Users/*/AppData/Local/Packages/Microsoft.WindowsTerminal*/LocalState/settings.json`.
    Prefer a path without `Preview` in the package name; take the first match.
    No match -> print `windows-terminal: Windows Terminal not found, skipping.`
-   and `exit 0`.
-2. **Merge (python3).** Invoke `python3` with the merge logic, passing the
+   and `exit 0`. Derive the Windows user directory (`/mnt/c/Users/<user>`) from
+   the matched path; both the font install and the settings merge reuse it.
+2. **Install font (per-user, no admin).** Target dir
+   `<winuser>/AppData/Local/Microsoft/Windows/Fonts`. Weights installed:
+   `CaskaydiaCoveNerdFont-Regular.ttf`, `-Bold.ttf`, `-Italic.ttf`,
+   `-BoldItalic.ttf`.
+   - **Idempotency:** if all four `.ttf` already exist in the target dir, skip
+     the whole step (print `windows-terminal: font already installed.`).
+   - **Download:** `curl -fL` the pinned release
+     `https://github.com/ryanoasis/nerd-fonts/releases/download/v${NERD_FONTS_VERSION}/CascadiaCode.zip`
+     into a `mktemp -d` working dir; `unzip` it there. `NERD_FONTS_VERSION` is a
+     shell constant at the top of the script (initially `3.2.1`) so bumping the
+     font is a one-line edit.
+   - **Copy:** copy the four weights into the target dir (create it if missing).
+   - **Register:** for each weight, run Windows interop
+     `reg.exe add "HKCU\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Fonts"
+     /v "CaskaydiaCove NF <Weight> (TrueType)" /t REG_SZ /d
+     "C:\\Users\\<user>\\AppData\\Local\\Microsoft\\Windows\\Fonts\\<file>.ttf"
+     /f`. `reg.exe add /f` is itself idempotent. If `reg.exe` is not on `PATH`
+     (interop disabled), print a warning telling the user to enable WSL interop
+     or install the font manually, but do not fail the run — the fonts are
+     already copied and will register on next login.
+   - Clean up the temp dir.
+3. **Merge (python3).** Invoke `python3` with the merge logic, passing the
    fragment path and the settings path. python3 is already a quill dependency
    (used elsewhere), so no new package. The merge:
    - Loads both files. If the existing `settings.json` is not valid JSON, print
@@ -155,7 +181,7 @@ Executable, `set -euo pipefail`. Flow:
      existing entry with the same name, else append). Other schemes are left
      untouched.
    - Serializes the result with 4-space indent.
-3. **Idempotency + backup.** Compare the serialized result to the current file
+4. **Idempotency + backup.** Compare the serialized result to the current file
    contents. If identical, print `windows-terminal: already up to date.` and
    `exit 0` with no write. If different, write `settings.json.quill-backup`
    once (only if it does not already exist), then overwrite `settings.json`.
@@ -166,10 +192,13 @@ idempotency contract for `install.sh` scripts.
 ## Data flow
 
 ```
-module.toml (os gate, todo)
+module.toml (os gate, curl+unzip)
       |
    install.sh
-      |  glob -> settings.json path      (skip if none)
+      |  glob -> settings.json path + winuser dir   (skip if none)
+      |
+      |  font: 4 ttf present? --yes--> skip
+      |         --no--> curl CascadiaCode.zip, unzip, copy, reg.exe register
       v
    python3 merge(fragment, settings.json)
       |  parse both, deep-merge defaults, upsert scheme, set launchMode
@@ -185,6 +214,11 @@ module.toml (os gate, todo)
 - **Unparseable existing settings.json**: `exit 1` with a stderr message. We do
   not overwrite a file we could not read, to avoid destroying hand edits.
 - **Missing fragment file**: `exit 1` (packaging bug, should fail loud).
+- **Font download fails** (network, 404 on a bumped version): `curl -f` returns
+  non-zero -> `set -e` fails the run loud, so a broken `NERD_FONTS_VERSION` is
+  caught immediately rather than silently skipping the font.
+- **`reg.exe` absent** (interop disabled): warn, continue. Fonts are copied and
+  will register on next Windows login; the settings merge still proceeds.
 - Everything else (write errors, permission issues on `/mnt/c`) propagates as a
   non-zero exit from `set -e`.
 
@@ -196,10 +230,13 @@ tests; their contract is self-checked idempotency. Verification is manual:
 1. `./bin/quill apply windows-terminal` on the WSL box — confirm the Catppuccin
    scheme, font, padding, opacity, and focus mode apply in a fresh Windows
    Terminal tab.
-2. Rerun `./bin/quill apply windows-terminal` — confirm it prints
-   "already up to date" and writes nothing (`settings.json` mtime unchanged).
-3. Confirm the user's existing keybindings/profiles survive the merge.
-4. On a non-WSL Ubuntu (or by hiding `/mnt/c`), confirm the clean skip path.
+2. Confirm the four CaskaydiaCove weights land in the Windows per-user Fonts
+   dir and the font appears in Windows Terminal's font dropdown.
+3. Rerun `./bin/quill apply windows-terminal` — confirm it prints "font already
+   installed" and "already up to date" and writes nothing (`settings.json` mtime
+   unchanged, no re-download).
+4. Confirm the user's existing keybindings/profiles survive the merge.
+5. On a non-WSL Ubuntu (or by hiding `/mnt/c`), confirm the clean skip path.
 
 ## Wiring
 
@@ -207,11 +244,15 @@ Add `windows-terminal` to the `modules` list in `profiles/wsl.toml`.
 
 ## Caveats
 
-- The CaskaydiaCove Nerd Font must be installed on the Windows host; quill cannot
-  do this from WSL. Surfaced via the module todo.
+- The font install is per-user (`HKCU` + LOCALAPPDATA Fonts), so it needs no
+  admin but only affects the current Windows user. System-wide install is out of
+  scope.
+- `NERD_FONTS_VERSION` is pinned in the script. Bumping it re-downloads on the
+  next run only if the four weights are missing; changing the version alone does
+  not force a refresh of already-installed files. To force a re-pull, delete the
+  weights from the Fonts dir.
 - Only packaged (Store/winget) Windows Terminal is handled. Portable/unpackaged
   installs store settings elsewhere and are out of scope; they hit the clean
   skip path.
-- Windows Terminal focus mode hides the tab bar and the title bar together; there
-  is no WT option to hide only the tabs. This is a WT limitation, not a module
-  choice.
+- Font registration relies on WSL interop (`reg.exe`). With interop disabled the
+  fonts still copy but register only on next Windows login.
