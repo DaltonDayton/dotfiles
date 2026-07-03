@@ -256,3 +256,9 @@ Add `windows-terminal` to the `modules` list in `profiles/wsl.toml`.
   skip path.
 - Font registration relies on WSL interop (`reg.exe`). With interop disabled the
   fonts still copy but register only on next Windows login.
+- The merge uses a strict JSON parser. Windows Terminal tolerates `//` and
+  `/* */` comments in `settings.json`; if the user's file contains them the run
+  fails loud (exit 1) rather than applying, to avoid corrupting the file. Comment
+  stripping is deliberately not attempted: `//` also appears inside string values
+  (e.g. the `$help` URL), so a naive stripper would mangle valid content. Users
+  with a commented settings.json must remove the comments first.

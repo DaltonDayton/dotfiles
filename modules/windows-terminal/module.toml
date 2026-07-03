@@ -4,4 +4,4 @@ os = ["ubuntu"]
 
 [[packages]]
 manager = "apt"
-names = ["curl", "unzip"]
+names = ["curl", "unzip", "python3"]
