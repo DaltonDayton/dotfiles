@@ -23,7 +23,7 @@ A Go CLI that declaratively manages the user's Arch Linux setup — packages, do
 
 ## User context
 
-- Primary OS: **Arch Linux** (desktop + laptop). Also uses **WSL/Ubuntu** for some work; Ubuntu is a **supported (in-progress) target** managed by the same module/profile model — OS detection, an `apt` driver, and the `shell` module are done; Arch remains the primary platform.
+- Primary OS: **Arch Linux** (desktop + laptop). Also uses **WSL/Ubuntu** for some work; Ubuntu is a **supported target** managed by the same module/profile model — OS detection, an `apt` driver, and the `git, shell, tmux, neovim, ai, python, asdf, windows-terminal` modules are ported and verified (`profiles/wsl.toml`); Arch remains the primary platform.
 - **Learning Go** — prefers idiomatic, widely-used patterns over clever abstractions. When introducing a Go pattern the user may not have seen, a short one-line comment explaining *why* is welcome; `what` it does should be self-evident from the code.
 - Shell: **zsh**. Window manager: **Hyprland**. AUR helper: **yay** (bootstrapped from source by `quill install` if missing).
 - Editor preferences live inside the `neovim` module (`modules/neovim/files/nvim/`).

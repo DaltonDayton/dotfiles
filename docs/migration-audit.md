@@ -2,13 +2,13 @@
 
 ## 1. Scope
 
-| | Original (`~/.dotfiles/arch/modules/`) | New (`/home/dalton/Development/.dotfiles/modules/`) |
+| | Original (`~/.dotfiles/arch/modules/`) | New (`modules/`) |
 |---|---|---|
-| Modules | `asdf, claude-code, fonts, gaming, git, hyprland, insync, kitty, misc, neovim, nvidia, obsidian, python, shell, solaar, theme, tmux` | `ai, asdf, fonts, gaming, git, hyprland, neovim, obsidian, python, razer, shell, solaar, tmux` |
+| Modules | `asdf, claude-code, fonts, gaming, git, hyprland, insync, kitty, misc, neovim, nvidia, obsidian, python, shell, solaar, theme, tmux` | `ai, asdf, fonts, gaming, git, hyprland, neovim, obsidian, python, razer, shell, solaar, tmux, windows-terminal` |
 | Profile manifest | hardcoded in `install.sh` | `profiles/arch-desktop.toml`, `profiles/arch-laptop.toml`, `profiles/wsl.toml` |
 | All Arch profiles enable | — | `git, shell, tmux, fonts, asdf, python, neovim, hyprland, ai, obsidian, solaar` |
 | Desktop only | — | `gaming, razer` (`profiles/arch-desktop.toml`) |
-| WSL (`profiles/wsl.toml`) enables | — | `git, shell, tmux, neovim, ai, python, asdf` (os-gated to `ubuntu`) |
+| WSL (`profiles/wsl.toml`) enables | — | `git, shell, tmux, neovim, ai, python, asdf, windows-terminal` (os-gated to `ubuntu`) |
 
 ---
 
@@ -71,7 +71,7 @@ All resolved.
 | `other_configs/alacritty.toml` | alacritty not in any host; kitty replaced it |
 | `other_configs/improvedtube.json` | browser extension config, not dotfiles concern |
 | `scripts/clearnvimcache.sh`, `scripts/list-explicit-packages.sh` | one-off utilities; keep outside `quill` |
-| `wsl_ubuntu/` | ✅ ported — WSL is now in-scope. Old split `arch/` + `wsl_ubuntu/` trees collapsed into unified os-gated modules; WSL uses `profiles/wsl.toml` (git, shell, tmux, neovim, ai, python, asdf). Single config source, no cross-OS drift. |
+| `wsl_ubuntu/` | ✅ ported — WSL is now in-scope. Old split `arch/` + `wsl_ubuntu/` trees collapsed into unified os-gated modules; WSL uses `profiles/wsl.toml` (git, shell, tmux, neovim, ai, python, asdf, windows-terminal). Single config source, no cross-OS drift. |
 | `shared_configs/claude/CLAUDE.md.template` | per-project bootstrap template, doesn't belong in the user-level `ai` module |
 
 ---
