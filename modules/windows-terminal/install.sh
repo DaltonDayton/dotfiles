@@ -5,11 +5,15 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 NERD_FONTS_VERSION="3.2.1"
 FONT_WEIGHTS=(Regular Bold Italic BoldItalic)
 
+# Glob for the packaged Windows Terminal settings.json. Overridable so tests
+# can point it at a fixture tree instead of the real Windows mount.
+: "${QUILL_WT_GLOB:=/mnt/c/Users/*/AppData/Local/Packages/Microsoft.WindowsTerminal*/LocalState/settings.json}"
+
 # Echo the packaged Windows Terminal settings.json path, preferring a
 # non-Preview install. Empty output = not found.
 locate_settings() {
   local match preview=""
-  for match in /mnt/c/Users/*/AppData/Local/Packages/Microsoft.WindowsTerminal*/LocalState/settings.json; do
+  for match in $QUILL_WT_GLOB; do
     [ -e "$match" ] || continue
     if [[ "$match" == *Preview* ]]; then
       preview="$match"
@@ -72,9 +76,10 @@ main() {
     exit 0
   fi
 
-  # /mnt/c/Users/<user> is the 5th path component: /, mnt, c, Users, <user>.
-  local winuser_dir
-  winuser_dir="$(echo "$settings" | cut -d/ -f1-5)"
+  # The Windows user dir is everything left of the /AppData/... suffix.
+  # Suffix-strip (not a fixed component count) so it survives a fixture prefix
+  # and usernames containing spaces.
+  local winuser_dir="${settings%%/AppData/*}"
 
   install_font "$winuser_dir"
 
