@@ -1,7 +1,7 @@
 name    = "arch-laptop"
 os      = "arch"
 machine = "laptop"
-modules = ["git", "shell", "tmux", "fonts", "asdf", "python", "neovim", "hyprland", "ai", "obsidian", "solaar"]
+modules = ["git", "shell", "tmux", "fonts", "asdf", "python", "neovim", "hyprland", "firefox", "ai", "obsidian", "solaar"]
 
 [vars]
 git_email = "50755420+DaltonDayton@users.noreply.github.com"

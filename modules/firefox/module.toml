@@ -1,0 +1,8 @@
+name = "firefox"
+description = "Firefox browser"
+tags = ["desktop"]
+os   = ["arch"]
+
+[[packages]]
+manager = "pacman"
+names = ["firefox"]

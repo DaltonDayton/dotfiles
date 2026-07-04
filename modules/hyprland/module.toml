@@ -12,7 +12,7 @@ names = [
     "waybar", "rofi", "kitty", "swaync", "sddm",
     "pipewire", "pipewire-pulse", "wireplumber", "pavucontrol",
     "xdg-desktop-portal", "xdg-desktop-portal-hyprland", "xdg-desktop-portal-gtk",
-    "bluez", "bluez-utils", "blueman",
+    "bluez", "bluez-utils", "blueman", "network-manager-applet",
     "grim", "slurp", "satty", "wl-clipboard", "wf-recorder",
     "cliphist",
     "tesseract", "tesseract-data-eng", "libnotify", "wtype",
