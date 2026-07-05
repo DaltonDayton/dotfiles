@@ -11,7 +11,6 @@ names = [
     "wine",
     "winetricks",
     # "wine-staging",  # Failing. Conflicts with 'wine'
-    "dxvk",
     "vkd3d",
     "lib32-alsa-lib",
     "lib32-pipewire",
@@ -70,4 +69,6 @@ names = [
 
 [[packages]]
 manager = "aur"
-names = ["faugus-launcher"]
+# dxvk has no official repo package; old install used dxvk-async-git, whose
+# async patch is obsolete since dxvk 2.x — stable dxvk-bin replaces it.
+names = ["faugus-launcher", "dxvk-bin"]
