@@ -25,7 +25,9 @@ func (l *moduleLine) status() string {
 	switch {
 	case l.failed > 0 && l.seen >= l.total:
 		return "failed"
-	case l.total > 0 && l.seen >= l.total:
+	// total == 0 counts as done: install.sh-only modules plan no declarative
+	// actions and never receive events.
+	case l.seen >= l.total:
 		return "done"
 	case l.seen > 0 || l.current != "":
 		return "running"
@@ -153,7 +155,11 @@ func (m *Model) View() string {
 			}
 		case "done":
 			icon = Success.Render("✓")
-			detail = fmt.Sprintf("%d applied · %d skipped", l.applied, l.skipped)
+			if l.total == 0 {
+				detail = "no declarative actions"
+			} else {
+				detail = fmt.Sprintf("%d applied · %d skipped", l.applied, l.skipped)
+			}
 		case "failed":
 			icon = Error.Render("✗")
 			detail = fmt.Sprintf("%d applied · %d skipped · %d failed", l.applied, l.skipped, l.failed)

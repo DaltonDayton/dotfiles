@@ -38,6 +38,18 @@ func TestProgress_PendingThenRunning(t *testing.T) {
 	}
 }
 
+func TestProgress_ZeroActionModuleIsDone(t *testing.T) {
+	// install.sh-only modules (e.g. mounts) plan zero declarative actions and
+	// never receive events; they must not sit at "pending" forever.
+	m := newTestModel([]string{"mounts"}, map[string]int{"mounts": 0})
+	if got := m.byName["mounts"].status(); got != "done" {
+		t.Fatalf("status = %q, want done", got)
+	}
+	if !strings.Contains(m.View(), "no declarative actions") {
+		t.Errorf("zero-action view missing explanation, got: %s", m.View())
+	}
+}
+
 func TestProgress_AppliedSkippedTotals(t *testing.T) {
 	m := newTestModel([]string{"git"}, map[string]int{"git": 3})
 	feed(m,
