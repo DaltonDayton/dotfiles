@@ -29,6 +29,10 @@ local function set(group, opts) hi(0, group, opts) end
 
 -- UI
 set("Normal",        { fg = p.fg, bg = p.bg0 })
+set("NormalNC",      { fg = p.fg, bg = p.bg0 })
+set("NonText",       { fg = p.bg4 })
+set("Whitespace",    { fg = p.bg3 })
+set("EndOfBuffer",   { fg = p.bg1 })
 set("NormalFloat",   { fg = p.fg, bg = p.bg1 })
 set("FloatBorder",   { fg = p.bg4, bg = p.bg1 })
 set("CursorLine",    { bg = p.bg2 })
@@ -90,3 +94,8 @@ set("@type",        { link = "Type" })
 set("@comment",     { link = "Comment" })
 set("@operator",    { link = "Operator" })
 set("@punctuation", { fg = p.grey2 })
+
+-- The `hi clear` above wiped plugin-defined groups (gitsigns blame, etc.).
+-- Applying via dofile skips the ColorScheme event, so fire it manually to
+-- let plugins re-derive their highlights.
+vim.api.nvim_exec_autocmds("ColorScheme", { pattern = "matugen", modeline = false })

@@ -18,5 +18,7 @@ return {
     for _, g in ipairs({ "LineNr", "LineNrAbove", "LineNrBelow", "CursorLineNr", "SignColumn" }) do
       clear_bg(g)
     end
+    -- default WinSeparator is darker than bg: invisible splits
+    vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#54546d" })
   end,
 }
