@@ -128,5 +128,5 @@
   "theme": "auto",
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
-  "model": "opus"
+  "model": "claude-fable-5[1m]"
 }
