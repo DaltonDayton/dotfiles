@@ -13,8 +13,7 @@ return {
   },
   scheme = "rose-pine-main",
   post = function()
-    -- transparency style clears floats entirely; give them a panel like catppuccin
-    vim.api.nvim_set_hl(0, "NormalFloat", { fg = "#e0def4", bg = "#1f1d2e" })
-    vim.api.nvim_set_hl(0, "FloatBorder", { fg = "#6e6a86", bg = "#1f1d2e" })
+    -- keep floats transparent; just give them a visible muted border
+    vim.api.nvim_set_hl(0, "FloatBorder", { fg = "#6e6a86" })
   end,
 }

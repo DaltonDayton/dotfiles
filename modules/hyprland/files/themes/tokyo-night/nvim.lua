@@ -19,6 +19,7 @@ return {
       "NvimTreeNormal", "NvimTreeNormalNC", "NvimTreeNormalFloat",
       "NvimTreeEndOfBuffer", "NvimTreeWinSeparator",
       "NvimTreeStatusLine", "NvimTreeStatusLineNC",
+      "NormalFloat", "FloatBorder", "FloatTitle",
     }) do
       clear_bg(g)
     end
