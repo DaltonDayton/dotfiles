@@ -1,0 +1,5 @@
+name = "mounts"
+description = "fstab entries + mountpoints for the NTFS data HDDs"
+tags    = ["system"]
+os      = ["arch"]
+machine = ["desktop"]

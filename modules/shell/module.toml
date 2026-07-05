@@ -15,6 +15,7 @@ names = [
     "fzf",
     "yazi",
     "atuin",
+    "rsync",
     "nvtop",
 ]
 
