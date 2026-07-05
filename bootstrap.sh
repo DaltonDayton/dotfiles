@@ -4,12 +4,17 @@
 set -euo pipefail
 
 REPO_URL="${DOTFILES_REPO_URL:-https://github.com/DaltonDayton/dotfiles.git}"
-REPO_DIR="${DOTFILES_DIR:-$HOME/.dotfiles}"
+REPO_DIR="${DOTFILES_DIR:-$HOME/dotfiles}"
 REPO_BRANCH="${DOTFILES_BRANCH:-main}"
 
 echo "==> Installing prerequisites"
 case "$(. /etc/os-release && echo "$ID")" in
   arch)
+    # gaming module needs lib32-*/steam from [multilib]; uncomment the stock
+    # block so the db sync below picks it up before quill installs anything
+    if ! grep -q '^\[multilib\]' /etc/pacman.conf; then
+      sudo sed -i '/^#\[multilib\]$/{s/^#//;n;s/^#//}' /etc/pacman.conf
+    fi
     sudo pacman -Sy --needed --noconfirm git go base-devel
     ;;
   ubuntu)

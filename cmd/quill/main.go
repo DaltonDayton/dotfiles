@@ -18,7 +18,7 @@ func main() {
 		SilenceErrors: true,
 		SilenceUsage:  true,
 	}
-	root.PersistentFlags().StringVar(&flagRepoRoot, "repo", "", "path to the dotfiles repo (default: containing dir of binary, else ~/.dotfiles)")
+	root.PersistentFlags().StringVar(&flagRepoRoot, "repo", "", "path to the dotfiles repo (default: containing dir of binary, else ~/dotfiles)")
 	root.AddCommand(newListCmd(), newStatusCmd(), newApplyCmd(), newInstallCmd(), newPathCmd())
 	if err := root.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)

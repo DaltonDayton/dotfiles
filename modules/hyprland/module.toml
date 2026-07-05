@@ -41,6 +41,11 @@ names = [
     "vulkan-tools",
 ]
 
+# satty (screenshot keybinds) saves here; missing on a fresh install
+[[directories]]
+path = "~/Pictures/Screenshots"
+mode = "0755"
+
 [[symlinks]]
 src = "files/hypr"
 dst = "~/.config/hypr"

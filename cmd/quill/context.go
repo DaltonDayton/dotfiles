@@ -50,7 +50,7 @@ func resolveProfileNonInteractive(root string, saved *state.Selection) (*manifes
 }
 
 // resolveRepoRoot prefers --repo, then the directory that contains the running
-// binary's parent (so `<repo>/bin/quill` finds `<repo>`), then `~/.dotfiles`.
+// binary's parent (so `<repo>/bin/quill` finds `<repo>`), then `~/dotfiles`.
 func resolveRepoRoot() (string, error) {
 	if flagRepoRoot != "" {
 		return flagRepoRoot, nil
@@ -66,5 +66,5 @@ func resolveRepoRoot() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(home, ".dotfiles"), nil
+	return filepath.Join(home, "dotfiles"), nil
 }
