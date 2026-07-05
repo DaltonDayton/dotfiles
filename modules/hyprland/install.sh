@@ -90,13 +90,6 @@ if command -v voxtype >/dev/null 2>&1; then
   fi
 fi
 
-# --- Matugen first-run render --------------------------------------
-# Skip if colors already exist — runtime theme swaps go through a separate
-# user-bound script that calls matugen directly. Quill never re-renders.
-if [[ ! -f "$HOME/.config/hypr/colors/matugen.conf" ]]; then
-  matugen image "$MODULE_DIR/files/wallpapers/default.png"
-fi
-
 # --- Theme indirection first-run seed ------------------------------
 # Indirection files are mutable (rewritten by apply-theme.sh on every
 # theme switch). Quill can't manage them as [[symlinks]] or [[files]] —
@@ -121,4 +114,15 @@ seed_indirection "$HOME/.config/tmux/colors/colors.conf"    'source-file ~/.conf
 STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/themes"
 mkdir -p "$STATE_DIR"
 [[ -f "$STATE_DIR/current" ]] || echo rose-pine > "$STATE_DIR/current"
-[[ -L "$STATE_DIR/current_wallpaper" ]] || ln -sfn "$MODULE_DIR/files/wallpapers/default.png" "$STATE_DIR/current_wallpaper"
+[[ -L "$STATE_DIR/current_wallpaper" ]] || ln -sfn "$MODULE_DIR/files/wallpapers/default.jpg" "$STATE_DIR/current_wallpaper"
+
+# --- Matugen first-run render --------------------------------------
+# Skip if colors already exist — runtime theme swaps go through a separate
+# user-bound script that calls matugen directly. Quill never re-renders.
+# Runs AFTER the indirection seed and is non-fatal: the seeded rose-pine
+# files are a complete fallback, and a matugen failure here once left the
+# desktop with no waybar colors at all (broken @import → no bar on login).
+if [[ ! -f "$HOME/.config/hypr/colors/matugen.conf" ]]; then
+  matugen image "$MODULE_DIR/files/wallpapers/default.jpg" \
+    || echo "warning: matugen first-run render failed; seeded rose-pine theme still applies" >&2
+fi

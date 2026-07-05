@@ -27,6 +27,7 @@ output_delay_ms = 1000  # 1 second delay before typing (lets SUPER key release)
 pre_recording_command = "hyprctl dispatch submap voxtype_recording"
 pre_output_command = "hyprctl dispatch submap reset"
 fallback_to_clipboard = true
+restore_clipboard = true  # put the pre-dictation clipboard back after paste (screenshots survive dictation)
 
 [output.notification]
 on_recording_start = true

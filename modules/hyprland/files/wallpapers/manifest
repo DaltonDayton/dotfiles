@@ -16,7 +16,7 @@ comfy-home.png: catppuccin rose-pine
 cozy-cabin.jpg: nightfox everforest-dark
 crimson-kimono.jpg: kanagawa tokyo-night
 dark-waves.jpg: noir
-default.png: catppuccin rose-pine
+default.jpg: catppuccin rose-pine
 dj-dog.png: catppuccin tokyo-night
 dragon.jpg: kanagawa everforest-dark
 elf-in-flowers.jpg: rose-pine everforest-dark
@@ -42,7 +42,7 @@ medieval-city.png: gruvbox-dark everforest-dark
 milky-way.jpg: nightfox catppuccin
 minimal-hills.jpg: e-ink noir
 monochrome-road.jpeg: e-ink noir
-night-sky.jpg: noir
+night-sky.png: noir
 pacman.png: catppuccin
 palm-canopy.png: nightfox nord
 paper-cut-waves.jpg: noir e-ink
@@ -58,7 +58,7 @@ spaceman.jpg: noir gruvbox-dark
 spike-spiegel.jpg: nightfox catppuccin
 starry-mountain.png: rose-pine catppuccin
 summer-garden.png: everforest-dark
-swamp-cabin.jpg: everforest-dark nightfox
+swamp-cabin.png: everforest-dark nightfox
 tetris.png: catppuccin
 tropic-island-day.jpg: catppuccin
 tropic-island-evening.jpg: gruvbox-dark

@@ -62,7 +62,7 @@
     "ignored-sinks": ["Easy Effects Sink"],
     "format-icons": {
       "headphone": "",
-      "hands-free": "",
+      "hands-free": "󰋎",
       "headset": "󰋎",
       "phone": "",
       "portable": "",
