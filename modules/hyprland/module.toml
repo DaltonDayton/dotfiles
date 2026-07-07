@@ -107,3 +107,20 @@ state = "enabled"
 scope = "system"
 name = "sddm.service"
 state = "enabled"
+
+# preserve VRAM across sleep; without these, resume kills every EGL context
+# (hyprlock SIGABRT, portal SIGSEGV, EGL_BAD_ALLOC on the restarted lock screen)
+[[services]]
+scope = "system"
+name = "nvidia-suspend.service"
+state = "enabled"
+
+[[services]]
+scope = "system"
+name = "nvidia-resume.service"
+state = "enabled"
+
+[[services]]
+scope = "system"
+name = "nvidia-hibernate.service"
+state = "enabled"
