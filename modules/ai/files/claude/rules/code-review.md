@@ -15,7 +15,8 @@ what was approved.
 
 ## Review body (the human-facing summary)
 
-- Keep it free of mechanism jargon (do not say "inline", "comments array", etc.) and free of status/pointer boilerplate (do not say "Requesting changes", "Approving", "see comments", "details inline"); the review event already conveys status and the anchored comments already convey the detail. Just summarize the findings and end on substance, not on a status sentence.
+- Default to no body: the review event conveys status and the anchored comments convey the findings. Only write a body when something needs description that no single inline comment can carry (cross-cutting context, interaction between findings, a verdict rationale spanning files).
+- When a body is warranted, keep it free of mechanism jargon (do not say "inline", "comments array", etc.) and free of status/pointer boilerplate (do not say "Requesting changes", "Approving", "see comments", "details inline"). Just summarize the findings and end on substance, not on a status sentence.
 
 ## Comment wording
 
