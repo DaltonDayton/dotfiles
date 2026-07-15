@@ -3,6 +3,11 @@ export PATH="$HOME/.asdf/bin:$PATH"
 export PATH="$HOME/go/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 
+# WSL: route browser-opening (az login, xdg-open) through the wslview shim.
+if grep -qiE microsoft /proc/version 2>/dev/null; then
+  export BROWSER=wslview
+fi
+
 # Suppress zoxide doctor check (false positive in Claude Code shell snapshot,
 # which reorders init so zoxide is not last even though ~/.zshrc has it last).
 export _ZO_DOCTOR=0
