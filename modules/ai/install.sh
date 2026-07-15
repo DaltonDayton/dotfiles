@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 case "$QUILL_OS" in
   arch)
     : # opencode + claude-code come from pacman/aur
@@ -25,3 +27,24 @@ case "$QUILL_OS" in
     exit 1
     ;;
 esac
+
+# Generate ~/.claude/settings.json by deep-merging the tracked base with a
+# per-machine, out-of-repo overlay. jq's `*` merges objects key-by-key and lets
+# the local operand win on scalar conflicts (e.g. model). Idempotent: rewrite
+# only when the merged result differs from what's already there.
+: "${QUILL_CLAUDE_BASE:=$SCRIPT_DIR/files/claude/settings.json}"
+: "${QUILL_CLAUDE_LOCAL:=$HOME/.claude/settings.local.json}"
+: "${QUILL_CLAUDE_OUT:=$HOME/.claude/settings.json}"
+
+local_json='{}'
+[ -f "$QUILL_CLAUDE_LOCAL" ] && local_json="$(cat "$QUILL_CLAUDE_LOCAL")"
+
+# jq aborts (set -e) on malformed JSON — fail loud rather than emit garbage.
+merged="$(jq -s '.[0] * .[1]' "$QUILL_CLAUDE_BASE" <(printf '%s' "$local_json"))"
+
+if [ -f "$QUILL_CLAUDE_OUT" ] && [ "$merged" = "$(cat "$QUILL_CLAUDE_OUT")" ]; then
+  exit 0
+fi
+
+mkdir -p "$(dirname "$QUILL_CLAUDE_OUT")"
+printf '%s\n' "$merged" > "$QUILL_CLAUDE_OUT"
