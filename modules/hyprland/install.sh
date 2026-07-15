@@ -50,6 +50,23 @@ if [[ -f "$XORG_SRC" ]]; then
   fi
 fi
 
+# --- NVIDIA DRM tuning (sudo, desktop only) ------------------------
+# fbdev=1 gives nvidia a real framebuffer console so kernel/resume spam
+# lands on the nvidia-driven panel instead of falling back to the amdgpu
+# iGPU's VT, which dumped a wall of DP debugfs warnings onto the second
+# monitor after an S3 wake. modeset=1 is already the driver default; set
+# explicitly so the option line is self-documenting. Desktop-only: the
+# Optimus laptop runs nvidia as render-offload, not the primary display,
+# and shouldn't get fbdev on the dGPU. Takes effect on next boot. Guarded
+# so a re-apply with the conf already in place stays sudo-free.
+if [[ "$HOSTNAME" == "archlinux" ]]; then
+  NVIDIA_MODPROBE="/etc/modprobe.d/nvidia.conf"
+  NVIDIA_MODPROBE_CONTENT='options nvidia_drm modeset=1 fbdev=1'
+  if [[ "$(cat "$NVIDIA_MODPROBE" 2>/dev/null)" != "$NVIDIA_MODPROBE_CONTENT" ]]; then
+    printf '%s\n' "$NVIDIA_MODPROBE_CONTENT" | sudo tee "$NVIDIA_MODPROBE" >/dev/null
+  fi
+fi
+
 # --- Voxtype first-run setup ---------------------------------------
 # Idempotent: --download skips a cached model; gpu --enable is a no-op when
 # already enabled; systemd is guarded by file existence. We deliberately
