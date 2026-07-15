@@ -12,4 +12,8 @@ return {
     end,
   },
   scheme = "rose-pine-main",
+  post = function()
+    -- keep floats transparent; just give them a visible muted border
+    vim.api.nvim_set_hl(0, "FloatBorder", { fg = "#6e6a86" })
+  end,
 }

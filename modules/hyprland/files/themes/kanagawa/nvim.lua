@@ -15,8 +15,13 @@ return {
       hl.ctermbg = nil
       vim.api.nvim_set_hl(0, group, hl)
     end
-    for _, g in ipairs({ "LineNr", "LineNrAbove", "LineNrBelow", "CursorLineNr", "SignColumn" }) do
+    for _, g in ipairs({
+      "LineNr", "LineNrAbove", "LineNrBelow", "CursorLineNr", "SignColumn",
+      "NormalFloat", "FloatBorder", "FloatTitle",
+    }) do
       clear_bg(g)
     end
+    -- default WinSeparator is darker than bg: invisible splits
+    vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#54546d" })
   end,
 }

@@ -19,8 +19,11 @@ return {
       "NvimTreeNormal", "NvimTreeNormalNC", "NvimTreeNormalFloat",
       "NvimTreeEndOfBuffer", "NvimTreeWinSeparator",
       "NvimTreeStatusLine", "NvimTreeStatusLineNC",
+      "NormalFloat", "FloatBorder", "FloatTitle",
     }) do
       clear_bg(g)
     end
+    -- default WinSeparator is darker than bg: invisible splits
+    vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#545c7e" })
   end,
 }

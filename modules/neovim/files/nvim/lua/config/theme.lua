@@ -69,10 +69,18 @@ local function plugin_id(spec)
   return tostring(spec.plugin or "")
 end
 
+-- Groups some colorschemes leave undefined; `default = true` yields to any
+-- theme (or plugin) that does define them.
+local function normalize()
+  vim.api.nvim_set_hl(0, "GitSignsCurrentLineBlame", { link = "NonText", default = true })
+end
+
 function M.apply()
   if not M.themed_host() then
     pcall(function() require("lazy").load({ plugins = { "catppuccin" } }) end)
+    vim.o.background = "dark"
     pcall(vim.cmd.colorscheme, FALLBACK.scheme)
+    normalize()
     return
   end
   local name = M.current()
@@ -81,12 +89,14 @@ function M.apply()
     -- the palette while matugen is already active still re-apply. :colorscheme
     -- is a no-op when the scheme is already current.
     local matugen_file = vim.fn.expand("~/.config/nvim/colors/matugen.lua")
+    vim.o.background = "dark" -- matugen runs with --prefer darkness
     if vim.uv.fs_stat(matugen_file) then
       pcall(dofile, matugen_file)
     else
       vim.notify("Theme: matugen palette not yet generated; using default", vim.log.levels.WARN)
       pcall(vim.cmd.colorscheme, "habamax")
     end
+    normalize()
     return
   end
   local spec, err = load_static_spec(name)
@@ -98,10 +108,14 @@ function M.apply()
   if id ~= "" then
     pcall(function() require("lazy").load({ plugins = { id } }) end)
   end
+  -- Set before :colorscheme so variant-aware schemes (e-ink) pick the right
+  -- side, and so switching away from a light theme resets to dark.
+  vim.o.background = spec.background or "dark"
   pcall(vim.cmd.colorscheme, spec.scheme)
   if type(spec.post) == "function" then
     pcall(spec.post)
   end
+  normalize()
 end
 
 function M.reload()

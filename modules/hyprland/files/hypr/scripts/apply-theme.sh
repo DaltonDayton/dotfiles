@@ -133,6 +133,11 @@ if [[ "$mode" == "matugen" ]]; then
     pkill swaync 2>/dev/null || true
     (swaync >/dev/null 2>&1 &)
   fi
+  # matugen post_hooks normally signal nvim/tmux, but they only fire when
+  # `matugen image` ran — with an empty wallpaper pool it doesn't, so signal
+  # here too (harmless duplicate otherwise).
+  pkill -SIGUSR1 nvim 2>/dev/null || true
+  tmux source-file "$HOME/.config/tmux/tmux.conf" >/dev/null 2>&1 || true
 else
   write_one "$HOME/.config/hypr/colors/colors.conf"    "source = ~/.config/themes/${THEME}/hypr.conf"
   write_one "$HOME/.config/waybar/colors/colors.css"   "@import \"../../themes/${THEME}/waybar.css\";"

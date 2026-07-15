@@ -1,21 +1,21 @@
 * {
-    bg0:    #191724;
-    bg1:    #1f1d2e;
-    bg2:    #26233a;
-    bg3:    #403d52;
-    bg4:    #524f67;
+  bg0:    #191724;
+  bg1:    #1f1d2e;
+  bg2:    #26233a;
+  bg3:    #403d52;
+  bg4:    #524f67;
 
-    fg:     #e0def4;
+  fg:     #e0def4;
 
-    red:    #eb6f92;
-    orange: #f6c177;
-    yellow: #f6c177;
-    green:  #9ccfd8;
-    aqua:   #31748f;
-    blue:   #31748f;
-    purple: #c4a7e7;
+  red:    #eb6f92;
+  orange: #ebbcba;
+  yellow: #f6c177;
+  green:  #9ccfd8;
+  aqua:   #9ccfd8;
+  blue:   #31748f;
+  purple: #c4a7e7;
 
-    grey0:  #6e6a86;
-    grey1:  #908caa;
-    grey2:  #e0def4;
+  grey0:  #6e6a86;
+  grey1:  #908caa;
+  grey2:  #e0def4;
 }
