@@ -73,6 +73,15 @@
             "command": "atuin hook claude-code"
           }
         ]
+      },
+      {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"User preference: if the just-approved plan is complex (multiple tasks, several files touched, or nuanced tradeoffs worth line-level comments), open it in Plannotator now: write the plan to a markdown file if it is not one already, invoke the plannotator-annotate skill on it, and act on annotations before executing. Skip for simple plans (a few obvious steps) and skip if this plan already went through Plannotator this session.\"}}'"
+          }
+        ]
       }
     ],
     "PostToolUseFailure": [
@@ -110,13 +119,20 @@
     "csharp-lsp@claude-plugins-official": true,
     "ruby-lsp@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
-    "caveman@caveman": true
+    "caveman@caveman": true,
+    "plannotator@plannotator": true
   },
   "extraKnownMarketplaces": {
     "caveman": {
       "source": {
         "source": "github",
         "repo": "JuliusBrussee/caveman"
+      }
+    },
+    "plannotator": {
+      "source": {
+        "source": "github",
+        "repo": "backnotprop/plannotator"
       }
     }
   },

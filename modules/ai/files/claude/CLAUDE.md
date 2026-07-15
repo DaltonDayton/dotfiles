@@ -17,6 +17,8 @@ Stack-specific conventions come from a stack file (see section 5), not from here
 
 Trivial, unambiguous edits (typo, rename, obvious one-liner) can skip straight to the change. When in doubt, plan.
 
+**Plan review medium:** when presenting a complex plan or design doc for my review (multiple tasks, several files touched, or tradeoffs worth line-level comments), write it to a markdown file and open it with the `plannotator-annotate` skill (auto-open, don't ask first). Simple plans (a few obvious steps) stay in chat. If I close the Plannotator session without any suggestions, treat that as approval and proceed.
+
 ---
 
 ## 1. Testing: TDD
