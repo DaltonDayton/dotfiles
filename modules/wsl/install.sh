@@ -23,10 +23,16 @@ read -r -d '' body <<'EOF' || true
 exec powershell.exe -NoProfile -Command "Start-Process '$*'" </dev/null >/dev/null 2>&1
 EOF
 
+# A symlinked shim path is always replaced, never compared or written through.
+[ -L "$SHIM" ] && rm "$SHIM"
+
 if [ -f "$SHIM" ] && [ "$(cat "$SHIM")" = "$body" ]; then
   exit 0
 fi
 
 mkdir -p "$QUILL_LOCAL_BIN"
-printf '%s\n' "$body" > "$SHIM"
-chmod +x "$SHIM"
+# Write via temp + rename so a partial write can never corrupt the shim in place.
+tmp="$(mktemp "$QUILL_LOCAL_BIN/.wslview.XXXXXX")"
+printf '%s\n' "$body" > "$tmp"
+chmod +x "$tmp"
+mv "$tmp" "$SHIM"

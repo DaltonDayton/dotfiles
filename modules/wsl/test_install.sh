@@ -37,4 +37,18 @@ QUILL_PROC_VERSION="$t3/procversion" QUILL_LOCAL_BIN="$t3/bin" PATH="/usr/bin:/b
 [ ! -e "$t3/bin/wslview" ] || fail "shim written off WSL"
 pass=$((pass+1))
 
+# Case 4: shim path occupied by a stale symlink -> replaced with a real file,
+# never written through.
+t4="$(mktemp -d)"
+printf 'Linux version 5.15 microsoft-standard-WSL2\n' > "$t4/procversion"
+mkdir -p "$t4/bin"
+printf 'stale target\n' > "$t4/target"
+ln -s "$t4/target" "$t4/bin/wslview"
+QUILL_PROC_VERSION="$t4/procversion" QUILL_LOCAL_BIN="$t4/bin" PATH="/usr/bin:/bin" \
+  bash "$INSTALL"
+[ ! -L "$t4/bin/wslview" ] || fail "stale symlink not replaced by real file"
+[ -x "$t4/bin/wslview" ] || fail "replaced shim not executable"
+[ "$(cat "$t4/target")" = "stale target" ] || fail "shim write leaked through symlink"
+pass=$((pass+1))
+
 echo "ok ($pass cases)"

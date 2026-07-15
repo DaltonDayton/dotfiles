@@ -81,10 +81,21 @@ defaults (model `fable`, personal plugin set) untouched on `main`.
 
 **Known trade-off**: Claude Code writes `~/.claude/settings.json` at runtime (UI,
 `/config`). That is how the drift arose, through the symlink. Once the file is
-generated rather than symlinked, `quill apply` reclobbers runtime UI edits from
-`base * local`. Any keep-worthy runtime tweak must be copied into
+generated rather than symlinked, `quill apply` would reclobber runtime UI edits
+from `base * local`. Any keep-worthy runtime tweak must be copied into
 `settings.local.json` by hand. This is the declarative-first contract quill
 already applies to every other managed file.
+
+**Drift guard** (added 2026-07-15): silent reclobbering proved unacceptable, so
+`install.sh` keeps a snapshot of its last generated output at
+`~/.local/state/quill/claude_settings.last.json`. When the live file no longer
+matches the snapshot, regeneration fails loud with a diff of the runtime edits
+and three exits: fold them into the tracked base, fold them into
+`settings.local.json`, or discard with `QUILL_CLAUDE_FORCE=1`. A missing
+snapshot (first run) skips the guard once and bootstraps it. Legacy symlinked
+outputs are migrated in the same script: a symlink at the output path is
+removed and regenerated as a real file, and all writes go through temp +
+rename so nothing is ever written through a link into the tracked base.
 
 ### 2. New `wsl` module
 
