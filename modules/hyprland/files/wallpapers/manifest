@@ -1,8 +1,8 @@
 # filename: theme [theme ...]
 abstract.png: noir gruvbox-dark
 bamboo-grove.png: everforest-dark kanagawa
-black-sand-beach.png: noir nord
-bliss-pixels.png: catppuccin everforest-dark
+black-sand-beach.png: noir
+bliss-pixels.png: everforest-dark
 blossom-street.jpg: catppuccin rose-pine
 boat.jpg: tokyo-night rose-pine
 cafe.jpg: tokyo-night catppuccin
@@ -14,9 +14,10 @@ code-motto.png: noir
 colorful-cityscape.jpg: tokyo-night nightfox
 comfy-home.png: catppuccin rose-pine
 cozy-cabin.jpg: nightfox everforest-dark
-crimson-kimono.jpg: kanagawa tokyo-night
+crimson-qipao.jpg: kanagawa tokyo-night
 dark-waves.jpg: noir
 default.jpg: catppuccin rose-pine
+dim-snowy-landscape.jpg: nord
 dj-dog.png: catppuccin tokyo-night
 dragon.jpg: kanagawa everforest-dark
 elf-in-flowers.jpg: rose-pine everforest-dark
@@ -34,34 +35,30 @@ heracles.png: nightfox gruvbox-dark
 hokusai-wave.jpg: kanagawa nightfox
 ice-castle.png: nord
 japanese-houses.png: tokyo-night catppuccin
-jellyfish.jpg: catppuccin nightfox
-layered-waves.png: nightfox nord
+kimono-girl.jpg: kanagawa noir
 lonely-fish.png: kanagawa nightfox
 maple-fan.png: kanagawa gruvbox-dark
+matterhorn.jpg: nord
 medieval-city.png: gruvbox-dark everforest-dark
 milky-way.jpg: nightfox catppuccin
 minimal-hills.jpg: e-ink noir
 monochrome-road.jpeg: e-ink noir
 night-sky.png: noir
 pacman.png: catppuccin
-palm-canopy.png: nightfox nord
+palm-canopy.png: nightfox
 paper-cut-waves.jpg: noir e-ink
-purple-valley.jpg: tokyo-night catppuccin
+purple-valley.jpg: tokyo-night
 red-tree-island.png: kanagawa rose-pine
 rooftop.jpg: rose-pine catppuccin
 sakura.png: rose-pine nightfox
-samurai-girl.jpg: kanagawa noir
 snow-sakura.jpg: rose-pine catppuccin
 snowy-lantern.png: nord kanagawa
-sound-waves.png: catppuccin nightfox
 spaceman.jpg: noir gruvbox-dark
-spike-spiegel.jpg: nightfox catppuccin
-starry-mountain.png: rose-pine catppuccin
 summer-garden.png: everforest-dark
 swamp-cabin.png: everforest-dark nightfox
-tetris.png: catppuccin
-tropic-island-day.jpg: catppuccin
+tropic-island-day.jpg: everforest-dark nightfox
 tropic-island-evening.jpg: gruvbox-dark
 tropic-island-morning.jpg: rose-pine catppuccin
-tropic-island-night.jpg: nightfox nord
-wave-lines.png: catppuccin rose-pine
+tropic-island-night.jpg: nightfox
+winter-lake.png: nord
+winter-trees.jpg: nord
