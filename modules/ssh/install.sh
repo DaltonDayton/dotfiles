@@ -16,3 +16,10 @@ fi
 if ! systemctl is-active --quiet sshd; then
   sudo systemctl start sshd
 fi
+
+# ufw is not managed by quill; when the host runs it, open ssh or the daemon
+# is unreachable (port drops, not refuses). "show added" works even while
+# ufw is inactive, keeping this idempotent either way.
+if command -v ufw >/dev/null && ! sudo ufw show added | grep -q 'ufw allow 22/tcp'; then
+  sudo ufw allow 22/tcp
+fi
