@@ -1,0 +1,20 @@
+name = "ssh"
+description = "OpenSSH server: key-only auth, hardened sshd config"
+tags    = ["system"]
+os      = ["arch"]
+machine = ["desktop", "laptop"]
+
+[[packages]]
+manager = "pacman"
+names = ["openssh"]
+
+[[symlinks]]
+src = "files/authorized_keys"
+dst = "~/.ssh/authorized_keys"
+
+# Enabled-only: starting a system unit declaratively would need polkit mid-TUI.
+# install.sh installs the hardening config and starts sshd with sudo.
+[[services]]
+scope = "system"
+name = "sshd.service"
+state = "enabled"
