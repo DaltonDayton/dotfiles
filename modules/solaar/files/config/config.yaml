@@ -1,5 +1,5 @@
 - 1.1.20
-- _NAME: LIFT VERTICAL ERGONOMIC MOUSE
+- _NAME: LIFT
   _absent: [hi-res-scroll, hires-smooth-invert, hires-smooth-resolution, hires-scroll-mode, scroll-ratchet, scroll-ratchet-torque, smart-shift, thumb-scroll-invert,
     thumb-scroll-mode, onboard_profiles, report_rate, report_rate_extended, pointer_speed, dpi_extended, speed-change, backlight, backlight_level, backlight_duration_hands_out,
     backlight_duration_hands_in, backlight_duration_powered, backlight-timed, led_control, led_zone_, rgb_control, rgb_zone_, per-key-lighting, brightness_control,
@@ -11,7 +11,7 @@
     headset-signature-passive, logivoice-nr-state, logivoice-ng-state, logivoice-comp-state, logivoice-deesser-state, logivoice-depopper-state, logivoice-limiter-state,
     logivoice-hpf-state]
   _battery: 4100
-  _config_cookie: [157, 234]
+  _config_cookie: [188, 229]
   _modelId: B03100000000
   _sensitive: {change-host: false, divert-keys: true, dpi: true, reprogrammable-keys: false}
   _serial: 75DE8EBA
