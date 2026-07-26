@@ -1,7 +1,6 @@
 {
     "clock": {
-        "format": "{:%H:%M}",
-        "format-alt": "{:%a, %d. %b}"
+        "format": "{:%a, %d. %b  <span alpha='26000'>|</span>  %H:%M}"
     },
 
     "hyprland/workspaces": {
