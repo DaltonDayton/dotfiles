@@ -26,6 +26,10 @@ input_path = '~/.config/matugen/templates/hyprland-colors.conf'
 output_path = '~/.config/hypr/colors/matugen.conf'
 post_hook = 'hyprctl reload'
 
+[templates.hyprland_lua]
+input_path = '~/.config/matugen/templates/hyprland-colors.lua'
+output_path = '~/.config/hypr/colors/matugen.lua'
+
 [templates.pywalfox]
 input_path = '~/.config/matugen/templates/pywalfox-colors.json'
 output_path = '~/.cache/wal/colors.json'

@@ -1,0 +1,23 @@
+return {
+    image = [[{{image}}]],
+
+    bg0 = "rgb({{palettes.neutral._5.hex_stripped}})",
+    bg1 = "rgb({{palettes.neutral._10.hex_stripped}})",
+    bg2 = "rgb({{palettes.neutral._15.hex_stripped}})",
+    bg3 = "rgb({{palettes.neutral._20.hex_stripped}})",
+    bg4 = "rgb({{palettes.neutral._25.hex_stripped}})",
+
+    fg = "rgb({{colors.on_surface.default.hex_stripped}})",
+
+    red    = "rgb({{colors.error.default.hex_stripped}})",
+    orange = "rgb({{colors.tertiary.default.hex_stripped}})",
+    yellow = "rgb({{colors.tertiary_fixed.default.hex_stripped}})",
+    green  = "rgb({{colors.primary.default.hex_stripped}})",
+    aqua   = "rgb({{colors.secondary_fixed.default.hex_stripped}})",
+    blue   = "rgb({{colors.secondary.default.hex_stripped}})",
+    purple = "rgb({{colors.primary_fixed.default.hex_stripped}})",
+
+    grey0 = "rgb({{colors.outline_variant.default.hex_stripped}})",
+    grey1 = "rgb({{colors.outline.default.hex_stripped}})",
+    grey2 = "rgb({{colors.on_surface_variant.default.hex_stripped}})",
+}
