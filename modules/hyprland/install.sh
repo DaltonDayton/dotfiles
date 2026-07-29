@@ -14,7 +14,7 @@ link_device_variant() {
   ln -sfn "$(basename "$(dirname "$pick")")/$(basename "$pick")" "$target_link"
 }
 
-link_device_variant "$MODULE_DIR/files/hypr/monitors" "$MODULE_DIR/files/hypr/monitors.conf" "default"
+link_device_variant "$MODULE_DIR/files/hypr/monitors" "$MODULE_DIR/files/hypr/monitors.lua" "default" "lua"
 link_device_variant "$MODULE_DIR/files/voxtype/configs" "$MODULE_DIR/files/voxtype/config.toml" "default" "toml"
 
 # --- SDDM (sudo) ---------------------------------------------------
