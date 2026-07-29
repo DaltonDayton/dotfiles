@@ -116,6 +116,7 @@ if [[ "$mode" == "matugen" ]]; then
   fi
 
   write_one "$HOME/.config/hypr/colors/colors.conf"    'source = ~/.config/hypr/colors/matugen.conf'
+  write_one "$HOME/.config/hypr/colors/colors.lua"     'return require("colors/matugen")'
   write_one "$HOME/.config/waybar/colors/colors.css"   '@import "matugen.css";'
   write_one "$HOME/.config/kitty/colors/colors.conf"   'include matugen.conf'
   write_one "$HOME/.config/rofi/colors/colors.rasi"    '@import "matugen.rasi"'
@@ -140,6 +141,7 @@ if [[ "$mode" == "matugen" ]]; then
   tmux source-file "$HOME/.config/tmux/tmux.conf" >/dev/null 2>&1 || true
 else
   write_one "$HOME/.config/hypr/colors/colors.conf"    "source = ~/.config/themes/${THEME}/hypr.conf"
+  write_one "$HOME/.config/hypr/colors/colors.lua"     "return require(\"$HOME/.config/themes/${THEME}/hypr.lua\")"
   write_one "$HOME/.config/waybar/colors/colors.css"   "@import \"../../themes/${THEME}/waybar.css\";"
   write_one "$HOME/.config/kitty/colors/colors.conf"   "include ~/.config/themes/${THEME}/kitty.conf"
   write_one "$HOME/.config/rofi/colors/colors.rasi"    "@import \"../../themes/${THEME}/rofi.rasi\""
