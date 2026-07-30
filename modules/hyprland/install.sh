@@ -16,6 +16,7 @@ link_device_variant() {
 
 link_device_variant "$MODULE_DIR/files/hypr/monitors" "$MODULE_DIR/files/hypr/monitors.lua" "default" "lua"
 link_device_variant "$MODULE_DIR/files/voxtype/configs" "$MODULE_DIR/files/voxtype/config.toml" "default" "toml"
+rm -f "$MODULE_DIR/files/hypr/monitors.conf" # stale pre-lua symlink; harmless but confusing
 
 # --- SDDM (sudo) ---------------------------------------------------
 # /etc/sddm.conf is a sudo symlink so live edits to the tracked file apply
@@ -71,7 +72,7 @@ fi
 # Idempotent: --download skips a cached model; gpu --enable is a no-op when
 # already enabled; systemd is guarded by file existence. We deliberately
 # don't run `voxtype setup compositor hyprland` — files/hypr/conf.d/
-# voxtype-submap.conf is tracked in the repo and sourced from hyprland.conf.
+# voxtype-submap.lua is tracked in the repo and required from hyprland.lua.
 if command -v voxtype >/dev/null 2>&1; then
   voxtype setup --quiet --download
   [[ -f "$HOME/.config/systemd/user/voxtype.service" ]] || voxtype setup --quiet systemd
@@ -121,6 +122,7 @@ seed_indirection() {
 }
 
 seed_indirection "$HOME/.config/hypr/colors/colors.conf"    'source = ~/.config/themes/rose-pine/hypr.conf'
+seed_indirection "$HOME/.config/hypr/colors/colors.lua"     "return require(\"$HOME/.config/themes/rose-pine/hypr.lua\")"
 seed_indirection "$HOME/.config/waybar/colors/colors.css"   '@import "../../themes/rose-pine/waybar.css";'
 seed_indirection "$HOME/.config/kitty/colors/colors.conf"   'include ~/.config/themes/rose-pine/kitty.conf'
 seed_indirection "$HOME/.config/rofi/colors/colors.rasi"    '@import "../../themes/rose-pine/rofi.rasi"'
