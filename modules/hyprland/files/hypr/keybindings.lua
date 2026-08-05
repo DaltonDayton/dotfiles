@@ -26,11 +26,21 @@ hl.bind(mod .. " + down", hl.dsp.focus({ direction = "d" }))
 
 -- Move active window around current workspace (floating windows move by
 -- coordinates, tiled windows swap in the direction).
-local moveactive = 'grep -q "true" <<< $(hyprctl activewindow -j | jq -r .floating) && hyprctl dispatch moveactive'
-hl.bind(mod .. " + SHIFT + left", hl.dsp.exec_cmd(moveactive .. " -30 0 || hyprctl dispatch movewindow l"), { description = "Move active window to the left" })
-hl.bind(mod .. " + SHIFT + right", hl.dsp.exec_cmd(moveactive .. " 30 0 || hyprctl dispatch movewindow r"), { description = "Move active window to the right" })
-hl.bind(mod .. " + SHIFT + up", hl.dsp.exec_cmd(moveactive .. " 0 -30 || hyprctl dispatch movewindow u"), { description = "Move active window up" })
-hl.bind(mod .. " + SHIFT + down", hl.dsp.exec_cmd(moveactive .. " 0 30 || hyprctl dispatch movewindow d"), { description = "Move active window down" })
+-- Floating windows nudge by pixels, tiled windows move in a direction.
+local function move_win(dx, dy, dir)
+    return function()
+        local w = hl.get_active_window()
+        if w ~= nil and w.floating then
+            hl.dispatch(hl.dsp.window.move({ x = dx, y = dy, relative = true }))
+        else
+            hl.dispatch(hl.dsp.window.move({ direction = dir }))
+        end
+    end
+end
+hl.bind(mod .. " + SHIFT + left", move_win(-30, 0, "l"), { description = "Move active window to the left" })
+hl.bind(mod .. " + SHIFT + right", move_win(30, 0, "r"), { description = "Move active window to the right" })
+hl.bind(mod .. " + SHIFT + up", move_win(0, -30, "u"), { description = "Move active window up" })
+hl.bind(mod .. " + SHIFT + down", move_win(0, 30, "d"), { description = "Move active window down" })
 
 -- Resize windows
 hl.bind(mod .. " + SHIFT + CTRL + Right", hl.dsp.window.resize({ x = 30, y = 0, relative = true }), { repeating = true })

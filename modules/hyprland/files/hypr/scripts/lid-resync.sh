@@ -6,20 +6,26 @@
 # across suspend (wake and lid-open land while userspace is still frozen),
 # which left the panel disabled after resume.
 #
-# Lidless hosts: plain "dpms on" is a no-op when Hyprland thinks the
+# Lidless hosts: plain dpms enable is a no-op when Hyprland thinks the
 # monitors are already on, leaving one stuck on the stale fbcon image
-# after S3 wake. The off/on forces a real modeset on every head.
+# after S3 wake. The disable/enable cycle forces a real modeset on every
+# head.
 set -euo pipefail
 
-if grep -q closed /proc/acpi/button/lid/*/state 2>/dev/null; then
-    hyprctl keyword monitor "eDP-1, disable"
-    hyprctl dispatch dpms on
-elif compgen -G '/proc/acpi/button/lid/*/state' >/dev/null; then
-    hyprctl keyword monitor "eDP-1, preferred, auto, 2"
-    hyprctl dispatch dpms on
+dpms() {
+    hyprctl dispatch "hl.dsp.dpms({ action = \"$1\" })"
+}
+
+if compgen -G '/proc/acpi/button/lid/*/state' >/dev/null; then
+    if grep -q closed /proc/acpi/button/lid/*/state; then
+        hyprctl eval 'hl.monitor({ output = "eDP-1", mode = "disable" })'
+    else
+        hyprctl eval 'hl.monitor({ output = "eDP-1", mode = "preferred", position = "auto", scale = 2 })'
+    fi
+    dpms enable
 else
     sleep 1
-    hyprctl dispatch dpms off
+    dpms disable
     sleep 1
-    hyprctl dispatch dpms on
+    dpms enable
 fi
