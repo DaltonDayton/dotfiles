@@ -110,6 +110,7 @@ Default convention, change if the repo says otherwise:
 
 - No emojis.
 - No em-dashes. Use commas, colons, or periods instead.
+- **Final deliverables as HTML, working docs as markdown.** When the end product is a document meant to be *read* (report, analysis, audit, comparison), write it as a standalone HTML file: real layout, tables, collapsible sections beat a wall of markdown. Intermediate artifacts (plans, specs, drafts still under review, anything Plannotator or git will chew on) stay markdown.
 
 ---
 
