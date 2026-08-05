@@ -1,0 +1,18 @@
+return {
+    bg0 = "rgb(191724)",
+    bg1 = "rgb(1f1d2e)",
+    bg2 = "rgb(26233a)",
+    bg3 = "rgb(403d52)",
+    bg4 = "rgb(524f67)",
+    red = "rgb(eb6f92)",
+    orange = "rgb(ebbcba)",
+    yellow = "rgb(f6c177)",
+    green = "rgb(9ccfd8)",
+    aqua = "rgb(9ccfd8)", -- foam, shared with green: rose-pine has 6 accents for 7 slots
+    blue = "rgb(31748f)",
+    purple = "rgb(c4a7e7)",
+    fg = "rgb(e0def4)",
+    grey0 = "rgb(6e6a86)",
+    grey1 = "rgb(908caa)",
+    grey2 = "rgb(e0def4)",
+}

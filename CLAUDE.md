@@ -20,6 +20,7 @@ A Go CLI that declaratively manages the user's Arch Linux setup — packages, do
 | Theme switcher (Super+D / Super+Shift+D, indirection layer, matugen-as-theme) | `docs/superpowers/specs/2026-04-25-theme-switcher-design.md` | `docs/superpowers/plans/2026-04-25-theme-switcher.md` |
 | Neovim theme integration (per-theme `nvim.lua`, dispatcher, SIGUSR1 reload) | (extends theme-switcher spec) | `docs/superpowers/plans/2026-04-28-nvim-theme-integration.md` |
 | WSL/Ubuntu foundation + shell module | `docs/superpowers/specs/2026-06-08-wsl-ubuntu-foundation-shell-design.md` | `docs/superpowers/plans/2026-06-08-wsl-ubuntu-foundation-shell.md` |
+| Hyprland Lua config migration (0.55+ `hl.*` API, dual-format colors) | `docs/superpowers/specs/2026-07-29-hyprland-lua-migration-design.md` | `docs/superpowers/plans/2026-07-29-hyprland-lua-migration.md` |
 
 ## User context
 

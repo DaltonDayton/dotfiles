@@ -1,5 +1,7 @@
 hypr/colors/colors.conf
 hypr/colors/matugen.conf
+hypr/colors/colors.lua
+hypr/colors/matugen.lua
 kitty/colors/colors.conf
 kitty/colors/matugen.conf
 waybar/colors/colors.css
