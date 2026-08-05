@@ -16,6 +16,7 @@ names = [
     "grim", "slurp", "satty", "wl-clipboard", "wf-recorder",
     "cliphist",
     "tesseract", "tesseract-data-eng", "libnotify", "wtype",
+    "dolphin", "ark",
     "xdg-utils", "desktop-file-utils", "shared-mime-info", "archlinux-xdg-menu",
     "jq", "btop", "pacman-contrib",
     "brightnessctl",
