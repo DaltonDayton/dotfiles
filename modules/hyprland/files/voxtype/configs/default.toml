@@ -24,8 +24,8 @@ type_delay_ms = 0
 output_delay_ms = 1000  # 1 second delay before typing (lets SUPER key release)
 
 # Compositor integration hooks (modifier key fix)
-pre_recording_command = "hyprctl dispatch submap voxtype_recording"
-pre_output_command = "hyprctl dispatch submap reset"
+pre_recording_command = "hyprctl dispatch 'hl.dsp.submap(\"voxtype_recording\")'"
+pre_output_command = "hyprctl dispatch 'hl.dsp.submap(\"reset\")'"
 fallback_to_clipboard = true
 restore_clipboard = true  # put the pre-dictation clipboard back after paste (screenshots survive dictation)
 

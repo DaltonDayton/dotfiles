@@ -79,6 +79,9 @@ hl.config({
     misc = {
         force_default_wallpaper = 0,
         disable_hyprland_logo = true,
+        -- Was set at runtime by hyprlock-watch.service via `hyprctl keyword`,
+        -- which no longer exists in lua mode; static is equivalent.
+        allow_session_lock_restore = true,
     },
     input = {
         kb_layout = "us",

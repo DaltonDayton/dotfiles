@@ -7,4 +7,3 @@ Type=simple
 ExecStart=hyprlock
 Restart=on-failure
 RestartSec=2
-ExecStartPre=hyprctl --instance 0 'keyword misc:allow_session_lock_restore 1'
