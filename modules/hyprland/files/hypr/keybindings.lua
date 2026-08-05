@@ -84,13 +84,13 @@ hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURC
 hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"), { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"), { locked = true, repeating = true })
 
--- Laptop lid switch: disable/enable built-in display
+-- Laptop lid switch: disable/enable built-in display. Re-enable goes through
+-- lid-resync.sh (shared with hypridle's after_sleep_cmd) since switch events
+-- can be lost across suspend.
 hl.bind("switch:on:Lid Switch", function()
     hl.monitor({ output = "eDP-1", mode = "disable" })
 end, { locked = true })
-hl.bind("switch:off:Lid Switch", function()
-    hl.monitor({ output = "eDP-1", mode = "preferred", position = "auto", scale = 2 })
-end, { locked = true })
+hl.bind("switch:off:Lid Switch", hl.dsp.exec_cmd("~/.config/hypr/scripts/lid-resync.sh"), { locked = true })
 
 -- Media control (requires playerctl)
 hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { locked = true })

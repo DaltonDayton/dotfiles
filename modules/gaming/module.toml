@@ -2,7 +2,7 @@ name = "gaming"
 description = "Wine, DXVK, Vulkan tooling, Steam, lib32 runtimes"
 tags    = ["gaming"]
 os      = ["arch"]
-machine = ["desktop"]
+machine = ["desktop", "laptop"]
 
 [[packages]]
 manager = "pacman"
@@ -72,3 +72,11 @@ manager = "aur"
 # dxvk has no official repo package; old install used dxvk-async-git, whose
 # async patch is obsolete since dxvk 2.x — stable dxvk-bin replaces it.
 names = ["faugus-launcher", "dxvk-bin"]
+
+# arch-laptop only: 32-bit GPU drivers for Steam/Proton. 64-bit stack
+# (nvidia-utils, nvidia-prime, vulkan-intel) comes from the hyprland module;
+# run games on the dGPU with prime-run.
+[[packages]]
+manager = "pacman"
+hosts = ["arch-laptop"]
+names = ["lib32-nvidia-utils", "lib32-vulkan-intel"]
