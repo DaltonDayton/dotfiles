@@ -47,7 +47,7 @@ hl.window_rule({
     render_unfocused = true, -- fixes game freezing when moving workspaces
     immediate = true,
     fullscreen = true,
-    fullscreen_state = { internal = 2, client = 2 },
+    fullscreen_state = "2 2",
 })
 
 hl.window_rule({
@@ -60,7 +60,7 @@ hl.window_rule({
     no_dim = true,
     no_shadow = true,
     fullscreen = true,
-    fullscreen_state = { internal = 3 },
+    fullscreen_state = "3",
     render_unfocused = true, -- fixes game freezing when moving workspaces
     monitor = "DP-1", -- HYTE case monitor — not detected since 2026-07 reinstall; fix name when reconnected
 })
