@@ -45,6 +45,7 @@ tooltip label {
 #battery,
 #tray,
 #bluetooth,
+#custom-ssh-standby,
 #idle_inhibitor,
 #custom-cpu,
 #custom-gpu,
@@ -59,6 +60,10 @@ tooltip label {
 
 #power-profiles-daemon {
   margin: 0;
+}
+
+#custom-ssh-standby.active {
+  color: @green;
 }
 
 #workspaces {

@@ -47,6 +47,19 @@
         "signal": 8
     },
 
+    "custom/ssh-standby": {
+        "format": "{icon}",
+        "format-icons": {
+            "active": "󰌘",
+            "inactive": "󰌙"
+        },
+        "return-type": "json",
+        "exec": "$HOME/.config/waybar/scripts/ssh-standby.sh status",
+        "interval": 10,
+        "signal": 9,
+        "on-click": "$HOME/.config/waybar/scripts/ssh-standby.sh toggle; pkill -SIGRTMIN+9 waybar"
+    },
+
     "custom/cpu": {
         "interval": 2,
         "exec": "$HOME/.config/waybar/scripts/cpu.sh",

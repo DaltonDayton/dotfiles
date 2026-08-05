@@ -21,6 +21,7 @@
     ],
 
     "modules-right": [
+        "custom/ssh-standby",
         "idle_inhibitor",
         "custom/pacman",
         "backlight",
