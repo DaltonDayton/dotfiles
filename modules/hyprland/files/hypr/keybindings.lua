@@ -26,7 +26,6 @@ hl.bind(mod .. " + down", hl.dsp.focus({ direction = "d" }))
 
 -- Move active window around current workspace (floating windows move by
 -- coordinates, tiled windows swap in the direction).
--- Floating windows nudge by pixels, tiled windows move in a direction.
 local function move_win(dx, dy, dir)
     return function()
         local w = hl.get_active_window()
@@ -37,10 +36,10 @@ local function move_win(dx, dy, dir)
         end
     end
 end
-hl.bind(mod .. " + SHIFT + left", move_win(-30, 0, "l"), { description = "Move active window to the left" })
-hl.bind(mod .. " + SHIFT + right", move_win(30, 0, "r"), { description = "Move active window to the right" })
-hl.bind(mod .. " + SHIFT + up", move_win(0, -30, "u"), { description = "Move active window up" })
-hl.bind(mod .. " + SHIFT + down", move_win(0, 30, "d"), { description = "Move active window down" })
+hl.bind(mod .. " + SHIFT + left", move_win(-30, 0, "l"), { repeating = true, description = "Move active window to the left" })
+hl.bind(mod .. " + SHIFT + right", move_win(30, 0, "r"), { repeating = true, description = "Move active window to the right" })
+hl.bind(mod .. " + SHIFT + up", move_win(0, -30, "u"), { repeating = true, description = "Move active window up" })
+hl.bind(mod .. " + SHIFT + down", move_win(0, 30, "d"), { repeating = true, description = "Move active window down" })
 
 -- Resize windows
 hl.bind(mod .. " + SHIFT + CTRL + Right", hl.dsp.window.resize({ x = 30, y = 0, relative = true }), { repeating = true })
