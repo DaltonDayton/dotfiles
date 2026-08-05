@@ -123,6 +123,28 @@ Apply: `sudo systemctl kill -s HUP systemd-logind` (reload, keeps sessions).
 On idle: dim to 10% at 2.5 min → lock at 5 min → screen off at 5.5 min →
 suspend at 30 min. Config: `modules/hyprland/files/hypr/hypridle.conf`.
 
+## GPU power layout (Optimus, muxless)
+
+The XPS 17 9700 has no mux: the internal panel is hard-wired to the Intel
+iGPU, so the NVIDIA dGPU can never be the only GPU. Division of labor:
+
+- **Hyprland + desktop apps**: Intel iGPU (aquamarine picks i915 as primary
+  drm; no `AQ_DRM_DEVICES` override, deliberately).
+- **Games**: dGPU via `prime-run %command%` in Steam launch options.
+- **voxtype**: dGPU, selected by vendor filter (`VOXTYPE_VULKAN_DEVICE=nvidia`
+  in the systemd drop-in). Index-based selection (`gpu_device`) is a trap:
+  Vulkan enumeration order flips with process environment, and it silently
+  ran whisper on the iGPU for months (14-16s transcriptions instead of ~2s).
+  Verify with `nvidia-smi`: the voxtype daemon must hold ~1.5G VRAM.
+
+dGPU runtime PM (`power/control = auto` + `NVreg_DynamicPowerManagement`) is
+deliberately NOT configured: voxtype's daemon plus Hyprland/swaync hold
+`/dev/nvidia0` open, so the GPU can never reach D3 sleep anyway. TLP also
+denylists nvidia for runtime PM. Measured on battery at desktop idle
+(2026-08-05): ~12W with dGPU awake (~5.5h on the worn 68Wh pack), ~10.3W with
+voxtype stopped. Full dGPU sleep (~7W est.) would require moving voxtype off
+the dGPU and reworking compositor device access; not worth it.
+
 ## Battery health snapshot
 
 2026-08-05: `charge_full` 5988 mAh vs 8339 mAh design = 71.8% capacity.
