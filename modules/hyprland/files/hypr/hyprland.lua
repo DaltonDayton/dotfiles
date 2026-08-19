@@ -127,7 +127,8 @@ hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
 
 -- Per-device input, see https://wiki.hypr.land/Configuring/Advanced-and-Cool/Devices/
 hl.device({ name = "logitech-usb-receiver-mouse", sensitivity = 0.0 })
-hl.device({ name = "razer-razer-naga-v2-hyperspeed", sensitivity = 0.3 })
+-- Raw input to match Windows (DPI stages stored onboard; pointer speed 6/11, enhance precision off)
+hl.device({ name = "razer-razer-naga-v2-hyperspeed", sensitivity = 0.0, accel_profile = "flat" })
 
 -- Split config modules
 require("monitors") -- symlink -> monitors/<host>.lua
