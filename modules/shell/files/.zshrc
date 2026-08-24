@@ -81,6 +81,7 @@ alias githistall="git log --pretty='%C(yellow)%h %C(cyan)%cd %Cblue%aN%C(auto)%d
 alias ff="fzf --preview 'bat {-1} --color=always'"
 alias sz="source ~/.zshrc"
 alias lg='lazygit'
+alias yayn='yay --noconfirm' # skip confirmation prompts (works with -S, -Syu, etc.)
 
 # Work around Crush terminal capability probe bleed (e.g. Gi=31;OK)
 crush() {

@@ -6,7 +6,7 @@
 -- fresh install still boots with sane borders.
 local ok, colors = pcall(require, "colors/colors")
 if not ok or type(colors) ~= "table" then
-    colors = { blue = "rgb(458588)", bg4 = "rgb(665c54)" }
+	colors = { blue = "rgb(458588)", bg4 = "rgb(665c54)" }
 end
 
 -- Environment variables
@@ -22,79 +22,79 @@ hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
 
 -- Autostart
 hl.on("hyprland.start", function()
-    -- Activate the systemd graphical session so xdg-desktop-portal
-    -- (Requisite=graphical-session.target) can start.
-    hl.exec_cmd("dbus-update-activation-environment --systemd --all")
-    hl.exec_cmd("systemctl --user start hyprland-session.target")
-    hl.exec_cmd("systemctl --user start hyprpolkitagent")
-    hl.exec_cmd("waybar")
-    hl.exec_cmd("awww-daemon")
-    hl.exec_cmd("hypridle")
-    hl.exec_cmd("swaync")
-    hl.exec_cmd("solaar --window=hide")
-    hl.exec_cmd("kbuildsycoca6") -- File Extension Discovery (Requires XDG_MENU_PREFIX env)
-    hl.exec_cmd("systemctl --user start voxtype") -- Voice dictation daemon
-    hl.exec_cmd("wl-paste --watch cliphist store") -- Clipboard history
-    hl.exec_cmd("nm-applet --indicator")
+	-- Activate the systemd graphical session so xdg-desktop-portal
+	-- (Requisite=graphical-session.target) can start.
+	hl.exec_cmd("dbus-update-activation-environment --systemd --all")
+	hl.exec_cmd("systemctl --user start hyprland-session.target")
+	hl.exec_cmd("systemctl --user start hyprpolkitagent")
+	hl.exec_cmd("waybar")
+	hl.exec_cmd("awww-daemon")
+	hl.exec_cmd("hypridle")
+	hl.exec_cmd("swaync")
+	hl.exec_cmd("solaar --window=hide")
+	hl.exec_cmd("kbuildsycoca6") -- File Extension Discovery (Requires XDG_MENU_PREFIX env)
+	hl.exec_cmd("systemctl --user start voxtype") -- Voice dictation daemon
+	hl.exec_cmd("wl-paste --watch cliphist store") -- Clipboard history
+	hl.exec_cmd("nm-applet --indicator")
 end)
 
 -- Look and feel
 hl.config({
-    general = {
-        gaps_in = 5,
-        gaps_out = 10,
-        border_size = 2,
-        ["col.active_border"] = colors.blue,
-        ["col.inactive_border"] = colors.bg4,
-        resize_on_border = false,
-        allow_tearing = false, -- see https://wiki.hypr.land/Configuring/Tearing/
-        layout = "dwindle",
-        no_focus_fallback = true,
-    },
-    decoration = {
-        rounding = 10,
-        rounding_power = 2,
-        active_opacity = 1.0,
-        inactive_opacity = 1.0,
-        shadow = {
-            enabled = true,
-            range = 4,
-            render_power = 3,
-            color = "rgba(1a1a1aee)",
-        },
-        blur = {
-            enabled = true,
-            size = 3,
-            passes = 1,
-            vibrancy = 0.1696,
-        },
-    },
-    animations = { enabled = true },
-    dwindle = {
-        preserve_split = true,
-    },
-    master = {
-        new_status = "master",
-    },
-    misc = {
-        force_default_wallpaper = 0,
-        disable_hyprland_logo = true,
-        -- Was set at runtime by hyprlock-watch.service via `hyprctl keyword`,
-        -- which no longer exists in lua mode; static is equivalent.
-        allow_session_lock_restore = true,
-    },
-    input = {
-        kb_layout = "us",
-        follow_mouse = 1,
-        sensitivity = 0, -- -1.0 - 1.0, 0 means no modification
-        touchpad = {
-            natural_scroll = true,
-        },
-    },
-    cursor = {
-        hide_on_key_press = true,
-        inactive_timeout = 2,
-    },
+	general = {
+		gaps_in = 5,
+		gaps_out = 10,
+		border_size = 2,
+		["col.active_border"] = colors.blue,
+		["col.inactive_border"] = colors.bg4,
+		resize_on_border = false,
+		allow_tearing = false, -- see https://wiki.hypr.land/Configuring/Tearing/
+		layout = "dwindle",
+		no_focus_fallback = true,
+	},
+	decoration = {
+		rounding = 10,
+		rounding_power = 2,
+		active_opacity = 1.0,
+		inactive_opacity = 1.0,
+		shadow = {
+			enabled = true,
+			range = 4,
+			render_power = 3,
+			color = "rgba(1a1a1aee)",
+		},
+		blur = {
+			enabled = true,
+			size = 3,
+			passes = 1,
+			vibrancy = 0.1696,
+		},
+	},
+	animations = { enabled = true },
+	dwindle = {
+		preserve_split = true,
+	},
+	master = {
+		new_status = "master",
+	},
+	misc = {
+		force_default_wallpaper = 0,
+		disable_hyprland_logo = true,
+		-- Was set at runtime by hyprlock-watch.service via `hyprctl keyword`,
+		-- which no longer exists in lua mode; static is equivalent.
+		allow_session_lock_restore = true,
+	},
+	input = {
+		kb_layout = "us",
+		follow_mouse = 1,
+		sensitivity = 0, -- -1.0 - 1.0, 0 means no modification
+		touchpad = {
+			natural_scroll = true,
+		},
+	},
+	cursor = {
+		hide_on_key_press = true,
+		inactive_timeout = 2,
+	},
 })
 
 -- Animation curves, see https://wiki.hypr.land/Configuring/Animations/#curves
