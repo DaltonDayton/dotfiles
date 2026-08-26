@@ -1,0 +1,20 @@
+# Layered on top of Omarchy's ~/.config/git/config via [include].
+[user]
+	name = Dalton Dayton
+	email = daltondayton1@gmail.com
+[init]
+	defaultBranch = main
+[core]
+	editor = nvim
+	autocrlf = false
+	pager = bat
+[rebase]
+	autoStash = true
+[merge]
+	autoStash = true
+[gpg]
+	format = ssh
+
+# Machine-specific bits (user.signingkey, commit.gpgsign) go here, untracked.
+[include]
+	path = ~/.config/git/config.local
