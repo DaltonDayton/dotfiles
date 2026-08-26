@@ -21,9 +21,34 @@ writes straight back into this repo and its edits show up as diffs. Anything
 real already sitting at a target is moved aside to `<file>.bak.<epoch>` first.
 Rerunning is a no-op.
 
-Three paths are linked as whole directories instead — `config/nvim`,
-`home/.claude/rules`, `home/.claude/stacks` — because other programs create
-files inside them.
+`config/nvim` is linked as a whole directory instead of file-by-file, because
+lazy.nvim writes into it.
+
+## Adopting things one at a time
+
+Most of what was carried over from the old setup is **staged, not live**. It sits
+in the repo so it's there to pick from, and `install.sh`'s `PENDING` list keeps
+it unlinked:
+
+| Staged | Would replace |
+|---|---|
+| `config/tmux/tmux.conf` | Omarchy's default tmux config |
+| `config/opencode/*.json` | Omarchy's default opencode config |
+| `config/sesh/sesh.toml` | nothing — new file |
+| `home/.claude/{CLAUDE.md,rules,stacks}` | nothing — new files |
+| `config/git/personal` | nothing — layers in via `[include]` |
+| `home/.zshrc` | nothing until you `chsh` to zsh |
+
+To adopt one: delete its line from `PENDING` in `install.sh`, then rerun. To see
+what you'd be taking on first:
+
+```sh
+diff /usr/share/omarchy/config/tmux/tmux.conf config/tmux/tmux.conf
+```
+
+Currently live: `config/nvim`, plus the `config/hypr/` and `config/omarchy/`
+files — those are snapshots of what was already on the system, so linking them
+changed no behavior, it just put them under version control.
 
 ## What's tracked, and what isn't
 
@@ -74,10 +99,10 @@ Commit signing needs an untracked `~/.config/git/config.local` with
 | `config/hypr/` | `~/.config/hypr/` |
 | `config/omarchy/` | `~/.config/omarchy/` |
 | `config/nvim/` | `~/.config/nvim/` |
-| `config/{tmux,sesh,opencode}/` | `~/.config/` |
-| `config/git/personal` | *(included, not linked)* |
-| `home/.claude/` | `~/.claude/` |
-| `home/.zshrc` | *(not linked — currently on bash)* |
+| `config/{tmux,sesh,opencode}/` | *(staged — see above)* |
+| `config/git/personal` | *(staged — applied by `[include]`, not a symlink)* |
+| `home/.claude/` | *(staged)* |
+| `home/.zshrc` | *(staged — currently on bash)* |
 
 ## History
 
