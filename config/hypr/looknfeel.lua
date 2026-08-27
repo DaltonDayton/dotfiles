@@ -48,3 +48,22 @@
 --     column_width = 0.97,
 --   },
 -- })
+
+-- https://wiki.hypr.land/Configuring/Basics/Variables/#cursor
+hl.config({
+  cursor = {
+    -- Don't teleport the pointer to a window when it takes focus (e.g. an app
+    -- opened from the menu). Omarchy's warp_on_change_workspace default stays.
+    no_warps = true,
+  },
+})
+
+-- https://wiki.hypr.land/Configuring/Dwindle-Layout/
+hl.config({
+  dwindle = {
+    -- Omarchy's default is 2 ("always split right/bottom"), which is why new
+    -- windows ignore the pointer. 0 splits based on where the cursor sits in
+    -- the focused window: left half opens left, right half opens right.
+    force_split = 0,
+  },
+})
