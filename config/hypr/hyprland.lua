@@ -27,3 +27,11 @@ require("default.hypr.toggles")
 
 -- Add any other personal Hyprland configuration below.
 -- o.window("qemu", { workspace = "5" })
+
+-- Tile Steam's main window. Omarchy floats it in
+-- default/hypr/apps/steam.lua; this runs later and wins.
+-- Matched on class AND title so Steam's dialogs (Friends List, game
+-- properties) keep Omarchy's floating treatment. The class is anchored
+-- because an unanchored "steam" also matches steam_app_battlenet, which
+-- would drag the Battle.net launcher out of its float.
+o.window({ class = "^steam$", title = "^Steam$" }, { tile = true })
