@@ -37,7 +37,7 @@ it unlinked:
 | `config/sesh/sesh.toml` | nothing — new file |
 | `home/.claude/{CLAUDE.md,rules,stacks}` | nothing — new files |
 | `config/git/personal` | nothing — layers in via `[include]` |
-| `home/.zshrc` | nothing until you `chsh` to zsh |
+| `home/.zshrc` | nothing — kept as a reference to port into `home/.bashrc` |
 
 To adopt one: delete its line from `PENDING` in `install.sh`, then rerun. To see
 what you'd be taking on first:
@@ -46,9 +46,10 @@ what you'd be taking on first:
 diff /usr/share/omarchy/config/tmux/tmux.conf config/tmux/tmux.conf
 ```
 
-Currently live: `config/nvim`, plus the `config/hypr/` and `config/omarchy/`
-files — those are snapshots of what was already on the system, so linking them
-changed no behavior, it just put them under version control.
+Currently live: `config/nvim`, `home/.bashrc`, plus the `config/hypr/` and
+`config/omarchy/` files — those are snapshots of what was already on the
+system, so linking them changed no behavior, it just put them under version
+control.
 
 ## What's tracked, and what isn't
 
@@ -61,7 +62,6 @@ are tracked, because they can't go stale:
 | Path | How it layers |
 |---|---|
 | `config/hypr/*.lua` | `hyprland.lua` requires `default.hypr.omarchy`, then your files |
-| `config/omarchy/hooks/*.d/*.hook` | additive drop-in directories |
 | `config/omarchy/defaults/` | single-value files read by `omarchy` commands |
 | `config/git/personal` | pulled into Omarchy's git config by an `[include]` |
 
@@ -76,6 +76,11 @@ Everything else that's a plain copy of an upstream default is deliberately
 **not** tracked: `starship.toml`, `btop.conf`, `lazygit/config.yml`,
 `omarchy-menu.jsonc`, `omarchy/branding/`, and the terminal configs. Committing
 those pins a stale version of a file Omarchy will keep improving.
+
+That includes the hooks already sitting in `~/.config/omarchy/hooks/` —
+`install-voxtype`, `setup-agent`, `setup-fingerprint` are Omarchy's own
+first-run invitations, copied there by its installer. `hooks/*.d/` is still a
+layered drop-in directory, so a hook you actually write belongs in the repo.
 
 ## Set by command, not tracked
 
@@ -102,7 +107,8 @@ Commit signing needs an untracked `~/.config/git/config.local` with
 | `config/{tmux,sesh,opencode}/` | *(staged — see above)* |
 | `config/git/personal` | *(staged — applied by `[include]`, not a symlink)* |
 | `home/.claude/` | *(staged)* |
-| `home/.zshrc` | *(staged — currently on bash)* |
+| `home/.bashrc` | `~/.bashrc` |
+| `home/.zshrc` | *(staged — reference only, on bash for good)* |
 
 ## History
 
