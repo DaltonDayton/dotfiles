@@ -17,3 +17,8 @@ source "$OMARCHY_PATH/default/bash/rc"
 unalias lsa 2>/dev/null
 alias ll='ls -a'
 alias cll='clear && ll'
+
+# uv (Astral installer) prepends ~/.local/bin so its binaries beat /usr/bin.
+# Omarchy only appends it, so without this a pacman-installed uv would win.
+# Guarded: harmless on a machine where uv was never installed this way.
+[[ -r "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"

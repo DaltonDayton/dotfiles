@@ -1,3 +1,5 @@
+-- Machine: desktop (dual 3440x1440 ultrawides, vertically stacked)
+-- Linked to ~/.config/hypr/monitors.lua by install.sh --machine=desktop
 -- See https://wiki.hypr.land/Configuring/Basics/Monitors/
 -- List current monitors and supported resolutions with: hyprctl monitors all
 

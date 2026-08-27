@@ -44,6 +44,17 @@
 --   },
 -- })
 
+-- Active overrides. Touchpad settings are inert on a machine without one, so
+-- these stay shared rather than split per-machine.
+hl.config({
+  input = {
+    touchpad = {
+      -- Use natural (inverse) scrolling.
+      natural_scroll = true,
+    },
+  },
+})
+
 -- App-specific touchpad scroll speeds.
 -- o.window("(Alacritty|kitty|foot)", { scroll_touchpad = 1.5 })
 -- o.window("com.mitchellh.ghostty", { scroll_touchpad = 0.2 })
