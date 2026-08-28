@@ -12,6 +12,9 @@ themes, hooks, `omarchy` commands). This file only covers the repo itself.
 - Files under `config/` and `home/` are symlinked to `~/.config/` and `~/`.
   Editing the repo copy edits the live config, and vice versa — no build step.
 - After adding a file, run `./install.sh` to link it. `--dry` previews.
+- Packages this setup depends on go in `packages.sh`, which `install.sh` runs
+  last. Install via `omarchy-pkg-add` / `omarchy-pkg-aur-add`, not raw
+  pacman/yay.
 - Never edit `/usr/share/omarchy/` — it's package-owned and `omarchy update`
   overwrites it. Reading it to see the defaults is fine and encouraged.
 - Validate Hyprland changes with `hyprctl reload && hyprctl configerrors`.

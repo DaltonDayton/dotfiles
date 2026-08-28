@@ -24,6 +24,26 @@ Rerunning is a no-op.
 `config/nvim` is linked as a whole directory instead of file-by-file, because
 lazy.nvim writes into it.
 
+## Packages
+
+`packages.sh` holds the packages this setup needs on top of Omarchy's own, and
+`install.sh` runs it last. It's also fine to run alone:
+
+```sh
+./packages.sh --dry   # what's missing
+./packages.sh
+```
+
+Add to the `REPO_PKGS` / `AUR_PKGS` arrays as you pick things up. Installs go
+through `omarchy-pkg-add` and `omarchy-pkg-aur-add` — Omarchy's own idempotent
+wrappers over `pacman -S --needed` and `yay`, which re-check with `pacman -Q`
+afterwards so a silent failure still exits nonzero. Nothing missing means no
+work and no sudo prompt, so `./install.sh` stays safe to rerun blind.
+
+Note that installing from the menu (Install → Package / AUR) records nothing —
+Omarchy has no notion of "packages I chose". Anything you want on the next
+machine has to be added here by hand.
+
 ## Adopting things one at a time
 
 Most of what was carried over from the old setup is **staged, not live**. It sits
@@ -90,7 +110,13 @@ rather than restoring a file:
 ```sh
 omarchy theme set catppuccin
 omarchy font set "CaskaydiaMono Nerd Font"   # rewrites all four terminal configs
+omarchy-toggle screensaver-off on            # idle goes straight to lock, no screensaver
 ```
+
+The screensaver toggle is a flag file at
+`~/.local/state/omarchy/toggles/screensaver-off`. `off` restores it, and
+Menu → Toggle → Screensaver flips it either way. It only suppresses the
+screensaver — `idle.lock` in `shell.json` still locks on schedule.
 
 Background: `3-blue-eye.png` (from the catppuccin theme).
 
@@ -109,6 +135,7 @@ Commit signing needs an untracked `~/.config/git/config.local` with
 | `home/.claude/` | *(staged)* |
 | `home/.bashrc` | `~/.bashrc` |
 | `home/.zshrc` | *(staged — reference only, on bash for good)* |
+| `packages.sh` | *(not linked — run to install packages)* |
 
 ## History
 

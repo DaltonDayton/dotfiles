@@ -154,4 +154,11 @@ while IFS= read -r rel; do
   link "$rel"
 done < <(find config home -type f -not -name '.gitkeep' | sort)
 
+# Packages last: symlinking is the fast, sudo-free part, and it should finish
+# even if the AUR is down. packages.sh no-ops silently when nothing is missing,
+# so a rerun still never prompts.
+PKG_ARGS=()
+(( DRY )) && PKG_ARGS+=(--dry)
+"$REPO/packages.sh" "${PKG_ARGS[@]}"
+
 echo "done."
