@@ -22,7 +22,7 @@ REPO_PKGS=(
 
 # AUR. Slower and built from source, so keep this list short.
 AUR_PKGS=(
-  sway-audio-idle-inhibit-git   # idle inhibitor while audio plays -- config/hypr/autostart.lua
+  wayland-pipewire-idle-inhibit  # Wayland idle inhibitor while audio plays -- config/hypr/autostart.lua
 )
 
 DRY=0
