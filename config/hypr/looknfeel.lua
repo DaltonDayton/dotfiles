@@ -49,6 +49,17 @@
 --   },
 -- })
 
+-- Bibata, carried over from the pre-Omarchy setup. Omarchy sets cursor *size*
+-- (XCURSOR_SIZE/HYPRCURSOR_SIZE = 24 in default/hypr/envs.lua) but never a
+-- theme, so this only adds the missing half -- don't restate the size here.
+--
+-- bibata-cursor-git ships hyprcursor alongside Xcursor. Hyprland renders the
+-- hyprcursor SVGs natively and rescales them per-monitor; the -bin package is
+-- Xcursor-only, so HYPRCURSOR_THEME would find nothing and silently fall back
+-- to pre-rendered bitmaps. XCURSOR_THEME still matters for XWayland and GTK.
+hl.env("XCURSOR_THEME", "Bibata-Modern-Ice")
+hl.env("HYPRCURSOR_THEME", "Bibata-Modern-Ice")
+
 -- https://wiki.hypr.land/Configuring/Basics/Variables/#cursor
 hl.config({
   cursor = {

@@ -23,6 +23,7 @@ REPO_PKGS=(
 # AUR. Slower and built from source, so keep this list short.
 AUR_PKGS=(
   wayland-pipewire-idle-inhibit  # Wayland idle inhibitor while audio plays -- config/hypr/autostart.lua
+  bibata-cursor-git              # cursor theme (hyprcursor + Xcursor) -- config/hypr/looknfeel.lua
 )
 
 DRY=0
