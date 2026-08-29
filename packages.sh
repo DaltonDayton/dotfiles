@@ -65,3 +65,48 @@ install_set() { # <installer> <label> <packages...>
 
 install_set omarchy-pkg-add     repo "${REPO_PKGS[@]}"
 install_set omarchy-pkg-aur-add aur  "${AUR_PKGS[@]}"
+
+# Dev toolchains -- reported, never installed here
+# ------------------------------------------------
+# `omarchy install dev-env <name>` does more than drop a binary: ruby also gets
+# rails and ~/.gemrc, python also gets uv. Reproducing that here would drift
+# from the installer, so this only reports what's missing and points at the
+# command. One-time per machine.
+#
+# Entries are <dev-env name>:<command to probe>:<mise|any>. The mise flag
+# matters because Omarchy's base install ships its own ruby
+# (omarchy-base.packages), so a bare `command -v ruby` would never notice that
+# `omarchy install dev-env ruby` had not been run. Toolchains the installer
+# does not route through mise (rust via rustup, php via pacman) use `any`.
+# Anything from `omarchy install dev-env` with no argument can be added here.
+DEV_ENVS=(
+  go:go:mise          # mason: gopls, goimports, gofumpt, delve
+  node:node:mise      # mason: ts_ls, eslint, prettier, pyright, emmet, html, cssls
+  python:python:mise  # mason: black, isort, pylint, debugpy
+  ruby:ruby:mise      # mason: ruby_lsp, rubocop
+  dotnet:dotnet:mise  # mason: csharp_ls
+)
+
+MISE_DIR="${MISE_DATA_DIR:-$HOME/.local/share/mise}"
+
+needs_dev_env() { # <command> <mise|any> -- true when it still needs installing
+  local cmd="$1" how="$2" path
+  path="$(command -v "$cmd" 2>/dev/null)" || return 0
+  [[ -n "$path" ]] || return 0
+  [[ "$how" == "mise" && "$path" != "$MISE_DIR"/* ]] && return 0
+  return 1
+}
+
+report_dev_envs() {
+  local entry name cmd how found=0
+  for entry in "${DEV_ENVS[@]}"; do
+    IFS=: read -r name cmd how <<<"$entry"
+    needs_dev_env "$cmd" "$how" || continue
+    found=$((found + 1))
+    printf '  missing toolchain: %-7s run: omarchy install dev-env %s\n' "$name" "$name"
+  done
+  (( found )) && printf '  %d toolchain(s) above are a one-time install per machine.\n' "$found"
+  return 0
+}
+
+report_dev_envs

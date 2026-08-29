@@ -123,6 +123,14 @@ Background: `3-blue-eye.png` (from the catppuccin theme).
 Commit signing needs an untracked `~/.config/git/config.local` with
 `user.signingkey` and `commit.gpgsign`; `config/git/personal` includes it.
 
+Language toolchains come from `omarchy install dev-env <name>` (go, node,
+python, ruby, dotnet). They're not tracked: the installer does more than drop a
+binary -- ruby also gets rails and `~/.gemrc`, python also gets uv -- so a
+copied `~/.config/mise/config.toml` would drift from it. `packages.sh` checks
+for each one and prints the command to run when it's missing, rather than
+installing it. Ruby is checked by whether it resolves inside mise, since
+Omarchy's base install ships its own `/usr/bin/ruby`.
+
 ## Layout
 
 | Path | Goes to |
@@ -136,6 +144,16 @@ Commit signing needs an untracked `~/.config/git/config.local` with
 | `home/.bashrc` | `~/.bashrc` |
 | `home/.zshrc` | *(staged — reference only, on bash for good)* |
 | `packages.sh` | *(not linked — run to install packages)* |
+| `other_configs/improvedtube.json` | *(not linked — import by hand, see below)* |
+
+## Browser extension settings
+
+`other_configs/improvedtube.json` is an [ImprovedTube](https://improvedtube.com/)
+settings export (YouTube tweaks: no Shorts, no autoplay, 2x default speed,
+subscriptions as the home page). Nothing symlinks it — `install.sh` only sweeps
+`config/` and `home/`. Restore it by hand after installing the extension:
+its options page → *Import/Export* → import this file. Re-export over it when
+the settings change.
 
 ## History
 
