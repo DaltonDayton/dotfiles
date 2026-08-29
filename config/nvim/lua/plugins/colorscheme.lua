@@ -1,33 +1,57 @@
--- Register every theme's colorscheme plugin so lazy.nvim installs them all up
--- front. The active theme loads eagerly with high priority; the rest stay
--- lazy = true (installed but not required), and the dispatcher force-loads
--- them via `require("lazy").load(...)` on theme switch.
-
+-- Every colorscheme Omarchy can switch to, installed up front but not loaded,
+-- so `omarchy theme set` never has to clone anything mid-session. The staged
+-- theme's own spec (see lua/config/theme.lua) replaces its entry below, which
+-- is what carries the palette and makes it load eagerly.
 local theme = require("config.theme")
 
--- No theme-switcher host (no ~/.config/themes): install just catppuccin so the
--- dispatcher's fallback in config/theme.lua has a colorscheme to load.
--- fallback_spec() returns the theme wrapper { plugin = {...}, scheme = ... };
--- this file returns lazy *plugin* specs, so hand lazy the inner .plugin.
-if not theme.themed_host() then
-  return { theme.fallback_spec().plugin }
+local catalogue = {
+  -- Name and branch must match Omarchy's generated theme spec
+  -- (default/themed/neovim.lua.tpl). lazy merges specs by url and lets an
+  -- explicit name rename the merged plugin, so a bare "bjarneo/aether.nvim"
+  -- here would build the cache into lazy/aether.nvim while the generated spec
+  -- renames it to lazy/aether at runtime -- a directory that was never cloned.
+  { "bjarneo/aether.nvim", branch = "v3", name = "aether" },
+  { "bjarneo/ethereal.nvim" },
+  { "bjarneo/hackerman.nvim" },
+  { "bjarneo/vantablack.nvim" },
+  { "bjarneo/white.nvim" },
+  { "catppuccin/nvim", name = "catppuccin" },
+  { "EdenEast/nightfox.nvim" },
+  { "ellisonleao/gruvbox.nvim" },
+  { "ficcdaf/ashen.nvim" },
+  { "folke/tokyonight.nvim" },
+  { "gthelding/monokai-pro.nvim" },
+  { "kepano/flexoki-neovim" },
+  { "neanias/everforest-nvim" },
+  { "OldJobobo/miasma.nvim" },
+  { "OldJobobo/retro-82.nvim" },
+  { "omacom-io/lumon.nvim" },
+  { "rebelot/kanagawa.nvim" },
+  { "ribru17/bamboo.nvim" },
+  { "rose-pine/neovim", name = "rose-pine" },
+  { "tahayvr/matteblack.nvim" },
+}
+
+for _, plugin in ipairs(catalogue) do
+  plugin.lazy = true
+  plugin.priority = 1000
 end
 
-local active = theme.current()
+-- Swap in the active theme's spec rather than letting lazy merge a lazy = true
+-- and a lazy = false copy of the same url -- one spec per plugin, no reliance
+-- on which import order wins.
+local by_url = {}
+for i, plugin in ipairs(catalogue) do
+  by_url[plugin[1]] = i
+end
 
-local specs = {}
-for _, name in ipairs(theme.list()) do
-  if name ~= "matugen" then
-    local ok, t = pcall(dofile, vim.fn.expand("~/.config/themes/" .. name .. "/nvim.lua"))
-    if ok and type(t) == "table" and type(t.plugin) == "table" then
-      local plugin = vim.deepcopy(t.plugin)
-      if name ~= active then
-        plugin.lazy = true
-        plugin.priority = nil
-      end
-      table.insert(specs, plugin)
-    end
+for _, plugin in ipairs(theme.plugins()) do
+  local i = by_url[plugin[1]]
+  if i then
+    catalogue[i] = plugin
+  else
+    table.insert(catalogue, plugin)
   end
 end
 
-return specs
+return catalogue

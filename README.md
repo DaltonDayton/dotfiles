@@ -113,6 +113,12 @@ omarchy font set "CaskaydiaMono Nerd Font"   # rewrites all four terminal config
 omarchy-toggle screensaver-off on            # idle goes straight to lock, no screensaver
 ```
 
+`omarchy theme set` now drives Neovim's colorscheme too: `config/nvim` reads
+the staged spec at `~/.local/state/omarchy/current/theme/neovim.lua` and watches
+that directory, so running open editors reskin without a restart. See the header
+comment in `config/nvim/lua/config/theme.lua` for where it departs from
+upstream's version, which assumes LazyVim and a symlinked config.
+
 The screensaver toggle is a flag file at
 `~/.local/state/omarchy/toggles/screensaver-off`. `off` restores it, and
 Menu → Toggle → Screensaver flips it either way. It only suppresses the

@@ -81,10 +81,3 @@ vim.api.nvim_create_autocmd("BufReadPost", {
   end,
   desc = "Restore cursor position when reopening files",
 })
-
--- Reload theme on external SIGUSR1 (sent by hypr theme-switcher)
-vim.api.nvim_create_autocmd("Signal", {
-  pattern = "SIGUSR1",
-  callback = function() require("config.theme").reload() end,
-  desc = "Reload colorscheme on SIGUSR1",
-})
