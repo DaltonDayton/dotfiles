@@ -10,6 +10,8 @@
 # Installs go through omarchy-pkg-add / omarchy-pkg-aur-add rather than raw
 # pacman/yay -- same path the rest of Omarchy uses. They're --needed, and they
 # re-check with pacman -Q afterwards so a silent failure still exits nonzero.
+# Omarchy shell plugins aren't packages at all; they get their own section
+# below, on the same check-the-result principle.
 #
 # Only list what this repo's configs actually depend on, or what you'd be
 # annoyed to be missing on a new box. Omarchy's own preinstalls don't belong
@@ -24,6 +26,17 @@ REPO_PKGS=(
 AUR_PKGS=(
   wayland-pipewire-idle-inhibit  # Wayland idle inhibitor while audio plays -- config/hypr/autostart.lua
   bibata-cursor-git              # cursor theme (hyprcursor + Xcursor) -- config/hypr/looknfeel.lua
+)
+
+# Omarchy shell plugins. Git clones under ~/.config/omarchy/plugins/<id>, which
+# this repo doesn't track -- shell.json tracks only where the widget sits in the
+# bar, so without this a fresh machine gets the bar entry and nothing behind it.
+#
+# Entries are <plugin id>:<git url>. The id comes from the plugin's
+# manifest.json and is the directory it lands in; it isn't derived from the URL,
+# so it's spelled out rather than guessed.
+SHELL_PLUGINS=(
+  crmne.hyprmoncfg:https://github.com/crmne/omarchy-hyprmoncfg.git  # monitor config widget -- config/omarchy/shell.json
 )
 
 DRY=0
@@ -66,6 +79,36 @@ install_set() { # <installer> <label> <packages...>
 
 install_set omarchy-pkg-add     repo "${REPO_PKGS[@]}"
 install_set omarchy-pkg-aur-add aur  "${AUR_PKGS[@]}"
+
+PLUGINS_DIR="$HOME/.config/omarchy/plugins"
+
+install_shell_plugins() {
+  local entry id url
+  for entry in "${SHELL_PLUGINS[@]}"; do
+    id="${entry%%:*}"; url="${entry#*:}"
+
+    # omarchy-plugin-add refuses an id that's already installed, so skipping
+    # here is what keeps a rerun quiet rather than fatal.
+    [[ -e "$PLUGINS_DIR/$id" ]] && continue
+
+    if (( DRY )); then printf '  would install %s (shell plugin)\n' "$id"; continue; fi
+    printf '  installing %s (shell plugin)\n' "$id"
+
+    # --yes skips the "plugins run unsandboxed" confirmation, which is the
+    # point of pinning the URL here, and leaves the plugin disabled: shell.json
+    # already places it, and letting the installer enable it too would just
+    # fight the tracked file.
+    #
+    # It ends by pinging the running shell to rescan, which fails on a machine
+    # where omarchy-shell isn't up yet -- a fresh install, exactly when this
+    # matters. The clone has landed by then, so check for that instead of
+    # trusting the exit status.
+    omarchy-plugin-add "$url" --yes || true
+    [[ -e "$PLUGINS_DIR/$id" ]] || { echo "failed to install shell plugin $id" >&2; exit 1; }
+  done
+}
+
+install_shell_plugins
 
 # Dev toolchains -- reported, never installed here
 # ------------------------------------------------

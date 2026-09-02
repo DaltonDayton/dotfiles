@@ -41,7 +41,15 @@
       ],
       "right": [
         {
-          "id": "omarchy.tray"
+          "id": "omarchy.tray",
+          "pinned": [
+            "steam",
+            "discord_status_icon_1"
+          ],
+          "hidden": []
+        },
+        {
+          "id": "crmne.hyprmoncfg"
         },
         {
           "id": "omarchy.agents"
