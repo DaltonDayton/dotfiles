@@ -60,15 +60,6 @@
 hl.env("XCURSOR_THEME", "Bibata-Modern-Ice")
 hl.env("HYPRCURSOR_THEME", "Bibata-Modern-Ice")
 
--- https://wiki.hypr.land/Configuring/Basics/Variables/#cursor
-hl.config({
-  cursor = {
-    -- Don't teleport the pointer to a window when it takes focus (e.g. an app
-    -- opened from the menu). Omarchy's warp_on_change_workspace default stays.
-    no_warps = true,
-  },
-})
-
 -- https://wiki.hypr.land/Configuring/Dwindle-Layout/
 hl.config({
   dwindle = {
