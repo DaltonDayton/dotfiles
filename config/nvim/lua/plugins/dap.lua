@@ -173,6 +173,90 @@ return {
       },
     }
 
+    -- C/C++: GDB's built-in DAP interface (gdb >= 14 speaks DAP natively via
+    -- `gdb -i dap`), so no extra Mason adapter is needed.
+    dap.adapters.gdb = {
+      type = "executable",
+      command = "gdb",
+      args = { "-i", "dap" },
+    }
+
+    -- Compile the current file with debug info into the cache dir and return
+    -- the binary path. Lets you debug a loose .cpp with no build system.
+    local function build_current_file()
+      local src = vim.fn.expand("%:p")
+      local out = vim.fn.stdpath("cache") .. "/dap-build/" .. vim.fn.expand("%:t:r")
+      vim.fn.mkdir(vim.fn.fnamemodify(out, ":h"), "p")
+
+      local cc = vim.bo.filetype == "c" and "cc" or "c++"
+      local result = vim.system({ cc, "-g", "-O0", "-Wall", src, "-o", out }, { text = true }):wait()
+
+      if result.code ~= 0 then
+        vim.notify("Build failed:\n" .. (result.stderr or ""), vim.log.levels.ERROR)
+        error("build failed")
+      end
+
+      return out
+    end
+
+    -- The debuggee's stdout is a pipe, not a tty, so libc full-buffers it and
+    -- nothing appears until exit. Preload coreutils' libstdbuf to force line
+    -- buffering, so `cout` shows up as you step.
+    local function debug_env()
+      -- NOTE: gdb's DAP calls inferior.clear_env() when `env` is supplied, so
+      -- this must be the FULL environment, not just the extra vars.
+      local env = vim.fn.environ()
+      local libstdbuf = "/usr/lib/coreutils/libstdbuf.so"
+
+      if vim.uv.fs_stat(libstdbuf) then
+        env.LD_PRELOAD = libstdbuf
+        env._STDBUF_O = "L"
+      end
+
+      return env
+    end
+
+    local c_configs = {
+      {
+        type = "gdb",
+        request = "launch",
+        env = debug_env,
+        name = "Build & debug current file",
+        program = build_current_file,
+        cwd = "${workspaceFolder}",
+      },
+      {
+        type = "gdb",
+        request = "launch",
+        env = debug_env,
+        name = "Launch executable...",
+        program = function() return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file") end,
+        cwd = "${workspaceFolder}",
+      },
+      {
+        type = "gdb",
+        request = "launch",
+        env = debug_env,
+        name = "Launch executable (with args)...",
+        program = function() return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file") end,
+        args = function()
+          local input = vim.fn.input("Args: ")
+          return vim.split(input, " +", { trimempty = true })
+        end,
+        cwd = "${workspaceFolder}",
+      },
+      {
+        type = "gdb",
+        request = "attach",
+        name = "Attach to running process",
+        pid = require("dap.utils").pick_process,
+        cwd = "${workspaceFolder}",
+      },
+    }
+
+    dap.configurations.cpp = c_configs
+    dap.configurations.c = c_configs
+
     vim.fn.sign_define(
       "DapBreakpoint",
       { text = "", texthl = "DapBreakpoint", linehl = "DapBreakpoint", numhl = "DapBreakpoint" }
