@@ -53,15 +53,10 @@ fi
 # here and rerun. To see what you'd be taking on first:
 #   diff /usr/share/omarchy/config/<path> <repo path>
 PENDING=(
-  home/.zshrc                  # on bash under Omarchy; needs a chsh to matter
   home/.claude/CLAUDE.md
   home/.claude/rules
   home/.claude/stacks
-  config/tmux/tmux.conf        # would replace Omarchy's default tmux config
-  config/sesh/sesh.toml
-  config/opencode/opencode.json
-  config/opencode/tui.json
-  config/git/personal          # applied via [include], not a symlink
+  config/sesh/sesh.toml        # sesh isn't installed yet; see home/.bashrc
 )
 
 # Linked as a whole directory rather than file-by-file, because something else
@@ -76,6 +71,9 @@ LINK_DIRS=(
 pending() { local p="$1"; for x in "${PENDING[@]}"; do [[ "$p" == "$x" ]] && return 0; done; return 1; }
 # monitors.<machine>.lua is linked by link_monitors, not the generic sweep.
 per_machine() { [[ "$1" == config/hypr/monitors.*.lua ]]; }
+# config/git/personal is pulled in by git_include; a symlink of it would be
+# dead weight since git only reads ~/.config/git/config.
+special() { per_machine "$1" || [[ "$1" == config/git/personal ]]; }
 under_link_dir() { local p="$1"; for d in "${LINK_DIRS[@]}"; do [[ "$p" == "$d"/* ]] && return 0; done; return 1; }
 
 target_for() { # repo-relative path -> absolute destination
@@ -150,7 +148,7 @@ done
 while IFS= read -r rel; do
   pending "$rel" && continue
   under_link_dir "$rel" && continue
-  per_machine "$rel" && continue
+  special "$rel" && continue
   link "$rel"
 done < <(find config home -type f -not -name '.gitkeep' | sort)
 
