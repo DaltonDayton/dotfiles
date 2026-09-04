@@ -53,9 +53,6 @@ fi
 # here and rerun. To see what you'd be taking on first:
 #   diff /usr/share/omarchy/config/<path> <repo path>
 PENDING=(
-  home/.claude/CLAUDE.md
-  home/.claude/rules
-  home/.claude/stacks
   config/sesh/sesh.toml        # sesh isn't installed yet; see home/.bashrc
 )
 

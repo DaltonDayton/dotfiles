@@ -53,7 +53,6 @@ them unlinked:
 | Staged | Would replace |
 |---|---|
 | `config/sesh/sesh.toml` | nothing — new file, and `sesh` isn't installed yet |
-| `home/.claude/{CLAUDE.md,rules,stacks}` | nothing — new files |
 
 To adopt one: delete its line from `PENDING` in `install.sh`, then rerun. If
 it would replace an Omarchy default, see what you'd be taking on first:
@@ -72,8 +71,8 @@ git log --diff-filter=D --oneline -- config/tmux config/opencode home/.zshrc
 git restore --source=<that commit>^ -- config/tmux/tmux.conf
 ```
 
-Currently live: `config/nvim`, `home/.bashrc`, `config/git/personal` (via the
-`[include]`), and the `config/hypr/` and `config/omarchy/` files. The hypr and
+Currently live: `config/nvim`, `home/.bashrc`, `home/.claude/`, `config/git/personal`
+(via the `[include]`), and the `config/hypr/` and `config/omarchy/` files. The hypr and
 omarchy files started as copies of what was on the system and now carry the
 actual overrides: window rules, extra bindings, cursor theme, idle inhibitor,
 bar layout.
@@ -182,7 +181,7 @@ Omarchy's base install ships its own `/usr/bin/ruby`.
 | `config/nvim/` | `~/.config/nvim/` |
 | `config/sesh/` | *(staged — see above)* |
 | `config/git/personal` | *(applied by `[include]`, not a symlink)* |
-| `home/.claude/` | *(staged)* |
+| `home/.claude/` | `~/.claude/` (`CLAUDE.md`, `rules/`, `stacks/`) |
 | `home/.bashrc` | `~/.bashrc` |
 | `packages.sh` | *(not linked — run to install packages)* |
 | `other_configs/improvedtube.json` | *(not linked — import by hand, see below)* |
