@@ -22,12 +22,3 @@ alias cll='clear && ll'
 # Omarchy only appends it, so without this a pacman-installed uv would win.
 # Guarded: harmless on a machine where uv was never installed this way.
 [[ -r "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
-
-# fzf completion on plain Tab instead of the `**` trigger. Omarchy sources
-# fzf's completion.bash, which defaults FZF_COMPLETION_TRIGGER to `**`; the
-# default uses ${VAR-...}, so an empty value is honored rather than ignored.
-# Applies to fzf's registered commands (cd, nvim, git, ls, cp, rm, kill, ssh,
-# export, ...) — everything else keeps normal bash completion.
-export FZF_COMPLETION_TRIGGER=''
-# Without this every Tab opens the picker, even for a single candidate.
-export FZF_COMPLETION_OPTS='--select-1 --exit-0'
