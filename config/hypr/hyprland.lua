@@ -35,3 +35,8 @@ require("default.hypr.toggles")
 -- because an unanchored "steam" also matches steam_app_battlenet, which
 -- would drag the Battle.net launcher out of its float.
 o.window({ class = "^steam$", title = "^Steam$" }, { tile = true })
+
+-- Keep Firefox opaque while viewing YouTube, including when unfocused.
+o.window({ class = "^[Ff]irefox$", title = ".*YouTube.*" }, {
+  opacity = "1 override 1 override 1 override",
+})
