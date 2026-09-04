@@ -124,6 +124,22 @@ omarchy-toggle screensaver-off on            # idle goes straight to lock, no sc
 omarchy default agent claude                 # installs via mise and writes defaults/agent
 ```
 
+Claude Code's ECC plugin (github.com/affaan-m/ecc) is also per-machine state.
+Install it from inside Claude Code, then set its hook profile to `minimal` so
+its edit gates stay out of Omarchy's quick agent flows:
+
+```
+/plugin marketplace add affaan-m/ecc
+/plugin install ecc@ecc            # user scope; writes the marketplace + enabledPlugins keys itself
+```
+
+and in `~/.claude/settings.json` (merge, don't replace: herdr owns the hooks
+block there):
+
+```json
+"pluginConfigs": { "ecc@ecc": { "options": { "hook_profile": "minimal" } } }
+```
+
 `omarchy theme set` now drives Neovim's colorscheme too: `config/nvim` reads
 the staged spec at `~/.local/state/omarchy/current/theme/neovim.lua` and watches
 that directory, so running open editors reskin without a restart. See the header
