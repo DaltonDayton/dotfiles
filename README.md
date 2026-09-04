@@ -125,8 +125,11 @@ omarchy default agent claude                 # installs via mise and writes defa
 ```
 
 Claude Code's ECC plugin (github.com/affaan-m/ecc) is also per-machine state.
-Install it from inside Claude Code, then set its hook profile to `minimal` so
-its edit gates stay out of Omarchy's quick agent flows:
+Install it from inside Claude Code, then pin its hook profile explicitly. It
+started on `standard` (the default) for use on real application repos; if the
+edit gates get in the way of Omarchy's quick agent flows, drop to `minimal`,
+or keep `standard` and switch off just the gate with
+`ECC_DISABLED_HOOKS=pre:edit-write:gateguard-fact-force,pre:bash:gateguard-fact-force`:
 
 ```
 /plugin marketplace add affaan-m/ecc
@@ -137,7 +140,7 @@ and in `~/.claude/settings.json` (merge, don't replace: herdr owns the hooks
 block there):
 
 ```json
-"pluginConfigs": { "ecc@ecc": { "options": { "hook_profile": "minimal" } } }
+"pluginConfigs": { "ecc@ecc": { "options": { "hook_profile": "standard" } } }
 ```
 
 `omarchy theme set` now drives Neovim's colorscheme too: `config/nvim` reads
