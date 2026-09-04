@@ -1,8 +1,5 @@
 # install.sh backs up displaced real files next to their target
 *.bak.*
 
-# Live theme pointer, rewritten by `omarchy theme set`
-config/omarchy/current
-
 # Machine-specific git bits (signing key), included by config/git/config
 config/git/config.local

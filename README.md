@@ -46,30 +46,37 @@ machine has to be added here by hand.
 
 ## Adopting things one at a time
 
-Most of what was carried over from the old setup is **staged, not live**. It sits
-in the repo so it's there to pick from, and `install.sh`'s `PENDING` list keeps
-it unlinked:
+A few carry-overs from the old setup are **staged, not live**. They sit in the
+repo so they're there to pick from, and `install.sh`'s `PENDING` list keeps
+them unlinked:
 
 | Staged | Would replace |
 |---|---|
-| `config/tmux/tmux.conf` | Omarchy's default tmux config |
-| `config/opencode/*.json` | Omarchy's default opencode config |
-| `config/sesh/sesh.toml` | nothing — new file |
+| `config/sesh/sesh.toml` | nothing — new file, and `sesh` isn't installed yet |
 | `home/.claude/{CLAUDE.md,rules,stacks}` | nothing — new files |
-| `config/git/personal` | nothing — layers in via `[include]` |
-| `home/.zshrc` | nothing — kept as a reference to port into `home/.bashrc` |
 
-To adopt one: delete its line from `PENDING` in `install.sh`, then rerun. To see
-what you'd be taking on first:
+To adopt one: delete its line from `PENDING` in `install.sh`, then rerun. If
+it would replace an Omarchy default, see what you'd be taking on first:
 
 ```sh
-diff /usr/share/omarchy/config/tmux/tmux.conf config/tmux/tmux.conf
+diff /usr/share/omarchy/config/<path> config/<path>
 ```
 
-Currently live: `config/nvim`, `home/.bashrc`, plus the `config/hypr/` and
-`config/omarchy/` files — those are snapshots of what was already on the
-system, so linking them changed no behavior, it just put them under version
-control.
+The old tmux, opencode, and zsh configs were staged here for a while and then
+dropped: each would have replaced an Omarchy default wholesale, and the only
+parts worth keeping (a couple of shell functions and aliases) were ported into
+`home/.bashrc`. They're still in history if a piece is ever needed:
+
+```sh
+git log --diff-filter=D --oneline -- config/tmux config/opencode home/.zshrc
+git restore --source=<that commit>^ -- config/tmux/tmux.conf
+```
+
+Currently live: `config/nvim`, `home/.bashrc`, `config/git/personal` (via the
+`[include]`), and the `config/hypr/` and `config/omarchy/` files. The hypr and
+omarchy files started as copies of what was on the system and now carry the
+actual overrides: window rules, extra bindings, cursor theme, idle inhibitor,
+bar layout.
 
 ## What's tracked, and what isn't
 
@@ -84,6 +91,9 @@ are tracked, because they can't go stale:
 | `config/hypr/*.lua` | `hyprland.lua` requires `default.hypr.omarchy`, then your files |
 | `config/omarchy/defaults/` | single-value files read by `omarchy` commands |
 | `config/git/personal` | pulled into Omarchy's git config by an `[include]` |
+
+`defaults/agent` only records the choice. On a new machine still run
+`omarchy default agent claude`, which also installs the agent through mise.
 
 **Snapshots** — your file replaces the default outright. Tracked only where the
 file is authoritative by design anyway:
@@ -111,6 +121,7 @@ rather than restoring a file:
 omarchy theme set catppuccin
 omarchy font set "CaskaydiaMono Nerd Font"   # rewrites all four terminal configs
 omarchy-toggle screensaver-off on            # idle goes straight to lock, no screensaver
+omarchy default agent claude                 # installs via mise and writes defaults/agent
 ```
 
 `omarchy theme set` now drives Neovim's colorscheme too: `config/nvim` reads
@@ -144,11 +155,10 @@ Omarchy's base install ships its own `/usr/bin/ruby`.
 | `config/hypr/` | `~/.config/hypr/` |
 | `config/omarchy/` | `~/.config/omarchy/` |
 | `config/nvim/` | `~/.config/nvim/` |
-| `config/{tmux,sesh,opencode}/` | *(staged — see above)* |
-| `config/git/personal` | *(staged — applied by `[include]`, not a symlink)* |
+| `config/sesh/` | *(staged — see above)* |
+| `config/git/personal` | *(applied by `[include]`, not a symlink)* |
 | `home/.claude/` | *(staged)* |
 | `home/.bashrc` | `~/.bashrc` |
-| `home/.zshrc` | *(staged — reference only, on bash for good)* |
 | `packages.sh` | *(not linked — run to install packages)* |
 | `other_configs/improvedtube.json` | *(not linked — import by hand, see below)* |
 
