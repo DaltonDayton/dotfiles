@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+# CPU and GPU utilization + temperature for the Omarchy bar.
+#
+# Runs as a `type: command` module (see the sysmon entry in
+# config/omarchy/shell.json); the bar calls it every few seconds and renders
+# the Waybar-style JSON it prints. Reads sysfs directly so the only external
+# tool is nvidia-smi, and that's optional: without it (the laptop, or an AMD
+# box) the GPU half comes from the amdgpu hwmon instead, and with no GPU
+# sensor at all it just prints the CPU half.
+#
+# The bar's renderer only understands one class, "active", which highlights
+# the widget. So that's what a hot reading gets; the tooltip carries the rest.
+#
+#   SYSMON_HOT=85   temperature (°C) at or above which the widget highlights
+set -euo pipefail
+
+HOT="${SYSMON_HOT:-85}"
+STATE="${XDG_RUNTIME_DIR:-/tmp}/omarchy-sysmon.stat"
+
+# -- CPU -------------------------------------------------------------------
+
+# /proc/stat is cumulative, so utilization is the delta since last call. The
+# previous sample lives in a runtime file; the first call after boot has
+# nothing to diff against and shows a dash for one tick.
+cpu_util() {
+  local _ user nice system idle iowait irq softirq steal
+  read -r _ user nice system idle iowait irq softirq steal _ < /proc/stat
+  local total=$((user + nice + system + idle + iowait + irq + softirq + steal))
+  local rest=$((idle + iowait))
+
+  local prev_total=0 prev_rest=0
+  [[ -r "$STATE" ]] && read -r prev_total prev_rest < "$STATE" || true
+  printf '%s %s\n' "$total" "$rest" > "$STATE"
+
+  local dt=$((total - prev_total))
+  (( prev_total > 0 && dt > 0 )) || { echo "-"; return; }
+  echo $(( (dt - (rest - prev_rest)) * 100 / dt ))
+}
+
+# First hwmon whose name matches; prints the directory.
+hwmon_named() {
+  local h
+  for h in /sys/class/hwmon/hwmon*; do
+    [[ -r "$h/name" ]] || continue
+    case "$(<"$h/name")" in "$1") echo "$h"; return 0 ;; esac
+  done
+  return 1
+}
+
+# millidegrees -> whole degrees, from a hwmon temp file
+read_temp() { [[ -r "$1" ]] && echo $(( $(<"$1") / 1000 )) || echo "-"; }
+
+CPU_UTIL=$(cpu_util)
+CPU_TEMP="-"; CPU_SENSOR=""
+for name in k10temp zenpower coretemp; do
+  if h=$(hwmon_named "$name"); then
+    CPU_TEMP=$(read_temp "$h/temp1_input")
+    CPU_SENSOR="$name $(cat "$h/temp1_label" 2>/dev/null || true)"
+    break
+  fi
+done
+
+# -- GPU -------------------------------------------------------------------
+
+GPU_UTIL=""; GPU_TEMP=""; GPU_NAME=""
+
+# nvidia-smi answers only when the driver is loaded and a card is present, so
+# a failure here just means "not an NVIDIA machine" and we fall through.
+if command -v nvidia-smi >/dev/null 2>&1; then
+  if out=$(nvidia-smi --query-gpu=name,utilization.gpu,temperature.gpu \
+             --format=csv,noheader,nounits 2>/dev/null | head -n1) && [[ -n "$out" ]]; then
+    IFS=, read -r GPU_NAME GPU_UTIL GPU_TEMP <<<"$out"
+    GPU_NAME="${GPU_NAME## }"; GPU_UTIL="${GPU_UTIL// /}"; GPU_TEMP="${GPU_TEMP// /}"
+  fi
+fi
+
+# amdgpu's hwmon hangs off the PCI device, which is also where the kernel
+# exposes gpu_busy_percent, so one directory gives both readings.
+if [[ -z "$GPU_TEMP" ]] && h=$(hwmon_named amdgpu); then
+  GPU_TEMP=$(read_temp "$h/temp1_input")
+  GPU_UTIL=$( [[ -r "$h/device/gpu_busy_percent" ]] && cat "$h/device/gpu_busy_percent" || echo "-" )
+  GPU_NAME="amdgpu $(cat "$h/temp1_label" 2>/dev/null || true)"
+fi
+
+# -- Output ----------------------------------------------------------------
+
+json_escape() {
+  local s="${1//\\/\\\\}"
+  s="${s//\"/\\\"}"
+  printf '%s' "${s//$'\n'/\\n}"
+}
+
+TEXT="󰻠 ${CPU_UTIL}% ${CPU_TEMP}°"
+TIP="CPU  ${CPU_UTIL}%  ${CPU_TEMP}°C  (${CPU_SENSOR:-no sensor})"
+if [[ -n "$GPU_TEMP" ]]; then
+  TEXT+="  󰢮 ${GPU_UTIL}% ${GPU_TEMP}°"
+  TIP+=$'\n'"GPU  ${GPU_UTIL}%  ${GPU_TEMP}°C  (${GPU_NAME})"
+fi
+
+CLASS=""
+for t in "$CPU_TEMP" "$GPU_TEMP"; do
+  [[ "$t" =~ ^[0-9]+$ ]] && (( t >= HOT )) && CLASS="active"
+done
+
+printf '{"text":"%s","tooltip":"%s","class":"%s"}\n' \
+  "$(json_escape "$TEXT")" "$(json_escape "$TIP")" "$CLASS"

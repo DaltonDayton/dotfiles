@@ -91,6 +91,12 @@ are tracked, because they can't go stale:
 | `config/hypr/*.lua` | `hyprland.lua` requires `default.hypr.omarchy`, then your files |
 | `config/omarchy/defaults/` | single-value files read by `omarchy` commands |
 | `config/git/personal` | pulled into Omarchy's git config by an `[include]` |
+| `config/omarchy/bar/scripts/` | scripts behind `type: command` bar widgets; `shell.json` points at them |
+
+`bar/scripts/sysmon` is the CPU/GPU utilization and temperature widget. It
+reads sysfs and, when present, `nvidia-smi`, so it needs no extra packages and
+falls back to the amdgpu sensor on a machine without an NVIDIA card. Click
+opens btop.
 
 `defaults/agent` only records the choice. On a new machine still run
 `omarchy default agent claude`, which also installs the agent through mise.
