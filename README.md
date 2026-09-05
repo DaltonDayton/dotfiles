@@ -92,10 +92,15 @@ are tracked, because they can't go stale:
 | `config/git/personal` | pulled into Omarchy's git config by an `[include]` |
 | `config/omarchy/bar/scripts/` | scripts behind `type: command` bar widgets; `shell.json` points at them |
 
-`bar/scripts/sysmon` is the CPU/GPU utilization and temperature widget. It
-reads sysfs and, when present, `nvidia-smi`, so it needs no extra packages and
-falls back to the amdgpu sensor on a machine without an NVIDIA card. Click
-opens btop.
+`bar/scripts/sysmon` shows GPU utilization and temperature in the bar. It reads
+sysfs and, when present, `nvidia-smi`, so it needs no extra packages and falls
+back to the amdgpu sensor on a machine without an NVIDIA card. It can show the
+CPU too (`SYSMON_SHOW=cpu,gpu`), but that half is covered by the
+`bitr0t.system-monitor` plugin's chip, which `packages.sh` installs: CPU% and
+the k10temp Tctl sensor in the bar, and a panel with graphs, processes, and the
+GPU on click. Neither NVIDIA reading can come from the plugin's chip, because
+the NVIDIA driver exposes no hwmon sensor for lm-sensors to list — hence
+keeping the script for the GPU half.
 
 `defaults/agent` only records the choice. On a new machine still run
 `omarchy default agent claude`, which also installs the agent through mise.

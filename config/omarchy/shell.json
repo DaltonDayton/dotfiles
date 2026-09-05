@@ -19,10 +19,18 @@
         {
           "id": "sysmon",
           "type": "command",
-          "exec": "~/.config/omarchy/bar/scripts/sysmon",
+          "exec": "SYSMON_SHOW=gpu ~/.config/omarchy/bar/scripts/sysmon",
           "interval": 2,
-          "tooltip": "CPU / GPU",
+          "tooltip": "GPU",
           "onClick": "omarchy-launch-or-focus-tui btop"
+        },
+        {
+          "id": "bitr0t.system-monitor",
+          "chipMode": "minimal",
+          "monitors": [
+            "cpu",
+            "sensor:temperature:k10temp-pci-00c3:Tctl:temp1_input"
+          ]
         }
       ],
       "center": [

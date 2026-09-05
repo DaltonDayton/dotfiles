@@ -36,7 +36,8 @@ AUR_PKGS=(
 # manifest.json and is the directory it lands in; it isn't derived from the URL,
 # so it's spelled out rather than guessed.
 SHELL_PLUGINS=(
-  crmne.hyprmoncfg:https://github.com/crmne/omarchy-hyprmoncfg.git  # monitor config widget -- config/omarchy/shell.json
+  crmne.hyprmoncfg:https://github.com/crmne/omarchy-hyprmoncfg.git          # monitor config widget -- config/omarchy/shell.json
+  bitr0t.system-monitor:https://github.com/rmacy/omarchy-system-monitor.git  # CPU chip + system monitor panel -- config/omarchy/shell.json
 )
 
 DRY=0

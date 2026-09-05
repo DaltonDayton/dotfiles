@@ -11,10 +11,13 @@
 # The bar's renderer only understands one class, "active", which highlights
 # the widget. So that's what a hot reading gets; the tooltip carries the rest.
 #
-#   SYSMON_HOT=85   temperature (°C) at or above which the widget highlights
+#   SYSMON_HOT=85       temperature (°C) at or above which the widget highlights
+#   SYSMON_SHOW=cpu,gpu which halves to print; "gpu" alone when another widget
+#                       (the bitr0t.system-monitor chip) already covers the CPU
 set -euo pipefail
 
 HOT="${SYSMON_HOT:-85}"
+SHOW=",${SYSMON_SHOW:-cpu,gpu},"
 STATE="${XDG_RUNTIME_DIR:-/tmp}/omarchy-sysmon.stat"
 
 # -- CPU -------------------------------------------------------------------
@@ -90,15 +93,28 @@ json_escape() {
   printf '%s' "${s//$'\n'/\\n}"
 }
 
-TEXT="󰻠 ${CPU_UTIL}% ${CPU_TEMP}°"
-TIP="CPU  ${CPU_UTIL}%  ${CPU_TEMP}°C  (${CPU_SENSOR:-no sensor})"
-if [[ -n "$GPU_TEMP" ]]; then
-  TEXT+="  󰢮 ${GPU_UTIL}% ${GPU_TEMP}°"
-  TIP+=$'\n'"GPU  ${GPU_UTIL}%  ${GPU_TEMP}°C  (${GPU_NAME})"
+parts=(); tips=(); temps=()
+if [[ "$SHOW" == *,cpu,* ]]; then
+  parts+=("󰻠 ${CPU_UTIL}% ${CPU_TEMP}°")
+  tips+=("CPU  ${CPU_UTIL}%  ${CPU_TEMP}°C  (${CPU_SENSOR:-no sensor})")
+  temps+=("$CPU_TEMP")
+fi
+if [[ "$SHOW" == *,gpu,* && -n "$GPU_TEMP" ]]; then
+  parts+=("󰢮 ${GPU_UTIL}% ${GPU_TEMP}°")
+  tips+=("GPU  ${GPU_UTIL}%  ${GPU_TEMP}°C  (${GPU_NAME})")
+  temps+=("$GPU_TEMP")
 fi
 
+# Nothing to show (GPU-only mode on a box with no GPU sensor): print an empty
+# text so the widget collapses instead of showing a stale reading.
+TEXT=""; TIP=""
+for i in "${!parts[@]}"; do
+  TEXT+="${TEXT:+  }${parts[i]}"
+  TIP+="${TIP:+$'\n'}${tips[i]}"
+done
+
 CLASS=""
-for t in "$CPU_TEMP" "$GPU_TEMP"; do
+for t in "${temps[@]}"; do
   [[ "$t" =~ ^[0-9]+$ ]] && (( t >= HOT )) && CLASS="active"
 done
 
