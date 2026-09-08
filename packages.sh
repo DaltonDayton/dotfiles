@@ -20,6 +20,7 @@ set -euo pipefail
 
 # Arch repos.
 REPO_PKGS=(
+  playerctl    # voxtype pauses media while recording; warns on every take without it
 )
 
 # AUR. Slower and built from source, so keep this list short.
