@@ -41,6 +41,9 @@ o.window({ class = "^[Ff]irefox$", title = ".*YouTube.*" }, {
   opacity = "1 override 1 override 1 override",
 })
 
+-- Obsidian on its own special workspace (ported from main). Toggled with
+-- SUPER+ALT+O in hypr/bindings.lua; launches Obsidian when opened empty.
+hl.workspace_rule({ workspace = "special:obsidian", on_created_empty = "obsidian", gaps_out = 25, gaps_in = 12 })
 
 -- Playwright / MCP automation launches headed Chromium (ported from main).
 -- Keep it a floating, centered window parked silently on its own special

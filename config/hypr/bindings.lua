@@ -57,6 +57,9 @@ o.bind("SUPER + CTRL + ALT + Right", "Move window right", move_win(30, 0, "r"), 
 o.bind("SUPER + CTRL + ALT + Up", "Move window up", move_win(0, -30, "u"), { repeating = true })
 o.bind("SUPER + CTRL + ALT + Down", "Move window down", move_win(0, 30, "d"), { repeating = true })
 
+-- Obsidian special workspace (rule lives in hypr/hyprland.lua).
+o.bind("SUPER + ALT + O", "Toggle Obsidian workspace", hl.dsp.workspace.toggle_special("obsidian"))
+o.bind("SUPER + SHIFT + ALT + O", "Move window to Obsidian workspace", hl.dsp.window.move({ workspace = "special:obsidian", follow = true }))
 
 -- Playwright special workspace (rule lives in hypr/hyprland.lua). No move
 -- binding: SUPER+SHIFT+ALT+B is Omarchy's private browser, and Chromium lands
