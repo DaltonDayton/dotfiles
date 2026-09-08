@@ -56,3 +56,9 @@ o.bind("SUPER + CTRL + ALT + Left", "Move window left", move_win(-30, 0, "l"), {
 o.bind("SUPER + CTRL + ALT + Right", "Move window right", move_win(30, 0, "r"), { repeating = true })
 o.bind("SUPER + CTRL + ALT + Up", "Move window up", move_win(0, -30, "u"), { repeating = true })
 o.bind("SUPER + CTRL + ALT + Down", "Move window down", move_win(0, 30, "d"), { repeating = true })
+
+
+-- Playwright special workspace (rule lives in hypr/hyprland.lua). No move
+-- binding: SUPER+SHIFT+ALT+B is Omarchy's private browser, and Chromium lands
+-- there on its own anyway.
+o.bind("SUPER + ALT + B", "Toggle Playwright workspace", hl.dsp.workspace.toggle_special("playwright"))

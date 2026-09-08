@@ -40,3 +40,24 @@ o.window({ class = "^steam$", title = "^Steam$" }, { tile = true })
 o.window({ class = "^[Ff]irefox$", title = ".*YouTube.*" }, {
   opacity = "1 override 1 override 1 override",
 })
+
+
+-- Playwright / MCP automation launches headed Chromium (ported from main).
+-- Keep it a floating, centered window parked silently on its own special
+-- workspace so an agent driving a browser never steals focus or reshuffles the
+-- layout. SUPER+ALT+B in hypr/bindings.lua peeks at it. Omarchy's
+-- default/hypr/apps/browser.lua tags it chromium-based-browser and tiles it, and
+-- that tile rule wins over a later float, so drop the tag first. "silent" only
+-- keeps the rule itself from switching workspaces: Playwright then asks
+-- Chromium to raise the window, and focusing a window on a special workspace
+-- shows that workspace. Suppressing activation is what keeps it off screen.
+hl.workspace_rule({ workspace = "special:playwright", gaps_out = 20, gaps_in = 10 })
+o.window({ class = "^chromium$" }, { tag = "-chromium-based-browser" })
+o.window({ class = "^chromium$" }, {
+  float = true,
+  size = { 1920, 1080 },
+  center = true,
+  workspace = "special:playwright silent",
+  no_initial_focus = true,
+  suppress_event = "activate activatefocus",
+})
