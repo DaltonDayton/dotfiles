@@ -102,6 +102,15 @@ GPU on click. Neither NVIDIA reading can come from the plugin's chip, because
 the NVIDIA driver exposes no hwmon sensor for lm-sensors to list — hence
 keeping the script for the GPU half.
 
+`.local/bin/nightlight-auto` turns the night light on at sunset and off at
+sunrise. hyprsunset only takes fixed clock times, so `autostart.lua` runs this
+once at login: it computes the real times for the coordinates at the top of the
+file, applies the state the way `omarchy toggle nightlight` does (so the bar
+chip stays right), and books a one-shot `systemd-run --user` timer for the next
+transition, which re-runs it. Toggling by hand in between is honored until the
+next sunrise/sunset. `nightlight-auto --dry` prints what it would do;
+`systemctl --user list-timers 'nightlight-auto-*'` shows what's booked.
+
 `defaults/agent` only records the choice. On a new machine still run
 `omarchy default agent claude`, which also installs the agent through mise.
 
@@ -111,6 +120,9 @@ file is authoritative by design anyway:
 - `config/omarchy/shell.json` — once you customize the bar, Omarchy stops
   merging its defaults back in (by design), so a tracked copy costs nothing.
 - `config/omarchy/shell.toml` — small, entirely yours.
+- `config/hypr/hyprsunset.conf` — Omarchy's default, with the identity profile
+  moved from 07:00 to noon so it can't switch the night light off before a
+  winter sunrise. `nightlight-auto` owns the real schedule.
 
 Everything else that's a plain copy of an upstream default is deliberately
 **not** tracked: `starship.toml`, `btop.conf`, `lazygit/config.yml`,

@@ -13,3 +13,8 @@
 -- takes a systemd-logind "idle" lock, and logind's idle lock only gates
 -- IdleAction= in logind.conf. Nothing in Omarchy reads it.
 o.launch_on_start("wayland-pipewire-idle-inhibit")
+
+-- Night light on at sunset, off at sunrise. hyprsunset only does fixed clock
+-- times, so this computes the real ones and books a systemd timer for the next
+-- transition; see home/.local/bin/nightlight-auto.
+o.launch_on_start("nightlight-auto")

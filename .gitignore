@@ -3,3 +3,4 @@
 
 # Machine-specific git bits (signing key), included by config/git/config
 config/git/config.local
+__pycache__/
