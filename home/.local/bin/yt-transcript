@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+# Transcript from a YouTube (or any yt-dlp) URL, as .txt and .srt.
+#
+# Default path: yt-dlp pulls the audio, ffmpeg resamples it to the 16 kHz mono
+# whisper wants, and whisper-cli transcribes it on the GPU. The model is the
+# one voxtype already downloaded (Omarchy's dictation tool), so there's nothing
+# extra to fetch; whisper-cli is the same whisper.cpp engine and shares the
+# ggml format. Runs at roughly 10x realtime on the 5080; the very first run
+# spends ~10 s compiling Vulkan shaders, after that it's warm.
+#
+#   yt-transcript <url>                 transcribe with whisper
+#   yt-transcript --captions <url>      grab YouTube's own captions instead
+#                                       (instant, no model; manual first, then
+#                                       auto-generated)
+#   -o DIR      where output lands       [$YT_TRANSCRIPT_DIR or ~/Transcripts]
+#   -m MODEL    ggml model file          [$YT_TRANSCRIPT_MODEL or voxtype's large-v3-turbo]
+#   -l LANG     spoken language          [en]
+#   --keep      keep the extracted .wav next to the transcript
+#
+# Needs: yt-dlp, ffmpeg, whisper-cpp + ggml-vulkan + ggml-cpu (packages.sh).
+set -euo pipefail
+
+usage() { sed -n '2,/^set -/p' "$0" | sed '$d' | cut -c3-; }
+
+OUT_DIR="${YT_TRANSCRIPT_DIR:-$HOME/Transcripts}"
+MODEL="${YT_TRANSCRIPT_MODEL:-$HOME/.local/share/voxtype/models/ggml-large-v3-turbo.bin}"
+LANG_CODE=en
+CAPTIONS=0
+KEEP=0
+URL=""
+
+while (( $# )); do
+  case "$1" in
+    -o) OUT_DIR="$2"; shift 2 ;;
+    -m) MODEL="$2"; shift 2 ;;
+    -l) LANG_CODE="$2"; shift 2 ;;
+    --captions) CAPTIONS=1; shift ;;
+    --keep) KEEP=1; shift ;;
+    -h|--help) usage; exit 0 ;;
+    -*) echo "unknown option: $1" >&2; usage >&2; exit 1 ;;
+    *) [[ -z "$URL" ]] || { echo "only one URL at a time" >&2; exit 1; }; URL="$1"; shift ;;
+  esac
+done
+[[ -n "$URL" ]] || { usage >&2; exit 1; }
+
+need() { command -v "$1" >/dev/null || { echo "missing: $1 ($2)" >&2; exit 1; }; }
+need yt-dlp "Omarchy base package"
+need ffmpeg "Omarchy base package"
+
+mkdir -p "$OUT_DIR"
+
+# srt -> plain text: drop cue numbers, timestamps, blanks. Consecutive repeats
+# go too, because YouTube's auto captions roll each line through two cues.
+srt_to_txt() { grep -vE '^[0-9]+$|^[0-9:,]+ --> |^$' "$1" | uniq > "${1%.srt}.txt"; }
+
+# Title and URL on top of the .txt, so a transcript read later still says
+# where it came from. The .srt is left alone: a header there isn't valid SubRip.
+add_header() { # <txt file> <title>
+  printf '%s\n%s\n\n' "$2" "$URL" | cat - "$1" > "$1.tmp" && mv -- "$1.tmp" "$1"
+}
+
+captions() {
+  local tmp srt="" flag
+  tmp="$(mktemp -d)"
+  trap "rm -rf '$tmp'" EXIT  # expand now: a local isn't in scope when EXIT fires
+
+  # Manual captions are worth more than auto-generated ones, so try them alone
+  # first. Passing both flags at once would write both files when both exist.
+  # --print alone would put yt-dlp in simulate mode and write nothing, hence
+  # --no-simulate alongside it.
+  local title
+  for flag in --write-subs --write-auto-subs; do
+    title="$(yt-dlp --no-playlist --no-warnings --quiet --skip-download --no-simulate "$flag" \
+      --sub-langs "${LANG_CODE}.*,${LANG_CODE}" --convert-subs srt \
+      -o "$tmp/%(title)s.%(ext)s" --print title -- "$URL")"
+    srt="$(find "$tmp" -name '*.srt' | head -1)"
+    [[ -n "$srt" ]] && break
+  done
+  [[ -n "$srt" ]] || { echo "no $LANG_CODE captions on this video; try without --captions" >&2; exit 1; }
+
+  # "<title>.en.srt" -> "<title>.srt", so both modes name their output alike.
+  local base; base="$(basename "$srt")"; base="${base%.srt}"; base="${base%.*}"
+  mv -- "$srt" "$OUT_DIR/$base.srt"
+  srt_to_txt "$OUT_DIR/$base.srt"
+  add_header "$OUT_DIR/$base.txt" "$title"
+  echo "$OUT_DIR/$base.txt"
+  echo "$OUT_DIR/$base.srt"
+}
+
+transcribe() {
+  need whisper-cli "pacman: whisper-cpp ggml-vulkan ggml-cpu"
+  [[ -r "$MODEL" ]] || { echo "model not found: $MODEL (run 'voxtype setup model' or pass -m)" >&2; exit 1; }
+
+  # The -o template names the file after the title and --print after_move hands
+  # back the path yt-dlp actually chose, so nothing has to be guessed here.
+  # --no-playlist: a watch?v=...&list=... link is one video, not the whole list.
+  local title wav
+  { read -r title; read -r wav; } < <(yt-dlp --no-playlist --no-warnings --quiet --no-simulate \
+    -x --audio-format wav --postprocessor-args "ffmpeg:-ar 16000 -ac 1" \
+    -o "$OUT_DIR/%(title)s.%(ext)s" --print after_move:title --print after_move:filepath -- "$URL")
+  [[ -f "${wav:-}" ]] || { echo "yt-dlp produced no audio for $URL" >&2; exit 1; }
+
+  local base="${wav%.wav}"
+  # -np hides the model/system dump, -pp keeps a percentage so a long video
+  # doesn't look hung. The segments still stream to stdout as they decode.
+  whisper-cli -m "$MODEL" -l "$LANG_CODE" -f "$wav" -np -pp -otxt -osrt -of "$base"
+  (( KEEP )) || rm -f -- "$wav"
+  add_header "$base.txt" "$title"
+
+  echo "$base.txt"
+  echo "$base.srt"
+}
+
+if (( CAPTIONS )); then captions; else transcribe; fi

@@ -91,6 +91,7 @@ are tracked, because they can't go stale:
 | `config/omarchy/defaults/` | single-value files read by `omarchy` commands |
 | `config/git/personal` | pulled into Omarchy's git config by an `[include]` |
 | `config/omarchy/bar/scripts/` | scripts behind `type: command` bar widgets; `shell.json` points at them |
+| `home/.local/bin/` | personal commands; `~/.local/bin` is already on Omarchy's `PATH` |
 
 `bar/scripts/sysmon` shows GPU utilization and temperature in the bar. It reads
 sysfs and, when present, `nvidia-smi`, so it needs no extra packages and falls
@@ -101,6 +102,13 @@ the k10temp Tctl sensor in the bar, and a panel with graphs, processes, and the
 GPU on click. Neither NVIDIA reading can come from the plugin's chip, because
 the NVIDIA driver exposes no hwmon sensor for lm-sensors to list — hence
 keeping the script for the GPU half.
+
+`.local/bin/yt-transcript` turns a YouTube URL into a `.txt` and `.srt`
+transcript. It runs whisper.cpp on the GPU (`whisper-cpp`, `ggml-vulkan`,
+`ggml-cpu` from `packages.sh`) with the `large-v3-turbo` model voxtype already
+keeps in `~/.local/share/voxtype/models/`, so there's no second model to fetch;
+`--captions` skips whisper and pulls YouTube's own subtitles instead. Omarchy's
+own yt-dlp integration (the browser's `Alt+Shift+D`) only downloads the video.
 
 `.local/bin/nightlight-auto` turns the night light on at sunset and off at
 sunrise. hyprsunset only takes fixed clock times, so `autostart.lua` runs this
@@ -200,6 +208,7 @@ Omarchy's base install ships its own `/usr/bin/ruby`.
 | `config/git/personal` | *(applied by `[include]`, not a symlink)* |
 | `home/.claude/` | `~/.claude/` (`CLAUDE.md`, `rules/`, `stacks/`) |
 | `home/.bashrc` | `~/.bashrc` |
+| `home/.local/bin/` | `~/.local/bin/` |
 | `packages.sh` | *(not linked — run to install packages)* |
 | `other_configs/improvedtube.json` | *(not linked — import by hand, see below)* |
 

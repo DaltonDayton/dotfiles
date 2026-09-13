@@ -21,6 +21,9 @@ set -euo pipefail
 # Arch repos.
 REPO_PKGS=(
   playerctl    # voxtype pauses media while recording; warns on every take without it
+  whisper-cpp  # whisper-cli -- home/.local/bin/yt-transcript
+  ggml-vulkan  # GPU backend for whisper-cli; ggml loads it at runtime
+  ggml-cpu     # whisper.cpp asserts on a CPU device even in GPU mode; Arch splits it out
 )
 
 # AUR. Slower and built from source, so keep this list short.
