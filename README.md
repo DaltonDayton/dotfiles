@@ -186,6 +186,18 @@ screensaver — `idle.lock` in `shell.json` still locks on schedule.
 
 Background: `3-blue-eye.png` (from the catppuccin theme).
 
+The ASMedia USB4 block on the X870E board (ASM4242: PCIe ports, xHCI, USB4
+router, all `1b21:242x`) is kept out of runtime suspend by
+`etc/udev/rules.d/90-asm4242-no-d3cold.rules`. Idle in D3cold it sometimes
+fails to resume, drops off the PCIe bus, and the NVIDIA driver then hard-locks
+the machine; the Omarchy menu triggers that resume on every open via `lspci`.
+`install.sh` is sudo-free, so this one is copied by hand:
+
+```sh
+sudo cp etc/udev/rules.d/90-asm4242-no-d3cold.rules /etc/udev/rules.d/
+sudo udevadm control --reload && sudo udevadm trigger --action=add --subsystem-match=pci --attr-match=vendor=0x1b21
+```
+
 Commit signing needs an untracked `~/.config/git/config.local` with
 `user.signingkey` and `commit.gpgsign`; `config/git/personal` includes it.
 
@@ -211,6 +223,7 @@ Omarchy's base install ships its own `/usr/bin/ruby`.
 | `home/.local/bin/` | `~/.local/bin/` |
 | `packages.sh` | *(not linked — run to install packages)* |
 | `other_configs/improvedtube.json` | *(not linked — import by hand, see below)* |
+| `etc/udev/rules.d/` | *(not linked — `sudo cp` by hand, see above)* |
 
 ## Browser extension settings
 
