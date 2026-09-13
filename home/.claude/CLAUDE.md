@@ -127,3 +127,7 @@ Default, adjust per project:
 **Just do it:** anything inside the approved plan, obvious fixes, following existing patterns.
 
 **Stop and ask:** scope creep beyond the plan, a new dependency, a schema/API/contract change, anything destructive (deleting files, data, migrations), or an ambiguity that materially changes the approach.
+
+# graphify
+- **graphify** (`~/.claude/skills/graphify/SKILL.md`) - any input to knowledge graph. Trigger: `/graphify`
+When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.
