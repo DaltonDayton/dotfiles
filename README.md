@@ -92,6 +92,7 @@ are tracked, because they can't go stale:
 | `config/git/personal` | pulled into Omarchy's git config by an `[include]` |
 | `config/omarchy/bar/scripts/` | scripts behind `type: command` bar widgets; `shell.json` points at them |
 | `home/.local/bin/` | personal commands; `~/.local/bin` is already on Omarchy's `PATH` |
+| `home/.local/share/applications/` | desktop entries; `battlenet.desktop` replaces the copy `omarchy install gaming battlenet` drops there |
 
 `bar/scripts/sysmon` shows GPU utilization and temperature in the bar. It reads
 sysfs and, when present, `nvidia-smi`, so it needs no extra packages and falls
@@ -118,6 +119,17 @@ chip stays right), and books a one-shot `systemd-run --user` timer for the next
 transition, which re-runs it. Toggling by hand in between is honored until the
 next sunrise/sunset. `nightlight-auto --dry` prints what it would do;
 `systemctl --user list-timers 'nightlight-auto-*'` shows what's booked.
+
+`.local/bin/battlenet-tsm` starts the TradeSkillMaster desktop app and then
+Battle.net, both in Omarchy's Battle.net prefix (`~/Games/battlenet`, a plain
+umu-launcher + GE-Proton prefix, so TSM just reuses the launcher's env). The
+tracked `.local/share/applications/battlenet.desktop` is Omarchy's entry with
+`Exec` pointed at the script, so the app menu launches both; `omarchy launch
+battlenet` still starts Battle.net alone. TSM itself was installed by running
+its Windows setup with that same env. `hyprland.lua` floats both, plus TSM's
+login splash and dialogs, into fixed spots on workspace 4, and ignores the
+prefix's focus-activation requests, which otherwise warp the cursor on every
+open and close.
 
 `defaults/agent` only records the choice. On a new machine still run
 `omarchy default agent claude`, which also installs the agent through mise.
@@ -221,6 +233,7 @@ Omarchy's base install ships its own `/usr/bin/ruby`.
 | `home/.claude/` | `~/.claude/` (`CLAUDE.md`, `rules/`, `stacks/`) |
 | `home/.bashrc` | `~/.bashrc` |
 | `home/.local/bin/` | `~/.local/bin/` |
+| `home/.local/share/applications/` | `~/.local/share/applications/` |
 | `packages.sh` | *(not linked — run to install packages)* |
 | `other_configs/improvedtube.json` | *(not linked — import by hand, see below)* |
 | `etc/udev/rules.d/` | *(not linked — `sudo cp` by hand, see above)* |

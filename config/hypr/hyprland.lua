@@ -64,3 +64,45 @@ o.window({ class = "^chromium$" }, {
   no_initial_focus = true,
   suppress_event = "activate activatefocus",
 })
+
+-- Battle.net + TSM (launched together by ~/.local/bin/battlenet-tsm): both
+-- floating and parked on the right edge, TSM in the top corner and the
+-- Battle.net launcher below it. Omarchy's default/hypr/apps/battlenet.lua
+-- floats and centers the launcher; this runs later and replaces the centering.
+-- move coordinates are monitor-local, so the right-edge maths holds on any
+-- monitor width. Title regexes must match the whole title, hence the
+-- trailing .* to cover TSM's version suffix. All pinned to workspace 4.
+o.window({ class = "^steam_app_battlenet$", title = "^TradeSkillMaster Application.*" }, {
+  workspace = "4",
+  float = true,
+  size = { 600, 600 },
+  move = { "monitor_w-window_w-3", "27" },
+})
+-- TSM's login splash ("TSM Login - v4.14.2") shows for a few seconds before
+-- the main window; float it into the same corner so it doesn't tile.
+o.window({ class = "^steam_app_battlenet$", title = "^TSM Login.*" }, {
+  workspace = "4",
+  float = true,
+  move = { "monitor_w-window_w-3", "27" },
+})
+-- TSM's login/logout dialog is a separate window titled just "TSMApplication".
+-- Centered on the main TSM window above: its centre is 303px in from the right
+-- edge (3px gap + half of 600) and 327px down (27px + half of 600).
+o.window({ class = "^steam_app_battlenet$", title = "^TSMApplication$" }, {
+  workspace = "4",
+  float = true,
+  move = { "monitor_w-303-(window_w*0.5)", "327-(window_h*0.5)" },
+})
+o.window({ class = "^steam_app_battlenet$", title = "^Battle\\.net$" }, {
+  workspace = "4",
+  center = false,
+  move = { "monitor_w-window_w-3", "631" },
+})
+
+-- Wine (via XWayland) asks Hyprland to activate the Battle.net/TSM windows as
+-- they open, close, and hand focus to each other, and Omarchy's global
+-- misc.focus_on_activate = true honours that with a cursor warp each time
+-- (CWindow::activate focuses, then warpCursor()). Ignore activation requests
+-- from this prefix only; keyboard focus moves and new-window focus are
+-- unaffected. Same treatment Omarchy gives Telegram.
+o.window({ class = "^steam_app_battlenet$" }, { focus_on_activate = false })
