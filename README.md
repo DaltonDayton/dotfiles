@@ -143,9 +143,12 @@ file is authoritative by design anyway:
 - `config/hypr/hyprsunset.conf` — Omarchy's default, with the identity profile
   moved from 07:00 to noon so it can't switch the night light off before a
   winter sunrise. `nightlight-auto` owns the real schedule.
+- `config/starship.toml` — Omarchy's default plus the `hostname` module, shown
+  only in SSH sessions so a remote shell never looks like a local one. Frozen
+  copy of a 30-line file; rediff against upstream now and then.
 
 Everything else that's a plain copy of an upstream default is deliberately
-**not** tracked: `starship.toml`, `btop.conf`, `lazygit/config.yml`,
+**not** tracked: `btop.conf`, `lazygit/config.yml`,
 `omarchy-menu.jsonc`, `omarchy/branding/`, and the terminal configs. Committing
 those pins a stale version of a file Omarchy will keep improving.
 
