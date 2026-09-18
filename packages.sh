@@ -24,6 +24,7 @@ REPO_PKGS=(
   whisper-cpp  # whisper-cli -- home/.local/bin/yt-transcript
   ggml-vulkan  # GPU backend for whisper-cli; ggml loads it at runtime
   ggml-cpu     # whisper.cpp asserts on a CPU device even in GPU mode; Arch splits it out
+  nfs-utils    # exports /mnt/4TB_HDD/media to pve for Jellyfin until the NAS takes over
 )
 
 # AUR. Slower and built from source, so keep this list short.
