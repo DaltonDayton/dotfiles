@@ -1,258 +1,59 @@
 # dotfiles
 
-Personal configuration for [Omarchy](https://omarchy.org/) (Arch + Hyprland).
-
-Omarchy ships its defaults in `/usr/share/omarchy/`. This repo holds only what
-sits on top of them, plus the configs Omarchy doesn't manage (neovim, tmux,
-opencode, Claude Code).
+My overrides on top of [Omarchy](https://omarchy.org/). Omarchy keeps its
+defaults in `/usr/share/omarchy/`; this repo holds only what I changed.
 
 ## Install
 
 ```sh
 git clone git@github.com:DaltonDayton/dotfiles.git ~/dotfiles
-cd ~/dotfiles
-./install.sh --dry   # preview
-./install.sh
+~/dotfiles/install.sh
 ```
 
-`install.sh` symlinks `config/*` into `~/.config/` and `home/*` into `~/`, one
-file at a time, so Omarchy's own tooling (the monitor wizard, the bar editor)
-writes straight back into this repo and its edits show up as diffs. Anything
-real already sitting at a target is moved aside to `<file>.bak.<epoch>` first.
-Rerunning is a no-op.
+Symlinks `config/*` into `~/.config/` and `home/*` into `~/`, moving any real
+file in the way to `<file>.bak.<epoch>`. `config/hypr/monitors.<hostname>.lua`
+becomes `monitors.lua`. It then runs `packages.sh`. Rerun any time.
 
-`config/nvim` is linked as a whole directory instead of file-by-file, because
-lazy.nvim writes into it.
+## Keeping up with Omarchy
 
-## Packages
+Most files here are **layered**: Omarchy loads its defaults, then mine
+(`hypr/*.lua`, bar scripts, `.local/bin`). Updates just work.
 
-`packages.sh` holds the packages this setup needs on top of Omarchy's own, and
-`install.sh` runs it last. It's also fine to run alone:
+A few are **snapshots** that replace Omarchy's file outright. Omarchy's version
+as of my last sync lives in `upstream/`, so after `omarchy update`:
 
 ```sh
-./packages.sh --dry   # what's missing
-./packages.sh
+./omarchy-diff           # what Omarchy changed since last sync (nothing = up to date)
+./omarchy-diff --merge   # 3-way merge it into config/, then review with git diff
 ```
 
-Add to the `REPO_PKGS` / `AUR_PKGS` arrays as you pick things up. Installs go
-through `omarchy-pkg-add` and `omarchy-pkg-aur-add` — Omarchy's own idempotent
-wrappers over `pacman -S --needed` and `yay`, which re-check with `pacman -Q`
-afterwards so a silent failure still exits nonzero. Nothing missing means no
-work and no sudo prompt, so `./install.sh` stays safe to rerun blind.
+To track a new snapshot file, copy it into `config/` and its default into
+`upstream/` at the same path.
 
-Note that installing from the menu (Install → Package / AUR) records nothing —
-Omarchy has no notion of "packages I chose". Anything you want on the next
-machine has to be added here by hand.
-
-## Adopting things one at a time
-
-A few carry-overs from the old setup are **staged, not live**. They sit in the
-repo so they're there to pick from, and `install.sh`'s `PENDING` list keeps
-them unlinked:
-
-| Staged | Would replace |
-|---|---|
-| `config/sesh/sesh.toml` | nothing — new file, and `sesh` isn't installed yet |
-
-To adopt one: delete its line from `PENDING` in `install.sh`, then rerun. If
-it would replace an Omarchy default, see what you'd be taking on first:
+## Once per machine
 
 ```sh
-diff /usr/share/omarchy/config/<path> config/<path>
+omarchy theme set catppuccin                 # background: 3-blue-eye.png
+omarchy font set "CaskaydiaMono Nerd Font"
+omarchy-toggle screensaver-off on
+omarchy default agent claude
+omarchy install dev-env <name>   # go, node, python, ruby, dotnet: nvim's mason tools need them
 ```
 
-The old tmux, opencode, and zsh configs were staged here for a while and then
-dropped: each would have replaced an Omarchy default wholesale, and the only
-parts worth keeping (a couple of shell functions and aliases) were ported into
-`home/.bashrc`. They're still in history if a piece is ever needed:
+- **Git signing:** `~/.config/git/config.local` with `user.signingkey` and `commit.gpgsign`.
+- **Desktop only:** keep the ASMedia USB4 chip out of D3cold. It otherwise freezes the machine via the NVIDIA driver:
+  ```sh
+  sudo cp etc/udev/rules.d/90-asm4242-no-d3cold.rules /etc/udev/rules.d/
+  sudo udevadm control --reload && sudo udevadm trigger --action=add --subsystem-match=pci --attr-match=vendor=0x1b21
+  ```
+- **ImprovedTube:** import `other_configs/improvedtube.json` from the extension's options page.
+- **Claude Code ECC plugin:** `/plugin marketplace add affaan-m/ecc`, then `/plugin install ecc@ecc`.
 
-```sh
-git log --diff-filter=D --oneline -- config/tmux config/opencode home/.zshrc
-git restore --source=<that commit>^ -- config/tmux/tmux.conf
-```
+## Scripts
 
-Currently live: `config/nvim`, `home/.bashrc`, `home/.claude/`, `config/git/personal`
-(via the `[include]`), and the `config/hypr/` and `config/omarchy/` files. The hypr and
-omarchy files started as copies of what was on the system and now carry the
-actual overrides: window rules, extra bindings, cursor theme, idle inhibitor,
-bar layout.
+- `nightlight-auto`: night light on at sunset, off at sunrise, for the coordinates at the top of the file. `--dry` previews.
+- `yt-transcript <url>`: `.txt` and `.srt` transcript via whisper.cpp on the GPU. `--captions` uses YouTube's subtitles.
+- `battlenet-tsm`: TSM and Battle.net in Omarchy's Battle.net prefix. The app menu entry points here.
+- `sysmon` (bar): GPU usage and temperature.
 
-## What's tracked, and what isn't
-
-Omarchy layers config in two different ways, and only one of them is safe to
-keep in git.
-
-**Layered** — upstream owns the defaults, your file holds only overrides. These
-are tracked, because they can't go stale:
-
-| Path | How it layers |
-|---|---|
-| `config/hypr/*.lua` | `hyprland.lua` requires `default.hypr.omarchy`, then your files |
-| `config/omarchy/defaults/` | single-value files read by `omarchy` commands |
-| `config/git/personal` | pulled into Omarchy's git config by an `[include]` |
-| `config/omarchy/bar/scripts/` | scripts behind `type: command` bar widgets; `shell.json` points at them |
-| `home/.local/bin/` | personal commands; `~/.local/bin` is already on Omarchy's `PATH` |
-| `home/.local/share/applications/` | desktop entries; `battlenet.desktop` replaces the copy `omarchy install gaming battlenet` drops there |
-
-`bar/scripts/sysmon` shows GPU utilization and temperature in the bar. It reads
-sysfs and, when present, `nvidia-smi`, so it needs no extra packages and falls
-back to the amdgpu sensor on a machine without an NVIDIA card. It can show the
-CPU too (`SYSMON_SHOW=cpu,gpu`), but that half is covered by the
-`bitr0t.system-monitor` plugin's chip, which `packages.sh` installs: CPU% and
-the k10temp Tctl sensor in the bar, and a panel with graphs, processes, and the
-GPU on click. Neither NVIDIA reading can come from the plugin's chip, because
-the NVIDIA driver exposes no hwmon sensor for lm-sensors to list — hence
-keeping the script for the GPU half.
-
-`.local/bin/yt-transcript` turns a YouTube URL into a `.txt` and `.srt`
-transcript. It runs whisper.cpp on the GPU (`whisper-cpp`, `ggml-vulkan`,
-`ggml-cpu` from `packages.sh`) with the `large-v3-turbo` model voxtype already
-keeps in `~/.local/share/voxtype/models/`, so there's no second model to fetch;
-`--captions` skips whisper and pulls YouTube's own subtitles instead. Omarchy's
-own yt-dlp integration (the browser's `Alt+Shift+D`) only downloads the video.
-
-`.local/bin/nightlight-auto` turns the night light on at sunset and off at
-sunrise. hyprsunset only takes fixed clock times, so `autostart.lua` runs this
-once at login: it computes the real times for the coordinates at the top of the
-file, applies the state the way `omarchy toggle nightlight` does (so the bar
-chip stays right), and books a one-shot `systemd-run --user` timer for the next
-transition, which re-runs it. Toggling by hand in between is honored until the
-next sunrise/sunset. `nightlight-auto --dry` prints what it would do;
-`systemctl --user list-timers 'nightlight-auto-*'` shows what's booked.
-
-`.local/bin/battlenet-tsm` starts the TradeSkillMaster desktop app and then
-Battle.net, both in Omarchy's Battle.net prefix (`~/Games/battlenet`, a plain
-umu-launcher + GE-Proton prefix, so TSM just reuses the launcher's env). The
-tracked `.local/share/applications/battlenet.desktop` is Omarchy's entry with
-`Exec` pointed at the script, so the app menu launches both; `omarchy launch
-battlenet` still starts Battle.net alone. TSM itself was installed by running
-its Windows setup with that same env. `hyprland.lua` floats both, plus TSM's
-login splash and dialogs, into fixed spots on workspace 4, and ignores the
-prefix's focus-activation requests, which otherwise warp the cursor on every
-open and close.
-
-`defaults/agent` only records the choice. On a new machine still run
-`omarchy default agent claude`, which also installs the agent through mise.
-
-**Snapshots** — your file replaces the default outright. Tracked only where the
-file is authoritative by design anyway:
-
-- `config/omarchy/shell.json` — once you customize the bar, Omarchy stops
-  merging its defaults back in (by design), so a tracked copy costs nothing.
-- `config/omarchy/shell.toml` — small, entirely yours.
-- `config/hypr/hyprsunset.conf` — Omarchy's default, with the identity profile
-  moved from 07:00 to noon so it can't switch the night light off before a
-  winter sunrise. `nightlight-auto` owns the real schedule.
-- `config/starship.toml` — Omarchy's default plus the `hostname` module, shown
-  only in SSH sessions so a remote shell never looks like a local one. Frozen
-  copy of a 30-line file; rediff against upstream now and then.
-
-Everything else that's a plain copy of an upstream default is deliberately
-**not** tracked: `btop.conf`, `lazygit/config.yml`,
-`omarchy-menu.jsonc`, `omarchy/branding/`, and the terminal configs. Committing
-those pins a stale version of a file Omarchy will keep improving.
-
-That includes the hooks already sitting in `~/.config/omarchy/hooks/` —
-`install-voxtype`, `setup-agent`, `setup-fingerprint` are Omarchy's own
-first-run invitations, copied there by its installer. `hooks/*.d/` is still a
-layered drop-in directory, so a hook you actually write belongs in the repo.
-
-## Set by command, not tracked
-
-These live in Omarchy's own state, so reproduce them by running the command
-rather than restoring a file:
-
-```sh
-omarchy theme set catppuccin
-omarchy font set "CaskaydiaMono Nerd Font"   # rewrites all four terminal configs
-omarchy-toggle screensaver-off on            # idle goes straight to lock, no screensaver
-omarchy default agent claude                 # installs via mise and writes defaults/agent
-```
-
-Claude Code's ECC plugin (github.com/affaan-m/ecc) is also per-machine state.
-Install it from inside Claude Code, then pin its hook profile explicitly. It
-started on `standard` (the default) for use on real application repos; if the
-edit gates get in the way of Omarchy's quick agent flows, drop to `minimal`,
-or keep `standard` and switch off just the gate with
-`ECC_DISABLED_HOOKS=pre:edit-write:gateguard-fact-force,pre:bash:gateguard-fact-force`:
-
-```
-/plugin marketplace add affaan-m/ecc
-/plugin install ecc@ecc            # user scope; writes the marketplace + enabledPlugins keys itself
-```
-
-and in `~/.claude/settings.json` (merge, don't replace: herdr owns the hooks
-block there):
-
-```json
-"pluginConfigs": { "ecc@ecc": { "options": { "hook_profile": "standard" } } }
-```
-
-`omarchy theme set` now drives Neovim's colorscheme too: `config/nvim` reads
-the staged spec at `~/.local/state/omarchy/current/theme/neovim.lua` and watches
-that directory, so running open editors reskin without a restart. See the header
-comment in `config/nvim/lua/config/theme.lua` for where it departs from
-upstream's version, which assumes LazyVim and a symlinked config.
-
-The screensaver toggle is a flag file at
-`~/.local/state/omarchy/toggles/screensaver-off`. `off` restores it, and
-Menu → Toggle → Screensaver flips it either way. It only suppresses the
-screensaver — `idle.lock` in `shell.json` still locks on schedule.
-
-Background: `3-blue-eye.png` (from the catppuccin theme).
-
-The ASMedia USB4 block on the X870E board (ASM4242: PCIe ports, xHCI, USB4
-router, all `1b21:242x`) is kept out of runtime suspend by
-`etc/udev/rules.d/90-asm4242-no-d3cold.rules`. Idle in D3cold it sometimes
-fails to resume, drops off the PCIe bus, and the NVIDIA driver then hard-locks
-the machine; the Omarchy menu triggers that resume on every open via `lspci`.
-`install.sh` is sudo-free, so this one is copied by hand:
-
-```sh
-sudo cp etc/udev/rules.d/90-asm4242-no-d3cold.rules /etc/udev/rules.d/
-sudo udevadm control --reload && sudo udevadm trigger --action=add --subsystem-match=pci --attr-match=vendor=0x1b21
-```
-
-Commit signing needs an untracked `~/.config/git/config.local` with
-`user.signingkey` and `commit.gpgsign`; `config/git/personal` includes it.
-
-Language toolchains come from `omarchy install dev-env <name>` (go, node,
-python, ruby, dotnet). They're not tracked: the installer does more than drop a
-binary -- ruby also gets rails and `~/.gemrc`, python also gets uv -- so a
-copied `~/.config/mise/config.toml` would drift from it. `packages.sh` checks
-for each one and prints the command to run when it's missing, rather than
-installing it. Ruby is checked by whether it resolves inside mise, since
-Omarchy's base install ships its own `/usr/bin/ruby`.
-
-## Layout
-
-| Path | Goes to |
-|---|---|
-| `config/hypr/` | `~/.config/hypr/` |
-| `config/omarchy/` | `~/.config/omarchy/` |
-| `config/nvim/` | `~/.config/nvim/` |
-| `config/sesh/` | *(staged — see above)* |
-| `config/git/personal` | *(applied by `[include]`, not a symlink)* |
-| `home/.claude/` | `~/.claude/` (`CLAUDE.md`, `rules/`, `stacks/`) |
-| `home/.bashrc` | `~/.bashrc` |
-| `home/.local/bin/` | `~/.local/bin/` |
-| `home/.local/share/applications/` | `~/.local/share/applications/` |
-| `packages.sh` | *(not linked — run to install packages)* |
-| `other_configs/improvedtube.json` | *(not linked — import by hand, see below)* |
-| `etc/udev/rules.d/` | *(not linked — `sudo cp` by hand, see above)* |
-
-## Browser extension settings
-
-`other_configs/improvedtube.json` is an [ImprovedTube](https://improvedtube.com/)
-settings export (YouTube tweaks: no Shorts, no autoplay, 2x default speed,
-subscriptions as the home page). Nothing symlinks it — `install.sh` only sweeps
-`config/` and `home/`. Restore it by hand after installing the extension:
-its options page → *Import/Export* → import this file. Re-export over it when
-the settings change.
-
-## History
-
-The `main` branch holds the previous setup: `quill`, a Go CLI that managed
-packages, modules, and profiles declaratively. Omarchy covers that ground, so
-this branch starts fresh. `main` is kept as an archive — pull anything else
-across with `git restore --source=main -- <path>`.
+The pre-Omarchy setup is archived on `main`.

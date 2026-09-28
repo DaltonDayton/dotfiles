@@ -11,7 +11,7 @@ themes, hooks, `omarchy` commands). This file only covers the repo itself.
 
 - Files under `config/` and `home/` are symlinked to `~/.config/` and `~/`.
   Editing the repo copy edits the live config, and vice versa — no build step.
-- After adding a file, run `./install.sh` to link it. `--dry` previews.
+- After adding a file, run `./install.sh` to link it.
 - Packages this setup depends on go in `packages.sh`, which `install.sh` runs
   last. Install via `omarchy-pkg-add` / `omarchy-pkg-aur-add`, not raw
   pacman/yay.
@@ -34,9 +34,13 @@ in git at all:
   upstream will keep improving.
 
 So: `diff /usr/share/omarchy/config/<path> ~/.config/<path>` first. If it's
-identical to the default, don't track it. If it's a snapshot you've genuinely
-customized, track it and accept that it's frozen — or find the layered
-equivalent (a `themed/` template, a hook, an `[include]`) and use that instead.
+identical to the default, don't track it. Prefer a layered equivalent (a
+`themed/` template, a hook, an `[include]`). If it has to be a snapshot, track
+it in `config/` and put Omarchy's current default at the same path under
+`upstream/`, so `./omarchy-diff` can show and merge later upstream changes.
+
+Keep override files to the lines that actually change something. Don't carry
+Omarchy's commented-out template examples.
 
 Settings that have a first-class command (`omarchy theme set`,
 `omarchy font set`) belong in README's "Set by command" section, not in a

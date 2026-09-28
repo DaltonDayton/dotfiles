@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# What did Omarchy change in the snapshot configs since the last sync?
+#   ./omarchy-diff           show upstream's changes (not yours)
+#   ./omarchy-diff --merge   3-way merge them into config/ and record the new baseline
+set -euo pipefail
+repo=$(cd "$(dirname "$0")" && pwd)
+omarchy=/usr/share/omarchy/config
+
+cd "$repo/upstream"
+find . -type f | sed 's|^\./||' | while read -r f; do
+  new="$omarchy/$f"
+  [[ -e $new ]] || { echo "gone upstream: $f"; continue; }
+  cmp -s "$f" "$new" && continue
+
+  if [[ ${1:-} == --merge ]]; then
+    if git merge-file "../config/$f" "$f" "$new"; then
+      echo "merged    $f"
+    else
+      echo "CONFLICT  config/$f  (resolve the <<<<<<< markers)"
+    fi
+    cp "$new" "$f"
+  else
+    echo "== $f"; diff -u "$f" "$new" || true
+  fi
+done
