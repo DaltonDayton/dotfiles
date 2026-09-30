@@ -63,6 +63,11 @@ After `omarchy update` (the `basics` feature sends a notification):
 - **Dictation:** `omarchy voxtype install`, then `sudo voxtype setup gpu --enable` (Omarchy's install
   tries this but ignores a failure) and `omarchy voxtype model` -> `large-v3-turbo`. The desktop's
   `yt-transcript` uses that same model.
+- **Bar plugins** (third-party, run unsandboxed, so review before installing):
+  `omarchy plugin add https://github.com/rmacy/omarchy-system-monitor.git` (CPU/temp chip; pick
+  monitors in its settings) and `omarchy plugin add https://github.com/crmne/omarchy-hyprmoncfg.git`
+  (monitor layout widget; Omarchy's own monitor widget may be enough).
+- **Tray pins** (desktop): pin Steam, Discord, NordVPN from the tray itself.
 - **Battle.net:** `omarchy install gaming battlenet` before enabling `battlenet-tsm`.
 - **ImprovedTube:** import `other_configs/improvedtube.json` from the extension's options page.
 - **Claude Code ECC plugin:** `/plugin marketplace add affaan-m/ecc`, then `/plugin install ecc@ecc`.
