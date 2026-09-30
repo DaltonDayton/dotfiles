@@ -60,7 +60,6 @@ After `omarchy update` (the `basics` feature sends a notification):
 ## By hand
 
 - **Git signing:** `~/.config/git/config.local` with `user.signingkey` and `commit.gpgsign`.
-- **Dev toolchains** (nvim's mason tools need them): `omarchy install dev-env <go|node|python|ruby|dotnet>`.
 - **Battle.net:** `omarchy install gaming battlenet` before enabling `battlenet-tsm`.
 - **ImprovedTube:** import `other_configs/improvedtube.json` from the extension's options page.
 - **Claude Code ECC plugin:** `/plugin marketplace add affaan-m/ecc`, then `/plugin install ecc@ecc`.

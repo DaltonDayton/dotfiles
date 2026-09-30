@@ -1,0 +1,14 @@
+# Omarchy's installer does more than drop a binary (python also gets uv), so
+# use it rather than calling mise directly. Only what's missing gets installed,
+# and only those are recorded for off to remove.
+export PATH=$HOME/.local/share/mise/shims:$PATH
+have() { mise ls --global --installed "$1" 2>/dev/null | grep -q .; }
+for lang in go dotnet python node; do
+  have "$lang" && continue
+  run omarchy install dev-env "$lang"
+  if have "$lang"; then
+    grep -qxF "$lang" "$STATE/dev-envs" 2>/dev/null || echo "$lang" >> "$STATE/dev-envs"
+  else
+    say "warning: omarchy install dev-env $lang finished but mise doesn't list $lang"
+  fi
+done

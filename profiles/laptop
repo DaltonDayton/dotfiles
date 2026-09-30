@@ -9,3 +9,4 @@ idle-inhibit-audio
 claude
 ssh-pve
 nvim
+dev-envs

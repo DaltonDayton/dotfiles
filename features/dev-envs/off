@@ -1,0 +1,6 @@
+# Removes only the toolchains setup installed (mise unuse also prunes the
+# install). uv, installed alongside python, stays in ~/.local/bin.
+if [[ -f $STATE/dev-envs ]]; then
+  while read -r lang; do run mise unuse --global "$lang"; done < <(sort -u "$STATE/dev-envs")
+  rm "$STATE/dev-envs"
+fi
