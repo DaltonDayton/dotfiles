@@ -1,59 +1,61 @@
 # dotfiles
 
 My overrides on top of [Omarchy](https://omarchy.org/). Omarchy keeps its
-defaults in `/usr/share/omarchy/`; this repo holds only what I changed.
+defaults in `/usr/share/omarchy/`; this repo holds only what I changed, split
+into small features that each machine's profile picks from.
 
 ## Install
 
 ```sh
 git clone git@github.com:DaltonDayton/dotfiles.git ~/dotfiles
-~/dotfiles/install.sh
+~/dotfiles/install.sh             # first run asks for a profile
+~/dotfiles/install.sh --pick      # choose the profile's features from a checklist
 ```
 
-Symlinks `config/*` into `~/.config/` and `home/*` into `~/`, moving any real
-file in the way to `<file>.bak.<epoch>`. `config/hypr/monitors.<hostname>.lua`
-becomes `monitors.lua`. It then runs `packages.sh`. Rerun any time.
+`install.sh` applies `profiles/<profile>`, one feature name per line. For each
+feature it installs missing packages, links its files, and runs its setup. A
+feature dropped from the list is undone, and Omarchy's own file comes back if
+one was moved aside. Rerunning changes nothing unless the list or a feature
+changed. Every change is also logged to `~/.local/state/dotfiles/install.log`.
+
+## Features
+
+`features/<name>/` can hold any of:
+
+| File | Effect |
+|---|---|
+| `about` | one line, shown in the picker |
+| `hypr.lua` | linked to `~/.config/hypr/features/<name>.lua`, which Omarchy's `hyprland.lua` loads (install.sh appends one line for it) |
+| `files/…` | mirrors `~`, and each file is symlinked there. Any real file in the way is moved to `.bak.<epoch>` |
+| `linkdirs` | paths under `files/` to link as one directory (e.g. nvim, which lazy.nvim writes into) |
+| `packages`, `aur` | installed with `omarchy pkg add` / `omarchy pkg aur add` |
+| `setup`, `off` | bash sourced by install.sh with helpers (`run`, `ensure_line`, `bar_set`, `bar_put`, `plugin_add`, …); must be safe to rerun |
+
+Omarchy's `bindings.lua`, `input.lua`, `looknfeel.lua`, `autostart.lua`,
+`.bashrc`, git config, and `shell.json` stay Omarchy's. Features add to them
+through a hypr feature file, a `source`/`[include]` line, or `omarchy bar set`.
+
+If Omarchy rewrites a linked file in place (its monitor scaling does this to
+`monitors.lua`), the next install keeps the rewritten copy as `.drift.<epoch>`
+and prints the `diff` command so you can pull the change in.
 
 ## Keeping up with Omarchy
 
-Most files here are **layered**: Omarchy loads its defaults, then mine
-(`hypr/*.lua`, bar scripts, `.local/bin`). Updates just work.
-
-A few are **snapshots** that replace Omarchy's file outright. Omarchy's version
-as of my last sync lives in `upstream/`, so after `omarchy update`:
+A few features ship a snapshot of an Omarchy file (`starship.toml`,
+`hyprsunset.conf`). Omarchy's version as of the last sync lives in `upstream/`.
+After `omarchy update` (the `omarchy-diff-hook` feature sends a notification):
 
 ```sh
-./omarchy-diff           # what Omarchy changed since last sync (nothing = up to date)
-./omarchy-diff --merge   # 3-way merge it into config/, then review with git diff
+./omarchy-diff           # what Omarchy changed since the last sync
+./omarchy-diff --merge   # 3-way merge it into the feature copies, then review with git diff
 ```
 
-To track a new snapshot file, copy it into `config/` and its default into
-`upstream/` at the same path.
-
-## Once per machine
-
-```sh
-omarchy theme set catppuccin                 # background: 3-blue-eye.png
-omarchy font set "CaskaydiaMono Nerd Font"
-omarchy-toggle screensaver-off on
-omarchy default agent claude
-omarchy install dev-env <name>   # go, node, python, ruby, dotnet: nvim's mason tools need them
-```
+## By hand
 
 - **Git signing:** `~/.config/git/config.local` with `user.signingkey` and `commit.gpgsign`.
-- **Desktop only:** keep the ASMedia USB4 chip out of D3cold. It otherwise freezes the machine via the NVIDIA driver:
-  ```sh
-  sudo cp etc/udev/rules.d/90-asm4242-no-d3cold.rules /etc/udev/rules.d/
-  sudo udevadm control --reload && sudo udevadm trigger --action=add --subsystem-match=pci --attr-match=vendor=0x1b21
-  ```
+- **Dev toolchains** (nvim's mason tools need them): `omarchy install dev-env <go|node|python|ruby|dotnet>`.
+- **Battle.net:** `omarchy install gaming battlenet` before enabling `battlenet-tsm`.
 - **ImprovedTube:** import `other_configs/improvedtube.json` from the extension's options page.
 - **Claude Code ECC plugin:** `/plugin marketplace add affaan-m/ecc`, then `/plugin install ecc@ecc`.
-
-## Scripts
-
-- `nightlight-auto`: night light on at sunset, off at sunrise, for the coordinates at the top of the file. `--dry` previews.
-- `yt-transcript <url>`: `.txt` and `.srt` transcript via whisper.cpp on the GPU. `--captions` uses YouTube's subtitles.
-- `battlenet-tsm`: TSM and Battle.net in Omarchy's Battle.net prefix. The app menu entry points here.
-- `sysmon` (bar): GPU usage and temperature.
 
 The pre-Omarchy setup is archived on `main`.

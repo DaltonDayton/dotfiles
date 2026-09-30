@@ -1,0 +1,1 @@
+[[ $(omarchy-font-current) == "CaskaydiaMono Nerd Font" ]] || run omarchy font set "CaskaydiaMono Nerd Font"

@@ -1,0 +1,1 @@
+remove_line ~/.bashrc "source $FEATURE/bashrc"

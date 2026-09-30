@@ -1,0 +1,6 @@
+rule=/etc/udev/rules.d/90-asm4242-no-d3cold.rules
+if ! cmp -s "$FEATURE/90-asm4242-no-d3cold.rules" "$rule"; then
+  run sudo cp "$FEATURE/90-asm4242-no-d3cold.rules" "$rule"
+  run sudo udevadm control --reload
+  run sudo udevadm trigger --action=add --subsystem-match=pci --attr-match=vendor=0x1b21
+fi

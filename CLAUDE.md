@@ -1,52 +1,47 @@
 # dotfiles (Omarchy)
 
-Override files for an [Omarchy](https://omarchy.org/) system, symlinked into
-place by `./install.sh`. See `README.md` for the layout.
+Overrides for an [Omarchy](https://omarchy.org/) system, organized as opt-in
+features that per-machine profiles select. See `README.md` for the layout.
 
-Omarchy ships a Claude skill at `~/.claude/skills/omarchy/` — use it for any
+Omarchy ships a Claude skill at `~/.claude/skills/omarchy/`. Use it for any
 question about *what* to put in these configs (Hyprland bindings, bar widgets,
 themes, hooks, `omarchy` commands). This file only covers the repo itself.
 
 ## Working here
 
-- Files under `config/` and `home/` are symlinked to `~/.config/` and `~/`.
-  Editing the repo copy edits the live config, and vice versa — no build step.
-- After adding a file, run `./install.sh` to link it.
-- Packages this setup depends on go in `packages.sh`, which `install.sh` runs
-  last. Install via `omarchy-pkg-add` / `omarchy-pkg-aur-add`, not raw
-  pacman/yay.
-- Never edit `/usr/share/omarchy/` — it's package-owned and `omarchy update`
-  overwrites it. Reading it to see the defaults is fine and encouraged.
-- Validate Hyprland changes with `hyprctl reload && hyprctl configerrors`.
-  `shell.json` and `omarchy-menu.jsonc` hot-reload on save.
+- A feature is `features/<name>/`: `about`, and any of `hypr.lua`, `files/`,
+  `linkdirs`, `packages`, `aur`, `setup`, `off`. Profiles in `profiles/` list
+  feature names. `./install.sh` applies the current profile and must stay
+  idempotent and quiet when nothing changes.
+- Linked files are live: editing the repo copy edits the real config.
+- `setup`/`off` are sourced by install.sh. Use its helpers (`run`, `say`,
+  `ensure_line`, `remove_line`, `ensure_block`, `bar_set`, `bar_put`,
+  `plugin_add`, `plugin_off`, `start_once`) and guard every action so a rerun
+  does nothing. `$FEATURE` is the feature dir, and `$CHANGED` is 1 when its links
+  just changed.
+- Prefer Omarchy's own commands (`omarchy pkg add`, `omarchy bar set/put`,
+  `omarchy plugin add`, `omarchy font set`, `omarchy hook install`, …) over
+  editing their files.
+- Never edit `/usr/share/omarchy/`. It's package-owned. Reading it is fine.
+- Validate Hyprland changes with `hyprctl reload && hyprctl configerrors`
+  (install.sh does this when a hypr file changed).
 
-## Before tracking a new file, check how it layers
+## Before adding a file to a feature
 
-Omarchy uses both models, and the difference decides whether the file belongs
-in git at all:
+Omarchy layers some config and snapshots the rest:
 
-- **Layered** (`~/.config/hypr/*.lua`, `hooks/*.d/`, `themed/*.tpl`,
-  `themes/<name>/`, `extensions/omarchy-menu.jsonc`) — upstream keeps its
-  defaults, your file only adds or overrides. Safe to track.
-- **Snapshot** (`shell.json`, terminal configs, `git/config`, `btop.conf`,
-  `starship.toml`) — Omarchy copies its default to `~/.config` at install and
-  never merges again. Tracking one of these pins a stale copy of a file
-  upstream will keep improving.
+- **Layered** (Hyprland via `hypr.lua`, `hooks/*.d/`, `themes/<name>/`,
+  git `[include]`, a `source` line in `.bashrc`, `omarchy bar set`): Omarchy
+  keeps its defaults, and the feature only adds. Prefer these.
+- **Snapshot** (`starship.toml`, `hyprsunset.conf`, terminal configs, …):
+  the feature's copy replaces Omarchy's. Put Omarchy's current default at the
+  same path under `upstream/` so `./omarchy-diff` can merge later changes.
 
-So: `diff /usr/share/omarchy/config/<path> ~/.config/<path>` first. If it's
-identical to the default, don't track it. Prefer a layered equivalent (a
-`themed/` template, a hook, an `[include]`). If it has to be a snapshot, track
-it in `config/` and put Omarchy's current default at the same path under
-`upstream/`, so `./omarchy-diff` can show and merge later upstream changes.
-
-Keep override files to the lines that actually change something. Don't carry
-Omarchy's commented-out template examples.
-
-Settings that have a first-class command (`omarchy theme set`,
-`omarchy font set`) belong in README's "Set by command" section, not in a
-tracked file.
+`diff /usr/share/omarchy/config/<path> ~/.config/<path>` first. If it matches
+the default, it doesn't belong here. Keep files to the lines that actually
+change something, without Omarchy's commented-out template examples.
 
 ## Not in scope
 
 `main` is the archived pre-Omarchy setup (the `quill` Go CLI). Don't port its
-patterns here — this branch is deliberately a plain symlink repo.
+patterns here.

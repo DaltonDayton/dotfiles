@@ -1,0 +1,1 @@
+[[ $(stat -c %a ~/.ssh) == 700 ]] || run chmod 700 ~/.ssh

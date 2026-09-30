@@ -1,0 +1,2 @@
+# Run now rather than waiting for the next login.
+(( CHANGED )) && run nightlight-auto

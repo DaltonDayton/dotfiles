@@ -1,0 +1,1 @@
+[[ -d ~/Games/battlenet ]] || say "note: no Battle.net prefix yet; run: omarchy install gaming battlenet"

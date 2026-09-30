@@ -1,31 +1,254 @@
 #!/usr/bin/env bash
-# Symlink config/ → ~/.config and home/ → ~. Safe to rerun.
+# Apply a profile: for each feature it lists, install packages, link files, and
+# run its setup; undo features that were dropped from the list. Safe to rerun,
+# and silent when there's nothing to change.
+#   ./install.sh                  apply the current profile (asks for one the first time)
+#   ./install.sh --profile NAME   switch to profiles/NAME, then apply
+#   ./install.sh --pick           pick the profile's features from a checklist, then apply
 set -euo pipefail
-repo=$(cd "$(dirname "$0")" && pwd)
 
-link() { # <src> <dst>: move a real file aside, then link
-  mkdir -p "$(dirname "$2")"
-  if [[ -e $2 && ! -L $2 ]]; then mv "$2" "$2.bak.$(date +%s)"; fi
-  ln -sfn "$1" "$2"
+REPO=$(cd "$(dirname "$0")" && pwd)
+STATE=${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles
+LOG=$STATE/install.log
+mkdir -p "$STATE"
+touch "$STATE/links"
+
+# ------------------------------------------------------------------ output
+
+HEADER_DONE=0
+say() { # print and log a change; the log gets a header once per run
+  if (( ! HEADER_DONE )); then
+    HEADER_DONE=1
+    printf '\n== %s  profile=%s\n' "$(date '+%F %T')" "$PROFILE" >> "$LOG"
+  fi
+  echo "$*"
+  echo "$*" >> "$LOG"
+}
+run() { say "run: $*"; "$@"; }
+die() { echo "error: $*" >&2; exit 1; }
+
+# ------------------------------------------------------ helpers for setup/off
+
+ensure_line() { # <file> <line>
+  grep -qxF -- "$2" "$1" 2>/dev/null && return 0
+  printf '\n%s\n' "$2" >> "$1"
+  say "added to $1: $2"
+}
+remove_line() { # <file> <line>
+  grep -qxF -- "$2" "$1" 2>/dev/null || return 0
+  local tmp; tmp=$(mktemp)
+  grep -vxF -- "$2" "$1" > "$tmp" || true
+  cat "$tmp" > "$1" && rm "$tmp"
+  say "removed from $1: $2"
+}
+ensure_block() { # <file> <header> <line>: e.g. a git [include] section
+  grep -qxF -- "$3" "$1" 2>/dev/null && return 0
+  printf '\n%s\n%s\n' "$2" "$3" >> "$1"
+  say "added to $1: $2 $3"
+}
+remove_block() { # <file> <header> <line>: drops the line and the header just above it
+  grep -qxF -- "$3" "$1" 2>/dev/null || return 0
+  local tmp; tmp=$(mktemp)
+  awk -v h="$2" -v l="$3" '
+    { lines[NR] = $0 }
+    END {
+      for (i = 1; i <= NR; i++) {
+        if (lines[i] == h && lines[i + 1] == l) { i++; continue }
+        print lines[i]
+      }
+    }' "$1" > "$tmp"
+  cat "$tmp" > "$1" && rm "$tmp"
+  say "removed from $1: $2 $3"
+}
+start_once() { # <command>: start it now unless it's already running
+  pgrep -f "(^|/)$1( |$)" >/dev/null && return 0   # not -x: that only sees 15 chars
+  say "started $1"
+  setsid uwsm-app -- "$1" >/dev/null 2>&1 &
 }
 
-link "$repo/config/nvim" ~/.config/nvim   # whole dir: lazy.nvim writes into it
+SHELL_JSON=$HOME/.config/omarchy/shell.json
+bar_value() { # <id> <key>: current value as compact JSON, or null
+  jq -c --arg id "$1" --arg key "$2" \
+    'first(.bar.layout[]?[]? | objects | select(.id == $id) | .[$key]) // null' "$SHELL_JSON"
+}
+in_bar() { # <id>
+  jq -e --arg id "$1" \
+    'any(.bar.layout[]?[]?; (if type == "string" then . else .id end) == $id)' "$SHELL_JSON" >/dev/null
+}
+bar_set() { # <id> <key> <value> [--json]: only when it differs
+  local want
+  if [[ ${4:-} == --json ]]; then want=$(jq -c . <<<"$3"); else want=$(jq -cn --arg v "$3" '$v'); fi
+  [[ $(bar_value "$1" "$2") == "$want" ]] && return 0
+  say "run: omarchy bar set $*"; omarchy bar set "$@" >/dev/null
+}
+bar_put() { # <id> [placement...]
+  in_bar "$1" && return 0
+  say "run: omarchy bar put $*"; omarchy bar put "$@" >/dev/null
+}
+plugin_add() { # <id> <git url>
+  local dir=$HOME/.config/omarchy/plugins/$1
+  [[ -e $dir ]] && return 0
+  # Can exit nonzero on a harmless rescan failure, so check the clone instead.
+  run omarchy plugin add "$2" --yes || true
+  [[ -e $dir ]] || die "plugin $1 did not install"
+}
+plugin_off() { # <id>
+  in_bar "$1" || return 0
+  say "run: omarchy plugin disable $1"; omarchy plugin disable "$1" >/dev/null
+}
 
-find "$repo/config" "$repo/home" -type f \
-  -not -path '*/config/nvim/*' -not -name 'monitors.*.lua' -not -path '*/git/personal' |
-while read -r f; do
-  rel=${f#"$repo"/}
-  case $rel in
-    config/*) link "$f" ~/.config/"${rel#config/}" ;;
-    home/*)   link "$f" ~/"${rel#home/}" ;;
+# --------------------------------------------------------------- arguments
+
+PROFILE=""
+[[ -r $STATE/profile ]] && PROFILE=$(<"$STATE/profile")
+PICK=0
+while (( $# )); do
+  case $1 in
+    --profile) PROFILE=${2:?--profile needs a name}; shift ;;
+    --profile=*) PROFILE=${1#*=} ;;
+    --pick) PICK=1 ;;
+    *) die "unknown argument: $1" ;;
   esac
+  shift
 done
 
-mon="$repo/config/hypr/monitors.$(hostname).lua"
-if [[ -e $mon ]]; then link "$mon" ~/.config/hypr/monitors.lua; else echo "no monitors.$(hostname).lua, keeping Omarchy's"; fi
+if [[ -z $PROFILE ]]; then
+  PROFILE=$(find "$REPO/profiles" -type f -printf '%f\n' | sort | gum choose --header "Profile for this machine")
+fi
+PROFILE_FILE=$REPO/profiles/$PROFILE
+[[ -f $PROFILE_FILE ]] || die "no profile '$PROFILE' in profiles/"
+[[ $(cat "$STATE/profile" 2>/dev/null) == "$PROFILE" ]] || { echo "$PROFILE" > "$STATE/profile"; say "profile set to $PROFILE"; }
 
-# git has no drop-in dir, so include ours from Omarchy's config instead of replacing it.
-grep -qF "$repo/config/git/personal" ~/.config/git/config 2>/dev/null ||
-  printf '\n[include]\n\tpath = %s\n' "$repo/config/git/personal" >> ~/.config/git/config
+listed() { { grep -v '^[[:space:]]*#' "$PROFILE_FILE" || true; } | awk NF | sort -u; }
 
-"$repo/packages.sh"
+if (( PICK )); then
+  mapfile -t current < <(listed)
+  items=() selected=()
+  for d in "$REPO"/features/*/; do
+    n=$(basename "$d")
+    items+=("$(printf '%-24s %s' "$n" "$(cat "$d/about" 2>/dev/null)")")
+    printf '%s\n' "${current[@]}" | grep -qxF "$n" && selected+=("${items[-1]}")
+  done
+  chosen=$(IFS=,; gum choose --no-limit --height 40 --header "Features for $PROFILE (space to toggle)" \
+    --selected="${selected[*]}" "${items[@]}") || die "cancelled"
+  awk '{print $1}' <<<"$chosen" > "$PROFILE_FILE"
+  say "profiles/$PROFILE now lists: $(listed | tr '\n' ' ')"
+fi
+
+# ---------------------------------------------------------------- features
+
+mapfile -t WANT < <(listed)
+for f in "${WANT[@]}"; do [[ -d $REPO/features/$f ]] || die "profiles/$PROFILE lists '$f', but features/$f doesn't exist"; done
+
+targets() { # <feature>: "src<TAB>dst" for everything it links
+  local d=$REPO/features/$1 rel skip
+  [[ -f $d/hypr.lua ]] && printf '%s\t%s\n' "$d/hypr.lua" "$HOME/.config/hypr/features/$1.lua"
+  [[ -d $d/files ]] || return 0
+  local -a dirs=()
+  [[ -f $d/linkdirs ]] && mapfile -t dirs < "$d/linkdirs"
+  for rel in "${dirs[@]}"; do printf '%s\t%s\n' "$d/files/$rel" "$HOME/$rel"; done
+  while IFS= read -r rel; do
+    skip=0
+    for dir in "${dirs[@]}"; do [[ $rel == "$dir"/* ]] && skip=1; done
+    (( skip )) || printf '%s\t%s\n' "$d/files/$rel" "$HOME/$rel"
+  done < <(find "$d/files" -type f -printf '%P\n' | sort)
+}
+
+# Two features linking the same path (e.g. both night lights) can't both be on.
+dupes=$(for f in "${WANT[@]}"; do targets "$f" | cut -f2 | sed "s|^|$f\t|"; done | sort -t$'\t' -k2 | awk -F'\t' '
+  $2 == prev { print "  " pf " and " $1 " both link " $2 } { prev = $2; pf = $1 }')
+[[ -z $dupes ]] || die "conflicting features:"$'\n'"$dupes"
+
+was_linked() { cut -f2 "$STATE/links" | grep -qxF -- "$1"; }
+
+link() { # <feature> <src> <dst>
+  local src=$2 dst=$3
+  [[ $(readlink -- "$dst") == "$src" ]] && return 1
+  mkdir -p "$(dirname "$dst")"
+  if [[ -e $dst && ! -L $dst ]]; then
+    local ts; ts=$(date +%s)
+    if was_linked "$dst"; then
+      # Something (e.g. Omarchy's monitor scaling, which uses sed -i) replaced our link.
+      mv -- "$dst" "$dst.drift.$ts"
+      say "warning: $dst had been replaced by a real file; kept it as $dst.drift.$ts"
+      say "         compare: diff $src $dst.drift.$ts"
+    else
+      mv -- "$dst" "$dst.bak.$ts"
+      say "backed up $dst -> $dst.bak.$ts"
+    fi
+  fi
+  ln -sfn -- "$src" "$dst"
+  say "linked    $dst"
+}
+
+unlink_feature() { # <feature>: remove its links, restoring the newest backup
+  local f=$1 dst bak
+  while IFS=$'\t' read -r _ dst; do
+    [[ -L $dst && $(readlink -- "$dst") == "$REPO/features/$f/"* ]] || continue
+    rm -- "$dst"
+    bak=$(compgen -G "$dst.bak.*" | sort | tail -1 || true)
+    if [[ -n $bak ]]; then mv -- "$bak" "$dst"; say "unlinked  $dst (restored $bak)"; else say "unlinked  $dst"; fi
+  done < <(awk -F'\t' -v f="$f" '$1 == f' "$STATE/links")
+}
+
+run_script() { # <feature> <setup|off> <changed>
+  local s=$REPO/features/$1/$2
+  [[ -f $s ]] || return 0
+  ( FEATURE=$REPO/features/$1 CHANGED=$3; source "$s"; true ) || die "$1/$2 failed"
+}
+
+HYPR_CHANGED=0
+
+# 1. Hyprland loader: one line appended to Omarchy's hyprland.lua. Not
+#    require_all, because its find skips symlinks and every feature file is one.
+LOADER='for f in io.popen("find -L \"$HOME/.config/hypr/features\" -maxdepth 1 -name \"*.lua\" -printf \"%f\\n\" 2>/dev/null | sort"):lines() do require("hypr.features." .. f:gsub("%.lua$", "")) end -- dotfiles'
+if [[ -f ~/.config/hypr/hyprland.lua ]] && ! grep -qxF -- "$LOADER" ~/.config/hypr/hyprland.lua; then
+  ensure_line ~/.config/hypr/hyprland.lua "$LOADER"
+  HYPR_CHANGED=1
+fi
+
+# 2. Features dropped from the profile.
+APPLIED=()
+[[ -r $STATE/applied ]] && mapfile -t APPLIED < "$STATE/applied"
+for f in "${APPLIED[@]}"; do
+  printf '%s\n' "${WANT[@]}" | grep -qxF "$f" && continue
+  say "-- off: $f"
+  run_script "$f" off 1
+  [[ -f $REPO/features/$f/hypr.lua ]] && HYPR_CHANGED=1
+  unlink_feature "$f"
+done
+
+# 3. Features in the profile.
+NEW_LINKS=$(mktemp)
+for f in "${WANT[@]}"; do
+  d=$REPO/features/$f
+  missing=()
+  for list in packages aur; do
+    [[ -f $d/$list ]] || continue
+    want=()
+    while read -r p; do [[ -n $p ]] && ! pacman -Q "$p" &>/dev/null && want+=("$p"); done < "$d/$list"
+    (( ${#want[@]} )) || continue
+    if [[ $list == aur ]]; then run omarchy pkg aur add "${want[@]}"; else run omarchy pkg add "${want[@]}"; fi
+  done
+
+  changed=0
+  while IFS=$'\t' read -r src dst; do
+    printf '%s\t%s\n' "$f" "$dst" >> "$NEW_LINKS"
+    if link "$f" "$src" "$dst"; then
+      changed=1
+      [[ $dst == "$HOME/.config/hypr/"* ]] && HYPR_CHANGED=1
+    fi
+  done < <(targets "$f")
+
+  run_script "$f" setup "$changed"
+done
+
+printf '%s\n' "${WANT[@]}" | awk NF > "$STATE/applied"
+mv "$NEW_LINKS" "$STATE/links"
+
+# 4. Validate Hyprland once if anything it reads changed.
+if (( HYPR_CHANGED )) && command -v hyprctl >/dev/null && [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
+  hyprctl reload >/dev/null
+  errors=$(hyprctl configerrors)
+  if [[ -n $errors && $errors != "no errors" ]]; then say "hyprland config errors:"; say "$errors"; else say "hyprland reloaded, no config errors"; fi
+fi
