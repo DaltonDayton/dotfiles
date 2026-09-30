@@ -6,3 +6,5 @@ special-workspaces
 font
 cursor-bibata
 idle-inhibit-audio
+claude
+ssh-pve
