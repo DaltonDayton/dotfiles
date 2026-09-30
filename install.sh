@@ -230,7 +230,15 @@ drop_packages() { # <feature>: remove the packages install.sh installed for it
 run_script() { # <feature> <setup|off> <changed>
   local s=$REPO/features/$1/$2
   [[ -f $s ]] || return 0
-  ( FEATURE=$REPO/features/$1 CHANGED=$3; source "$s"; true ) || die "$1/$2 failed"
+  # Not `( … ) || die`: bash ignores set -e inside anything on the left of ||,
+  # so a failing command in the script would go unnoticed.
+  local rc
+  set +e
+  # The trailing `:` keeps a final `[[ … ]] && cmd` from counting as a failure.
+  ( set -e; FEATURE=$REPO/features/$1 CHANGED=$3; eval "$(<"$s")"$'\n:' )
+  rc=$?
+  set -e
+  (( rc == 0 )) || die "$1/$2 failed (exit $rc)"
 }
 
 HYPR_CHANGED=0
