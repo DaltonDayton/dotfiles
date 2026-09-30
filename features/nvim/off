@@ -1,0 +1,8 @@
+# Restore the data dirs setup moved aside; keep ours next to them.
+ts=$(date +%s)
+for d in ~/.local/share/nvim ~/.local/state/nvim ~/.cache/nvim; do
+  bak=$(compgen -G "$d.bak.*" | sort | tail -1 || true)
+  [[ -n $bak ]] || continue
+  [[ -e $d ]] && run mv "$d" "$d.dotfiles.$ts"
+  run mv "$bak" "$d"
+done

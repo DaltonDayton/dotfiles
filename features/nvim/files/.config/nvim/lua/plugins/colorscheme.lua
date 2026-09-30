@@ -20,7 +20,6 @@ local catalogue = {
   { "ellisonleao/gruvbox.nvim" },
   { "ficcdaf/ashen.nvim" },
   { "folke/tokyonight.nvim" },
-  { "gthelding/monokai-pro.nvim" },
   { "kepano/flexoki-neovim" },
   { "neanias/everforest-nvim" },
   { "OldJobobo/miasma.nvim" },
