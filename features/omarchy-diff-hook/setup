@@ -1,4 +1,0 @@
-hook=~/.config/omarchy/hooks/post-update.d/omarchy-diff.hook
-tmp=$(mktemp -d)/omarchy-diff.hook
-printf '#!/bin/bash\n# Installed by the dotfiles omarchy-diff-hook feature.\nchanges=$(%q/omarchy-diff 2>&1 | grep "^== " | cut -c4- | tr "\\n" " ")\n[[ -n $changes ]] && notify-send "Omarchy changed snapshot configs" "$changes- run ./omarchy-diff in ~/dotfiles"\nexit 0\n' "$REPO" > "$tmp"
-cmp -s "$tmp" "$hook" || run omarchy hook install post-update "$tmp"

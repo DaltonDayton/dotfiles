@@ -1,1 +1,0 @@
-remove_block ~/.config/git/config "[include]" "	path = $FEATURE/personal"

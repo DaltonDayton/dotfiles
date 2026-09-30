@@ -1,0 +1,18 @@
+# git: personal settings via [include]
+ensure_block ~/.config/git/config "[include]" "	path = $FEATURE/personal"
+
+# bash: aliases and sdev
+ensure_line ~/.bashrc "source $FEATURE/bashrc"
+
+# Claude as the default coding agent
+[[ $(cat ~/.config/omarchy/defaults/agent 2>/dev/null) == claude ]] || run omarchy default agent claude
+
+# idle goes straight to lock
+[[ -e ~/.local/state/omarchy/toggles/screensaver-off ]] || run omarchy toggle screensaver-off on
+
+# notify after omarchy update when a snapshot file changed upstream
+hook=~/.config/omarchy/hooks/post-update.d/omarchy-diff.hook
+tmp=$(mktemp -d)/omarchy-diff.hook
+printf '#!/bin/bash\n# Installed by the dotfiles basics feature.\nchanges=$(%q/omarchy-diff 2>&1 | grep "^== " | cut -c4- | tr "\\n" " ")\n[[ -n $changes ]] && notify-send "Omarchy changed snapshot configs" "$changes- run ./omarchy-diff in ~/dotfiles"\nexit 0\n' "$REPO" > "$tmp"
+cmp -s "$tmp" "$hook" || run omarchy hook install post-update "$tmp"
+rm -r "${tmp%/*}"

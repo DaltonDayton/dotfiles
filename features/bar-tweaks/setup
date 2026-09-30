@@ -1,0 +1,3 @@
+bar_set omarchy.clock format "ddd d MMM HH:mm"
+bar_set omarchy.power showPercentage true --json
+bar_set omarchy.tray pinned '["steam","discord_status_icon_1","NordVPN"]' --json

@@ -1,1 +1,0 @@
-[[ -e ~/.local/state/omarchy/toggles/screensaver-off ]] && run omarchy toggle screensaver-off off

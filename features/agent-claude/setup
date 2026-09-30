@@ -1,1 +1,0 @@
-[[ $(cat ~/.config/omarchy/defaults/agent 2>/dev/null) == claude ]] || run omarchy default agent claude

@@ -1,1 +1,0 @@
-ensure_line ~/.bashrc "source $FEATURE/bashrc"

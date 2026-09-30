@@ -50,7 +50,7 @@ and prints the `diff` command so you can pull the change in.
 
 A few features ship a snapshot of an Omarchy file (`starship.toml`,
 `hyprsunset.conf`). Omarchy's version as of the last sync lives in `upstream/`.
-After `omarchy update` (the `omarchy-diff-hook` feature sends a notification):
+After `omarchy update` (the `basics` feature sends a notification):
 
 ```sh
 ./omarchy-diff           # what Omarchy changed since the last sync

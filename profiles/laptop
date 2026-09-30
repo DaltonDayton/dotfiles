@@ -1,1 +1,3 @@
 # One feature per line (see features/). Add with ./install.sh --pick or by hand.
+basics
+hypr-tweaks

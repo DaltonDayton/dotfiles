@@ -1,2 +1,0 @@
-hook=~/.config/omarchy/hooks/post-update.d/omarchy-diff.hook
-[[ -e $hook ]] && run rm "$hook"
