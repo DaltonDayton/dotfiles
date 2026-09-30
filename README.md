@@ -60,6 +60,9 @@ After `omarchy update` (the `basics` feature sends a notification):
 ## By hand
 
 - **Git signing:** `~/.config/git/config.local` with `user.signingkey` and `commit.gpgsign`.
+- **Dictation:** `omarchy voxtype install`, then `sudo voxtype setup gpu --enable` (Omarchy's install
+  tries this but ignores a failure) and `omarchy voxtype model` -> `large-v3-turbo`. The desktop's
+  `yt-transcript` uses that same model.
 - **Battle.net:** `omarchy install gaming battlenet` before enabling `battlenet-tsm`.
 - **ImprovedTube:** import `other_configs/improvedtube.json` from the extension's options page.
 - **Claude Code ECC plugin:** `/plugin marketplace add affaan-m/ecc`, then `/plugin install ecc@ecc`.

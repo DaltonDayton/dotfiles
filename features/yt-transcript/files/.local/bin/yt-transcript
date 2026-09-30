@@ -17,7 +17,7 @@
 #   -l LANG     spoken language          [en]
 #   --keep      keep the extracted .wav next to the transcript
 #
-# Needs: yt-dlp, ffmpeg, whisper-cpp + ggml-vulkan + ggml-cpu (packages.sh).
+# Needs: yt-dlp, ffmpeg, whisper-cpp + ggml-vulkan + ggml-cpu (the yt-transcript feature).
 set -euo pipefail
 
 usage() { sed -n '2,/^set -/p' "$0" | sed '$d' | cut -c3-; }
