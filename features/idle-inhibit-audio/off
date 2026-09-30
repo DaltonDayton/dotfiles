@@ -1,0 +1,1 @@
+pgrep -f '(^|/)wayland-pipewire-idle-inhibit( |$)' >/dev/null && run pkill -f '(^|/)wayland-pipewire-idle-inhibit( |$)'

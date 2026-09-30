@@ -1,0 +1,5 @@
+# Cancel the booked sunrise/sunset timers, then turn the night light off.
+for t in $(systemctl --user list-units --plain --no-legend 'nightlight-auto-*.timer' | awk '{print $1}'); do
+  run systemctl --user stop "$t"
+done
+omarchy toggle nightlight --status 2>/dev/null | jq -e .enabled >/dev/null && run omarchy toggle nightlight

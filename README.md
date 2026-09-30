@@ -13,10 +13,17 @@ git clone git@github.com:DaltonDayton/dotfiles.git ~/dotfiles
 ```
 
 `install.sh` applies `profiles/<profile>`, one feature name per line. For each
-feature it installs missing packages, links its files, and runs its setup. A
-feature dropped from the list is undone, and Omarchy's own file comes back if
-one was moved aside. Rerunning changes nothing unless the list or a feature
-changed. Every change is also logged to `~/.local/state/dotfiles/install.log`.
+feature it installs missing packages, links its files, and runs its setup.
+Rerunning changes nothing unless the list or a feature changed. Every change is
+also logged to `~/.local/state/dotfiles/install.log`.
+
+Dropping a feature from the list undoes it on the next run:
+- runs its `off` (removes added lines, resets bar settings, disables plugins, stops what it started)
+- removes its links, restoring the Omarchy file each one replaced
+- removes the packages install.sh installed for it (`omarchy pkg drop`), keeping
+  any that were already there or that another enabled feature lists
+
+It leaves plugin clones, empty directories, and `.drift` files behind.
 
 ## Features
 

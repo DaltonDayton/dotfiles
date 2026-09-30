@@ -5,13 +5,16 @@
 #   ./install.sh                  apply the current profile (asks for one the first time)
 #   ./install.sh --profile NAME   switch to profiles/NAME, then apply
 #   ./install.sh --pick           pick the profile's features from a checklist, then apply
+#
+# Dropping a feature runs its `off`, removes its links (restoring any file they
+# replaced), and removes the packages install.sh installed for it.
 set -euo pipefail
 
 REPO=$(cd "$(dirname "$0")" && pwd)
 STATE=${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles
 LOG=$STATE/install.log
 mkdir -p "$STATE"
-touch "$STATE/links"
+touch "$STATE/links" "$STATE/packages"
 
 # ------------------------------------------------------------------ output
 
@@ -191,6 +194,39 @@ unlink_feature() { # <feature>: remove its links, restoring the newest backup
   done < <(awk -F'\t' -v f="$f" '$1 == f' "$STATE/links")
 }
 
+needed_by() { # <package>: an enabled feature that lists it, if any
+  local g
+  for g in "${WANT[@]}"; do
+    grep -qxF -- "$1" "$REPO/features/$g/packages" "$REPO/features/$g/aur" 2>/dev/null && { echo "$g"; return 0; }
+  done
+  return 0
+}
+
+drop_packages() { # <feature>: remove the packages install.sh installed for it
+  local f=$1 p owner tmp drop=()
+  mapfile -t mine < <(awk -F'\t' -v f="$f" '$1 == f { print $2 }' "$STATE/packages")
+  (( ${#mine[@]} )) || return 0
+  tmp=$(mktemp)
+  awk -F'\t' -v f="$f" '$1 != f' "$STATE/packages" > "$tmp"
+  for p in "${mine[@]}"; do
+    owner=$(needed_by "$p")
+    if [[ -n $owner ]]; then
+      printf '%s\t%s\n' "$owner" "$p" >> "$tmp"
+      say "kept $p (still needed by $owner)"
+    else
+      drop+=("$p")
+    fi
+  done
+  mv "$tmp" "$STATE/packages"
+  (( ${#drop[@]} )) || return 0
+  run omarchy pkg drop "${drop[@]}" && return 0
+  say "warning: could not remove ${drop[*]} (something else may depend on them)"
+  for p in "${drop[@]}"; do   # keep tracking whatever is still installed
+    pacman -Q "$p" &>/dev/null && printf '%s\t%s\n' "$f" "$p" >> "$STATE/packages"
+  done
+  return 0
+}
+
 run_script() { # <feature> <setup|off> <changed>
   local s=$REPO/features/$1/$2
   [[ -f $s ]] || return 0
@@ -216,6 +252,7 @@ for f in "${APPLIED[@]}"; do
   run_script "$f" off 1
   [[ -f $REPO/features/$f/hypr.lua ]] && HYPR_CHANGED=1
   unlink_feature "$f"
+  drop_packages "$f"
 done
 
 # 3. Features in the profile.
@@ -229,6 +266,8 @@ for f in "${WANT[@]}"; do
     while read -r p; do [[ -n $p ]] && ! pacman -Q "$p" &>/dev/null && want+=("$p"); done < "$d/$list"
     (( ${#want[@]} )) || continue
     if [[ $list == aur ]]; then run omarchy pkg aur add "${want[@]}"; else run omarchy pkg add "${want[@]}"; fi
+    # Only what install.sh installed gets removed again when the feature is dropped.
+    printf "$f\t%s\n" "${want[@]}" >> "$STATE/packages"
   done
 
   changed=0

@@ -1,0 +1,1 @@
+omarchy toggle nightlight --status 2>/dev/null | jq -e .enabled >/dev/null && run omarchy toggle nightlight
