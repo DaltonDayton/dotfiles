@@ -18,12 +18,12 @@ Rerunning changes nothing unless the list or a feature changed. Every change is
 also logged to `~/.local/state/dotfiles/install.log`.
 
 Dropping a feature from the list undoes it on the next run:
-- runs its `off` (removes added lines, resets bar settings, disables plugins, stops what it started)
+- runs its `off` (removes added lines, resets bar settings, stops what it started)
 - removes its links, restoring the Omarchy file each one replaced
 - removes the packages install.sh installed for it (`omarchy pkg drop`), keeping
   any that were already there or that another enabled feature lists
 
-It leaves plugin clones, empty directories, and `.drift` files behind.
+It leaves empty directories and `.drift` files behind.
 
 ## Features
 
@@ -36,7 +36,7 @@ It leaves plugin clones, empty directories, and `.drift` files behind.
 | `files/…` | mirrors `~`, and each file is symlinked there. Any real file in the way is moved to `.bak.<epoch>` |
 | `linkdirs` | paths under `files/` to link as one directory (e.g. nvim, which lazy.nvim writes into) |
 | `packages`, `aur` | installed with `omarchy pkg add` / `omarchy pkg aur add` |
-| `setup`, `off` | bash sourced by install.sh with helpers (`run`, `ensure_line`, `bar_set`, `bar_put`, `plugin_add`, …); must be safe to rerun |
+| `setup`, `off` | bash sourced by install.sh with helpers (`run`, `ensure_line`, `bar_set`, …); must be safe to rerun |
 
 Omarchy's `bindings.lua`, `input.lua`, `looknfeel.lua`, `autostart.lua`,
 `.bashrc`, git config, and `shell.json` stay Omarchy's. Features add to them

@@ -1,2 +1,0 @@
-plugin_add crmne.hyprmoncfg https://github.com/crmne/omarchy-hyprmoncfg.git
-bar_put crmne.hyprmoncfg --after omarchy.tray

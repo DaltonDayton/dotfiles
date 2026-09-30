@@ -15,12 +15,12 @@ themes, hooks, `omarchy` commands). This file only covers the repo itself.
   idempotent and quiet when nothing changes.
 - Linked files are live: editing the repo copy edits the real config.
 - `setup`/`off` are sourced by install.sh. Use its helpers (`run`, `say`,
-  `ensure_line`, `remove_line`, `ensure_block`, `bar_set`, `bar_put`,
-  `plugin_add`, `plugin_off`) and guard every action so a rerun
+  `ensure_line`, `remove_line`, `ensure_block`, `remove_block`, `bar_set`)
+  and guard every action so a rerun
   does nothing. `$FEATURE` is the feature dir, and `$CHANGED` is 1 when its links
   just changed.
-- Prefer Omarchy's own commands (`omarchy pkg add`, `omarchy bar set/put`,
-  `omarchy plugin add`, `omarchy font set`, `omarchy hook install`, …) over
+- Prefer Omarchy's own commands (`omarchy pkg add`, `omarchy bar set`,
+  `omarchy font set`, `omarchy hook install`, …) over
   editing their files.
 - Never edit `/usr/share/omarchy/`. It's package-owned. Reading it is fine.
 - Validate Hyprland changes with `hyprctl reload && hyprctl configerrors`

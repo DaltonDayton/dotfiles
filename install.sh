@@ -69,30 +69,11 @@ bar_value() { # <id> <key>: current value as compact JSON, or null
   jq -c --arg id "$1" --arg key "$2" \
     'first(.bar.layout[]?[]? | objects | select(.id == $id) | .[$key]) // null' "$SHELL_JSON"
 }
-in_bar() { # <id>
-  jq -e --arg id "$1" \
-    'any(.bar.layout[]?[]?; (if type == "string" then . else .id end) == $id)' "$SHELL_JSON" >/dev/null
-}
 bar_set() { # <id> <key> <value> [--json]: only when it differs
   local want
   if [[ ${4:-} == --json ]]; then want=$(jq -c . <<<"$3"); else want=$(jq -cn --arg v "$3" '$v'); fi
   [[ $(bar_value "$1" "$2") == "$want" ]] && return 0
   say "run: omarchy bar set $*"; omarchy bar set "$@" >/dev/null
-}
-bar_put() { # <id> [placement...]
-  in_bar "$1" && return 0
-  say "run: omarchy bar put $*"; omarchy bar put "$@" >/dev/null
-}
-plugin_add() { # <id> <git url>
-  local dir=$HOME/.config/omarchy/plugins/$1
-  [[ -e $dir ]] && return 0
-  # Can exit nonzero on a harmless rescan failure, so check the clone instead.
-  run omarchy plugin add "$2" --yes || true
-  [[ -e $dir ]] || die "plugin $1 did not install"
-}
-plugin_off() { # <id>
-  in_bar "$1" || return 0
-  say "run: omarchy plugin disable $1"; omarchy plugin disable "$1" >/dev/null
 }
 
 # --------------------------------------------------------------- arguments
