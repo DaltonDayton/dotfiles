@@ -63,11 +63,6 @@ remove_block() { # <file> <header> <line>: drops the line and the header just ab
   cat "$tmp" > "$1" && rm "$tmp"
   say "removed from $1: $2 $3"
 }
-start_once() { # <command>: start it now unless it's already running
-  pgrep -f "(^|/)$1( |$)" >/dev/null && return 0   # not -x: that only sees 15 chars
-  say "started $1"
-  setsid uwsm-app -- "$1" >/dev/null 2>&1 &
-}
 
 SHELL_JSON=$HOME/.config/omarchy/shell.json
 bar_value() { # <id> <key>: current value as compact JSON, or null
@@ -184,15 +179,17 @@ link() { # <feature> <src> <dst>
   say "linked    $dst"
 }
 
-unlink_feature() { # <feature>: remove its links, restoring the newest backup
-  local f=$1 dst bak
-  while IFS=$'\t' read -r _ dst; do
+unlink_entries() { # stdin: "feature<TAB>dst" lines. Remove our links, restoring the newest backup.
+  local f dst bak
+  while IFS=$'\t' read -r f dst; do
     [[ -L $dst && $(readlink -- "$dst") == "$REPO/features/$f/"* ]] || continue
     rm -- "$dst"
+    [[ $dst == "$HOME/.config/hypr/"* ]] && HYPR_CHANGED=1
     bak=$(compgen -G "$dst.bak.*" | sort | tail -1 || true)
     if [[ -n $bak ]]; then mv -- "$bak" "$dst"; say "unlinked  $dst (restored $bak)"; else say "unlinked  $dst"; fi
-  done < <(awk -F'\t' -v f="$f" '$1 == f' "$STATE/links")
+  done
 }
+unlink_feature() { unlink_entries < <(awk -F'\t' -v f="$1" '$1 == f' "$STATE/links"); }
 
 needed_by() { # <package>: an enabled feature that lists it, if any
   local g
@@ -204,7 +201,7 @@ needed_by() { # <package>: an enabled feature that lists it, if any
 
 drop_packages() { # <feature>: remove the packages install.sh installed for it
   local f=$1 p owner tmp drop=()
-  mapfile -t mine < <(awk -F'\t' -v f="$f" '$1 == f { print $2 }' "$STATE/packages")
+  mapfile -t mine < <(awk -F'\t' -v f="$f" '$1 == f { print $2 }' "$STATE/packages" | sort -u)
   (( ${#mine[@]} )) || return 0
   tmp=$(mktemp)
   awk -F'\t' -v f="$f" '$1 != f' "$STATE/packages" > "$tmp"
@@ -215,6 +212,8 @@ drop_packages() { # <feature>: remove the packages install.sh installed for it
       say "kept $p (still needed by $owner)"
     else
       drop+=("$p")
+      # makepkg's default OPTIONS include debug, so AUR builds bring a -debug package along.
+      if pacman -Q "$p-debug" &>/dev/null; then drop+=("$p-debug"); fi
     fi
   done
   mv "$tmp" "$STATE/packages"
@@ -289,6 +288,9 @@ for f in "${WANT[@]}"; do
 
   run_script "$f" setup "$changed"
 done
+
+# Links a still-enabled feature no longer ships (e.g. a deleted hypr.lua).
+unlink_entries < <(sort "$STATE/links" | comm -23 - <(sort "$NEW_LINKS"))
 
 printf '%s\n' "${WANT[@]}" | awk NF > "$STATE/applied"
 mv "$NEW_LINKS" "$STATE/links"

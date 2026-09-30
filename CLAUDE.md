@@ -16,7 +16,7 @@ themes, hooks, `omarchy` commands). This file only covers the repo itself.
 - Linked files are live: editing the repo copy edits the real config.
 - `setup`/`off` are sourced by install.sh. Use its helpers (`run`, `say`,
   `ensure_line`, `remove_line`, `ensure_block`, `bar_set`, `bar_put`,
-  `plugin_add`, `plugin_off`, `start_once`) and guard every action so a rerun
+  `plugin_add`, `plugin_off`) and guard every action so a rerun
   does nothing. `$FEATURE` is the feature dir, and `$CHANGED` is 1 when its links
   just changed.
 - Prefer Omarchy's own commands (`omarchy pkg add`, `omarchy bar set/put`,

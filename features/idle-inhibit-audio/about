@@ -1,1 +1,1 @@
-Don't idle-lock while audio is playing
+Don't idle-lock while audio is playing (packaged systemd user service)
