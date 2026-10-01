@@ -1,9 +1,0 @@
-# Keep the ASMedia ASM4242 USB4 block (PCIe upstream/downstream ports, xHCI,
-# USB4 host router) out of runtime suspend.
-#
-# Left on "auto" the whole block idles in D3cold, and anything that reads PCI
-# config space (lspci, which the Omarchy menu's hybrid-GPU guard runs on every
-# open) wakes it. The chip intermittently fails that resume, falls off the bus,
-# and the NVIDIA ISR then hard-locks the CPU on a register read. Two freezes
-# traced to this on 2026-09-01 and 2026-09-06. See README "Set by command".
-ACTION=="add", SUBSYSTEM=="pci", ATTR{vendor}=="0x1b21", ATTR{device}=="0x242[1356]", ATTR{power/control}="on"

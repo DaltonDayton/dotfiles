@@ -1,9 +1,0 @@
-# Browsers only inhibit for visible video. Must be a Wayland inhibitor:
-# Omarchy's idle service ignores logind's idle lock. Runs as the package's own
-# systemd user service (starts with the session, restarts on crash).
-unit=wayland-pipewire-idle-inhibit.service
-if ! systemctl --user -q is-enabled "$unit"; then
-  # One started some other way (e.g. Hyprland autostart) would run twice.
-  pgrep -x wayland-pipewir >/dev/null && run pkill -x wayland-pipewir
-  run systemctl --user enable --now "$unit"
-fi

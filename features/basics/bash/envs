@@ -1,0 +1,31 @@
+# Editor used by CLI
+export EDITOR="${EDITOR:-nvim}"
+export SUDO_EDITOR="$EDITOR"
+
+# Used by terminal programs (like gh and claude) to open URLs. wslview (from
+# the wslu package) hands them to the Windows default browser.
+export BROWSER="${BROWSER:-wslview}"
+export BAT_THEME=ansi
+
+# Color man pages with bat
+export MANROFFOPT="-c"
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+
+# Bash started by herdr's remote bridge skips the login profile and lands in
+# the C locale, where printf emits \u/\U escapes literally.
+if [ -z "${LANG:-}" ]; then
+  export LANG=C.UTF-8
+fi
+
+# User-level tool paths, appended so system binaries keep precedence. The mise
+# shims are what let `command -v starship` succeed before mise's prompt hook
+# has run (see init).
+case ":$PATH:" in
+  *":$HOME/.local/share/mise/shims:"*) ;;
+  *) PATH="$PATH:$HOME/.local/share/mise/shims" ;;
+esac
+case ":$PATH:" in
+  *":$HOME/.local/bin:"*) ;;
+  *) PATH="$PATH:$HOME/.local/bin" ;;
+esac
+export PATH

@@ -1,1 +1,15 @@
-playerctl
+build-essential
+curl
+unzip
+git
+tmux
+fzf
+zoxide
+eza
+bat
+ripgrep
+fd-find
+jq
+btop
+bash-completion
+wslu

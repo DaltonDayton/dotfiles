@@ -1,14 +1,12 @@
-# Omarchy's installer does more than drop a binary (python also gets uv), so
-# use it rather than calling mise directly. Only what's missing gets installed,
-# and only those are recorded for off to remove.
-export PATH=$HOME/.local/share/mise/shims:$PATH
-have() { mise ls --global --installed "$1" 2>/dev/null | grep -q .; }
-for lang in go dotnet python node; do
-  have "$lang" && continue
-  run omarchy install dev-env "$lang"
-  if have "$lang"; then
-    grep -qxF "$lang" "$STATE/dev-envs" 2>/dev/null || echo "$lang" >> "$STATE/dev-envs"
-  else
-    say "warning: omarchy install dev-env $lang finished but mise doesn't list $lang"
-  fi
-done
+# Ruby the way `omarchy install dev-env ruby` does it: mise's precompiled
+# builds (which target Ubuntu) rather than compiling, .ruby-version files
+# honoured, no gem docs. The settings must land before the install, so ruby
+# isn't in the mise list like dotnet and node are.
+mise settings get ruby.compile 2>/dev/null | grep -qx false || run mise settings add ruby.compile false
+mise settings get idiomatic_version_file_enable_tools 2>/dev/null | grep -q ruby || run mise settings add idiomatic_version_file_enable_tools ruby
+[[ $(cat ~/.gemrc 2>/dev/null) == "gem: --no-document" ]] || { echo "gem: --no-document" > ~/.gemrc; say "wrote ~/.gemrc"; }
+if ! mise ls --global --installed ruby 2>/dev/null | grep -q .; then
+  run mise use --global ruby@latest
+  touch "$STATE/dev-envs-ruby"
+fi
+mise x ruby -- gem list -i rails >/dev/null 2>&1 || run mise x ruby -- gem install rails --no-document

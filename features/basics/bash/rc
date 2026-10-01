@@ -1,0 +1,12 @@
+# Sourced from ~/.bashrc by the dotfiles basics feature. A snapshot of
+# Omarchy's default/bash/ (Omarchy 4.0.4) trimmed for a terminal-only Ubuntu
+# box, plus personal additions. It doesn't track Omarchy; edit freely.
+DOTFILES_BASH=${BASH_SOURCE[0]%/*}
+source "$DOTFILES_BASH/envs"
+[[ $- != *i* ]] && return
+source "$DOTFILES_BASH/shell"
+source "$DOTFILES_BASH/aliases"
+for f in "$DOTFILES_BASH"/fns/*; do source "$f"; done
+source "$DOTFILES_BASH/init"
+bind -f "$DOTFILES_BASH/inputrc"
+source "$DOTFILES_BASH/personal"
