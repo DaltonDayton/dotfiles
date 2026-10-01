@@ -30,7 +30,15 @@ return {
       },
     },
     dependencies = {
-      { "mason-org/mason.nvim", opts = {} },
+      {
+        "mason-org/mason.nvim",
+        opts = {},
+        init = function()
+          -- ~/.npmrc may point at a private registry whose token expires; editor
+          -- tools come from public npm so they never depend on that login.
+          vim.env.npm_config_registry = "https://registry.npmjs.org/"
+        end,
+      },
       "neovim/nvim-lspconfig",
     },
   },
