@@ -301,17 +301,25 @@ function M.debug_test_at_cursor()
   -- Notify user
   vim.notify("Debugging Playwright test: " .. test_name, vim.log.levels.INFO)
 
-  -- Launch DAP debugger with secured parameters
+  -- Launch DAP debugger with secured parameters.
+  -- Run through the PROJECT's Playwright CLI (node node_modules/playwright/cli.js),
+  -- NOT `npx playwright` — npx can resolve a different/global @playwright/test than
+  -- the one the spec imports, which triggers "did not expect test.describe() to be
+  -- called here" / "two different versions of @playwright/test". Playwright runs the
+  -- test in a worker subprocess, so autoAttachChildProcesses is required for
+  -- breakpoints in the spec to bind.
+  local cwd = vim.fn.getcwd()
   require("dap").run({
     type = "pwa-node",
     request = "launch",
     name = "Debug Playwright Test",
-    runtimeExecutable = "npx",
-    -- SECURITY: Test name is escaped, passed as separate array element (not concatenated)
-    runtimeArgs = { "playwright", "test", "--headed", "--timeout", "0", "-g", escaped_name },
-    -- SECURITY: Use relative path from validated absolute path
-    args = { vim.fn.fnamemodify(validated_path, ":.") },
-    cwd = vim.fn.getcwd(),
+    runtimeExecutable = "node",
+    program = cwd .. "/node_modules/playwright/cli.js",
+    -- SECURITY: Test name is escaped, passed as separate array element (not concatenated).
+    -- SECURITY: Use relative path from validated absolute path.
+    args = { "test", vim.fn.fnamemodify(validated_path, ":."), "--headed", "--timeout", "0", "--workers", "1", "-g", escaped_name },
+    cwd = cwd,
+    autoAttachChildProcesses = true,
     console = "integratedTerminal",
     internalConsoleOptions = "neverOpen",
   })
