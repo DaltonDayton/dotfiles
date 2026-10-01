@@ -1,6 +1,6 @@
-# Omarchy's install leaves LazyVim's plugins and mason tools in the data dirs.
-# lazy.nvim would reuse those checkouts instead of lazy-lock.json's commits, so
-# start clean when the config is first linked. off puts them back.
+# A previous nvim setup may have left plugins and mason tools in the data
+# dirs. lazy.nvim would reuse those checkouts instead of lazy-lock.json's
+# commits, so start clean when the config is first linked. off puts them back.
 if (( CHANGED )); then
   ts=$(date +%s)
   for d in ~/.local/share/nvim ~/.local/state/nvim ~/.cache/nvim; do

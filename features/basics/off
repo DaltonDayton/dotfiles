@@ -1,5 +1,2 @@
-remove_block ~/.config/git/config "[include]" "	path = $FEATURE/personal"
-remove_line ~/.bashrc "source $FEATURE/bashrc"
-[[ -e ~/.local/state/omarchy/toggles/screensaver-off ]] && run omarchy toggle screensaver-off off
-hook=~/.config/omarchy/hooks/post-update.d/omarchy-diff.hook
-[[ -e $hook ]] && run rm "$hook"
+remove_line ~/.bashrc "source $FEATURE/bash/rc"
+for b in bat fd; do [[ -L ~/.local/bin/$b ]] && run rm ~/.local/bin/$b; done

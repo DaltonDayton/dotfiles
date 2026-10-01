@@ -1,2 +1,0 @@
-rule=/etc/udev/rules.d/90-asm4242-no-d3cold.rules
-if [[ -e $rule ]]; then run sudo rm "$rule"; run sudo udevadm control --reload; fi

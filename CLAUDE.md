@@ -1,47 +1,27 @@
-# dotfiles (Omarchy)
+# dotfiles (wsl branch)
 
-Overrides for an [Omarchy](https://omarchy.org/) system, organized as opt-in
-features that per-machine profiles select. See `README.md` for the layout.
-
-Omarchy ships a Claude skill at `~/.claude/skills/omarchy/`. Use it for any
-question about *what* to put in these configs (Hyprland bindings, bar widgets,
-themes, hooks, `omarchy` commands). This file only covers the repo itself.
+Terminal-only config for Ubuntu 24.04 under WSL, organized as opt-in features
+that a profile selects. See `README.md` for the layout. There is no desktop,
+window manager, or Omarchy on this machine; `features/basics/bash/` is a
+one-time snapshot of Omarchy's shell defaults and is edited directly.
 
 ## Working here
 
-- A feature is `features/<name>/`: `about`, and any of `hypr.lua`, `files/`,
-  `linkdirs`, `packages`, `aur`, `setup`, `off`. Profiles in `profiles/` list
+- A feature is `features/<name>/`: `about`, and any of `files/`, `linkdirs`,
+  `packages` (apt), `mise`, `setup`, `off`. Profiles in `profiles/` list
   feature names. `./install.sh` applies the current profile and must stay
   idempotent and quiet when nothing changes.
 - Linked files are live: editing the repo copy edits the real config.
 - `setup`/`off` are sourced by install.sh. Use its helpers (`run`, `say`,
-  `ensure_line`, `remove_line`, `ensure_block`, `remove_block`, `bar_set`)
-  and guard every action so a rerun
-  does nothing. `$FEATURE` is the feature dir, and `$CHANGED` is 1 when its links
-  just changed.
-- Prefer Omarchy's own commands (`omarchy pkg add`, `omarchy bar set`,
-  `omarchy font set`, `omarchy hook install`, …) over
-  editing their files.
-- Never edit `/usr/share/omarchy/`. It's package-owned. Reading it is fine.
-- Validate Hyprland changes with `hyprctl reload && hyprctl configerrors`
-  (install.sh does this when a hypr file changed).
-
-## Before adding a file to a feature
-
-Omarchy layers some config and snapshots the rest:
-
-- **Layered** (Hyprland via `hypr.lua`, `hooks/*.d/`, `themes/<name>/`,
-  git `[include]`, a `source` line in `.bashrc`, `omarchy bar set`): Omarchy
-  keeps its defaults, and the feature only adds. Prefer these.
-- **Snapshot** (`starship.toml`, `hyprsunset.conf`, terminal configs, …):
-  the feature's copy replaces Omarchy's. Put Omarchy's current default at the
-  same path under `upstream/` so `./omarchy-diff` can merge later changes.
-
-`diff /usr/share/omarchy/config/<path> ~/.config/<path>` first. If it matches
-the default, it doesn't belong here. Keep files to the lines that actually
-change something, without Omarchy's commented-out template examples.
+  `ensure_line`, `remove_line`, `ensure_block`, `remove_block`) and guard every
+  action so a rerun does nothing. `$FEATURE` is the feature dir, `$STATE` is
+  `~/.local/state/dotfiles`, and `$CHANGED` is 1 when its links just changed.
+- Prefer apt for a tool when Ubuntu's version is recent enough, and mise
+  otherwise (its registry covers most CLI tools; `mise registry | grep name`).
+- Keep files to the lines that actually change something.
 
 ## Not in scope
 
-`main` is the archived pre-Omarchy setup (the `quill` Go CLI). Don't port its
-patterns here.
+`slim` is the Omarchy setup for the personal machines and `main` is the
+archived pre-Omarchy one. Don't port patterns from either here; this branch is
+managed on its own.

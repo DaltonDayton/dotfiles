@@ -1,2 +1,0 @@
-unit=wayland-pipewire-idle-inhibit.service
-if systemctl --user -q is-enabled "$unit"; then run systemctl --user disable --now "$unit"; fi

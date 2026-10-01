@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# Apply a profile: for each feature it lists, install packages, link files, and
-# run its setup; undo features that were dropped from the list. Safe to rerun,
-# and silent when there's nothing to change.
+# Apply a profile: for each feature it lists, install packages (apt) and tools
+# (mise), link files, and run its setup; undo features that were dropped from
+# the list. Safe to rerun, and silent when there's nothing to change.
 #   ./install.sh                  apply the current profile (asks for one the first time)
 #   ./install.sh --profile NAME   switch to profiles/NAME, then apply
 #   ./install.sh --pick           pick the profile's features from a checklist, then apply
 #
 # Dropping a feature runs its `off`, removes its links (restoring any file they
-# replaced), and removes the packages install.sh installed for it.
+# replaced), and removes the packages and tools install.sh installed for it.
 set -euo pipefail
 
 REPO=$(cd "$(dirname "$0")" && pwd)
@@ -64,17 +64,18 @@ remove_block() { # <file> <header> <line>: drops the line and the header just ab
   say "removed from $1: $2 $3"
 }
 
-SHELL_JSON=$HOME/.config/omarchy/shell.json
-bar_value() { # <id> <key>: current value as compact JSON, or null
-  jq -c --arg id "$1" --arg key "$2" \
-    'first(.bar.layout[]?[]? | objects | select(.id == $id) | .[$key]) // null' "$SHELL_JSON"
+# ------------------------------------------------------------ package tools
+
+export PATH=$PATH:$HOME/.local/share/mise/shims:$HOME/.local/bin
+
+APT_UPDATED=0
+apt_installed() { [[ $(dpkg-query -W -f '${Status}' "$1" 2>/dev/null) == "install ok installed" ]]; }
+apt_install() {
+  (( APT_UPDATED )) || { run sudo apt-get update -q; APT_UPDATED=1; }
+  run sudo apt-get install -y -q "$@"
 }
-bar_set() { # <id> <key> <value> [--json]: only when it differs
-  local want
-  if [[ ${4:-} == --json ]]; then want=$(jq -c . <<<"$3"); else want=$(jq -cn --arg v "$3" '$v'); fi
-  [[ $(bar_value "$1" "$2") == "$want" ]] && return 0
-  say "run: omarchy bar set $*"; omarchy bar set "$@" >/dev/null
-}
+mise_installed() { mise ls --global --installed "$1" 2>/dev/null | grep -q .; }
+mise_install() { local t; for t in "$@"; do run mise use --global "$t@latest"; done; }
 
 # --------------------------------------------------------------- arguments
 
@@ -92,7 +93,13 @@ while (( $# )); do
 done
 
 if [[ -z $PROFILE ]]; then
-  PROFILE=$(find "$REPO/profiles" -type f -printf '%f\n' | sort | gum choose --header "Profile for this machine")
+  mapfile -t profiles < <(find "$REPO/profiles" -type f -printf '%f\n' | sort)
+  if command -v gum >/dev/null; then
+    PROFILE=$(printf '%s\n' "${profiles[@]}" | gum choose --header "Profile for this machine")
+  else # gum arrives with the basics feature; plain select until then
+    echo "Profile for this machine:"
+    select PROFILE in "${profiles[@]}"; do [[ -n $PROFILE ]] && break; done
+  fi
 fi
 PROFILE_FILE=$REPO/profiles/$PROFILE
 [[ -f $PROFILE_FILE ]] || die "no profile '$PROFILE' in profiles/"
@@ -101,6 +108,7 @@ PROFILE_FILE=$REPO/profiles/$PROFILE
 listed() { { grep -v '^[[:space:]]*#' "$PROFILE_FILE" || true; } | awk NF | sort -u; }
 
 if (( PICK )); then
+  command -v gum >/dev/null || die "--pick needs gum (the basics feature installs it)"
   mapfile -t current < <(listed)
   items=() selected=()
   for d in "$REPO"/features/*/; do
@@ -116,12 +124,19 @@ fi
 
 # ---------------------------------------------------------------- features
 
+# mise installs everything apt doesn't carry (or carries too old). Its own
+# installer drops the binary in ~/.local/bin; the shims dir (on PATH above)
+# makes the tools visible to non-interactive shells too.
+if ! command -v mise >/dev/null; then
+  say "installing mise"
+  curl -fsSL https://mise.run | sh
+fi
+
 mapfile -t WANT < <(listed)
 for f in "${WANT[@]}"; do [[ -d $REPO/features/$f ]] || die "profiles/$PROFILE lists '$f', but features/$f doesn't exist"; done
 
 targets() { # <feature>: "src<TAB>dst" for everything it links
   local d=$REPO/features/$1 rel skip
-  [[ -f $d/hypr.lua ]] && printf '%s\t%s\n' "$d/hypr.lua" "$HOME/.config/hypr/features/$1.lua"
   [[ -d $d/files ]] || return 0
   local -a dirs=()
   [[ -f $d/linkdirs ]] && mapfile -t dirs < "$d/linkdirs"
@@ -133,7 +148,7 @@ targets() { # <feature>: "src<TAB>dst" for everything it links
   done < <(find "$d/files" -type f -printf '%P\n' | sort)
 }
 
-# Two features linking the same path (e.g. both night lights) can't both be on.
+# Two features linking the same path can't both be on.
 dupes=$(for f in "${WANT[@]}"; do targets "$f" | cut -f2 | sed "s|^|$f\t|"; done | sort -t$'\t' -k2 | awk -F'\t' '
   $2 == prev { print "  " pf " and " $1 " both link " $2 } { prev = $2; pf = $1 }')
 [[ -z $dupes ]] || die "conflicting features:"$'\n'"$dupes"
@@ -147,7 +162,6 @@ link() { # <feature> <src> <dst>
   if [[ -e $dst && ! -L $dst ]]; then
     local ts; ts=$(date +%s)
     if was_linked "$dst"; then
-      # Something (e.g. Omarchy's monitor scaling, which uses sed -i) replaced our link.
       mv -- "$dst" "$dst.drift.$ts"
       say "warning: $dst had been replaced by a real file; kept it as $dst.drift.$ts"
       say "         compare: diff $src $dst.drift.$ts"
@@ -165,23 +179,23 @@ unlink_entries() { # stdin: "feature<TAB>dst" lines. Remove our links, restoring
   while IFS=$'\t' read -r f dst; do
     [[ -L $dst && $(readlink -- "$dst") == "$REPO/features/$f/"* ]] || continue
     rm -- "$dst"
-    [[ $dst == "$HOME/.config/hypr/"* ]] && HYPR_CHANGED=1
     bak=$(compgen -G "$dst.bak.*" | sort | tail -1 || true)
     if [[ -n $bak ]]; then mv -- "$bak" "$dst"; say "unlinked  $dst (restored $bak)"; else say "unlinked  $dst"; fi
   done
 }
 unlink_feature() { unlink_entries < <(awk -F'\t' -v f="$1" '$1 == f' "$STATE/links"); }
 
-needed_by() { # <package>: an enabled feature that lists it, if any
-  local g
+# $STATE/packages holds "feature<TAB>kind:name" lines, kind being apt or mise.
+needed_by() { # <kind:name>: an enabled feature that lists it, if any
+  local g kind=${1%%:*} name=${1#*:}
   for g in "${WANT[@]}"; do
-    grep -qxF -- "$1" "$REPO/features/$g/packages" "$REPO/features/$g/aur" 2>/dev/null && { echo "$g"; return 0; }
+    grep -qxF -- "$name" "$REPO/features/$g/$( [[ $kind == apt ]] && echo packages || echo mise )" 2>/dev/null && { echo "$g"; return 0; }
   done
   return 0
 }
 
-drop_packages() { # <feature>: remove the packages install.sh installed for it
-  local f=$1 p owner tmp drop=()
+drop_packages() { # <feature>: remove the packages and tools install.sh installed for it
+  local f=$1 p owner tmp apt=() mise=()
   mapfile -t mine < <(awk -F'\t' -v f="$f" '$1 == f { print $2 }' "$STATE/packages" | sort -u)
   (( ${#mine[@]} )) || return 0
   tmp=$(mktemp)
@@ -191,18 +205,17 @@ drop_packages() { # <feature>: remove the packages install.sh installed for it
     if [[ -n $owner ]]; then
       printf '%s\t%s\n' "$owner" "$p" >> "$tmp"
       say "kept $p (still needed by $owner)"
-    else
-      drop+=("$p")
-      # makepkg's default OPTIONS include debug, so AUR builds bring a -debug package along.
-      if pacman -Q "$p-debug" &>/dev/null; then drop+=("$p-debug"); fi
+    elif [[ $p == apt:* ]]; then apt+=("${p#apt:}")
+    else mise+=("${p#mise:}")
     fi
   done
   mv "$tmp" "$STATE/packages"
-  (( ${#drop[@]} )) || return 0
-  run omarchy pkg drop "${drop[@]}" && return 0
-  say "warning: could not remove ${drop[*]} (something else may depend on them)"
-  for p in "${drop[@]}"; do   # keep tracking whatever is still installed
-    pacman -Q "$p" &>/dev/null && printf '%s\t%s\n' "$f" "$p" >> "$STATE/packages"
+  for p in "${mise[@]}"; do run mise unuse --global "$p"; done
+  (( ${#apt[@]} )) || return 0
+  run sudo apt-get remove -y -q "${apt[@]}" && return 0
+  say "warning: could not remove ${apt[*]} (something else may depend on them)"
+  for p in "${apt[@]}"; do   # keep tracking whatever is still installed
+    apt_installed "$p" && printf '%s\tapt:%s\n' "$f" "$p" >> "$STATE/packages"
   done
   return 0
 }
@@ -221,64 +234,46 @@ run_script() { # <feature> <setup|off> <changed>
   (( rc == 0 )) || die "$1/$2 failed (exit $rc)"
 }
 
-HYPR_CHANGED=0
-
-# 1. Hyprland loader: one line appended to Omarchy's hyprland.lua. Not
-#    require_all, because its find skips symlinks and every feature file is one.
-LOADER='for f in io.popen("find -L \"$HOME/.config/hypr/features\" -maxdepth 1 -name \"*.lua\" -printf \"%f\\n\" 2>/dev/null | sort"):lines() do require("hypr.features." .. f:gsub("%.lua$", "")) end -- dotfiles'
-if [[ -f ~/.config/hypr/hyprland.lua ]] && ! grep -qxF -- "$LOADER" ~/.config/hypr/hyprland.lua; then
-  ensure_line ~/.config/hypr/hyprland.lua "$LOADER"
-  HYPR_CHANGED=1
-fi
-
-# 2. Features dropped from the profile.
+# 1. Features dropped from the profile.
 APPLIED=()
 [[ -r $STATE/applied ]] && mapfile -t APPLIED < "$STATE/applied"
 for f in "${APPLIED[@]}"; do
   printf '%s\n' "${WANT[@]}" | grep -qxF "$f" && continue
   say "-- off: $f"
   run_script "$f" off 1
-  [[ -f $REPO/features/$f/hypr.lua ]] && HYPR_CHANGED=1
   unlink_feature "$f"
   drop_packages "$f"
 done
 
-# 3. Features in the profile.
+# 2. Features in the profile.
 NEW_LINKS=$(mktemp)
 for f in "${WANT[@]}"; do
   d=$REPO/features/$f
-  missing=()
-  for list in packages aur; do
+  for list in packages mise; do
     [[ -f $d/$list ]] || continue
     want=()
-    while read -r p; do [[ -n $p ]] && ! pacman -Q "$p" &>/dev/null && want+=("$p"); done < "$d/$list"
-    (( ${#want[@]} )) || continue
-    if [[ $list == aur ]]; then run omarchy pkg aur add "${want[@]}"; else run omarchy pkg add "${want[@]}"; fi
+    if [[ $list == packages ]]; then
+      while read -r p; do [[ -n $p ]] && ! apt_installed "$p" && want+=("$p"); done < "$d/$list"
+      (( ${#want[@]} )) && apt_install "${want[@]}"
+    else
+      while read -r p; do [[ -n $p ]] && ! mise_installed "$p" && want+=("$p"); done < "$d/$list"
+      (( ${#want[@]} )) && mise_install "${want[@]}"
+    fi
     # Only what install.sh installed gets removed again when the feature is dropped.
-    printf "$f\t%s\n" "${want[@]}" >> "$STATE/packages"
+    for p in "${want[@]}"; do printf '%s\t%s:%s\n' "$f" "$( [[ $list == packages ]] && echo apt || echo mise )" "$p" >> "$STATE/packages"; done
   done
 
   changed=0
   while IFS=$'\t' read -r src dst; do
     printf '%s\t%s\n' "$f" "$dst" >> "$NEW_LINKS"
-    if link "$f" "$src" "$dst"; then
-      changed=1
-      [[ $dst == "$HOME/.config/hypr/"* ]] && HYPR_CHANGED=1
-    fi
+    link "$f" "$src" "$dst" && changed=1
   done < <(targets "$f")
 
   run_script "$f" setup "$changed"
 done
 
-# Links a still-enabled feature no longer ships (e.g. a deleted hypr.lua).
+# Links a still-enabled feature no longer ships.
 unlink_entries < <(sort "$STATE/links" | comm -23 - <(sort "$NEW_LINKS"))
 
 printf '%s\n' "${WANT[@]}" | awk NF > "$STATE/applied"
 mv "$NEW_LINKS" "$STATE/links"
-
-# 4. Validate Hyprland once if anything it reads changed.
-if (( HYPR_CHANGED )) && command -v hyprctl >/dev/null && [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]]; then
-  hyprctl reload >/dev/null
-  errors=$(hyprctl configerrors)
-  if [[ -n $errors && $errors != "no errors" ]]; then say "hyprland config errors:"; say "$errors"; else say "hyprland reloaded, no config errors"; fi
-fi

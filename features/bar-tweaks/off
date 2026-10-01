@@ -1,2 +1,0 @@
-bar_set omarchy.clock format "dddd HH:mm"   # Omarchy's default
-bar_set omarchy.power showPercentage false --json

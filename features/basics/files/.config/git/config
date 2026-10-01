@@ -1,0 +1,43 @@
+# Omarchy's git defaults (config/git/config, Omarchy 4.0.4) plus personal
+# settings. Identity and signing come from the untracked config.local.
+
+[alias]
+	co = checkout
+	br = branch
+	ci = commit
+	st = status
+[init]
+	defaultBranch = main
+[pull]
+	rebase = true 			 # Rebase (instead of merge) on pull
+[push]
+	autoSetupRemote = true   # Automatically set upstream branch on push
+[diff]
+	algorithm = histogram    # Clearer diffs on moved/edited lines
+	colorMoved = plain       # Highlight moved blocks in diffs
+	mnemonicPrefix = true    # More intuitive refs in diff output
+[commit]
+	verbose = true           # Include diff comment in commit message template
+[column]
+	ui = auto 			     # Output in columns when possible
+[branch]
+	sort = -committerdate    # Sort branches by most recent commit first
+[tag]
+	sort = -version:refname  # Sort version numbers as you would expect
+[rerere]
+	enabled = true           # Record and reuse conflict resolutions
+	autoupdate = true        # Apply stored conflict resolutions automatically
+[core]
+	editor = nvim
+	autocrlf = false
+	pager = bat
+[rebase]
+	autoStash = true
+[merge]
+	autoStash = true
+[gpg]
+	format = ssh
+
+# Per-machine: user.name, user.email, user.signingkey, commit.gpgsign.
+[include]
+	path = ~/.config/git/config.local
