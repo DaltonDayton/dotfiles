@@ -1,6 +1,6 @@
 # dotfiles (wsl branch)
 
-Terminal-only config for Ubuntu 24.04 under WSL, organized as opt-in features
+Terminal-only config for Ubuntu 24.04 or 26.04 under WSL, organized as opt-in features
 that a profile selects. See `README.md` for the layout. There is no desktop,
 window manager, or Omarchy on this machine; `features/basics/bash/` is a
 one-time snapshot of Omarchy's shell defaults and is edited directly.

@@ -1,0 +1,9 @@
+#!/bin/sh
+# Stands in for wslu's wslview, which Ubuntu 26.04 no longer packages: hands a
+# URL or path to the Windows default handler. The target travels through the
+# environment so no shell quoting has to survive into PowerShell.
+[ -e "$1" ] && set -- "$(wslpath -w "$1")"
+# Windows tools misbehave when started from a \\wsl.localhost working directory.
+cd /mnt/c || exit 1
+WSLVIEW_TARGET=$1 WSLENV=${WSLENV:+$WSLENV:}WSLVIEW_TARGET \
+  exec powershell.exe -NoProfile -Command 'Start-Process $env:WSLVIEW_TARGET' </dev/null

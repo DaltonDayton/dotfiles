@@ -1,6 +1,6 @@
 # dotfiles (wsl)
 
-Terminal-only setup for Ubuntu 24.04 under WSL. It started as a snapshot of
+Terminal-only setup for Ubuntu 24.04 or 26.04 under WSL. It started as a snapshot of
 the Omarchy configs from my personal machines (branch `main`) and forks from
 there; nothing here tracks Omarchy. Split into small features that a profile
 picks from.
@@ -44,7 +44,8 @@ The `basics` feature carries the Omarchy shell: `bash/` is Omarchy's
 `default/bash/` (envs, aliases, functions, init, inputrc) with the Ubuntu and
 no-desktop edits applied, `bash/personal` is my own additions, and
 `files/.config/` holds the git, tmux, herdr, and starship configs. `bat` and
-`fd` get `~/.local/bin` symlinks to Ubuntu's renamed binaries.
+`fd` get `~/.local/bin` symlinks to Ubuntu's renamed binaries, and `wslview` is a
+small shim for opening URLs and files on the Windows side (26.04 has no `wslu`).
 
 ## By hand
 
