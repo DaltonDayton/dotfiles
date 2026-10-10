@@ -7,6 +7,23 @@ Omarchy ships a Claude skill at `~/.claude/skills/omarchy/`. Use it for any
 question about *what* to put in these configs (Hyprland bindings, bar widgets,
 themes, hooks, `omarchy` commands). This file only covers the repo itself.
 
+## Why it's shaped this way
+
+This repo is a diff against Omarchy, not a config. Omarchy owns the defaults
+and keeps updating them; every file here should be justifiable as "this line
+differs from stock and I know why".
+
+- A feature is one user-visible effect, named by that effect (`lid-hibernate`,
+  not `systemd-logind`). Group tiny related tweaks (`hypr-tweaks`, `basics`)
+  instead of making a feature per line.
+- Profiles are the only machine-specific thing. A new machine is a new profile
+  picking from the same features. No host conditionals inside a feature.
+- Dropping a feature from a profile must fully undo it, so prefer mechanisms
+  that layer over Omarchy's files and can be reversed (see below).
+- Some things stay manual on purpose: third-party plugins that run unsandboxed,
+  tray pins, signing keys. When automating something needs sudo or a script we
+  don't control, lean toward the README's "By hand" list instead.
+
 ## Working here
 
 - A feature is `features/<name>/`: `about`, and any of `hypr.lua`, `files/`,
@@ -43,5 +60,5 @@ change something, without Omarchy's commented-out template examples.
 
 ## Not in scope
 
-`main` is the archived pre-Omarchy setup (the `quill` Go CLI). Don't port its
+The `quill` branch is the archived pre-Omarchy setup (the `quill` Go CLI). Don't port its
 patterns here.

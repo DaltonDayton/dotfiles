@@ -72,4 +72,4 @@ After `omarchy update` (the `basics` feature sends a notification):
 - **ImprovedTube:** import `other_configs/improvedtube.json` from the extension's options page.
 - **Claude Code ECC plugin:** `/plugin marketplace add affaan-m/ecc`, then `/plugin install ecc@ecc`.
 
-The pre-Omarchy setup is archived on `main`.
+The pre-Omarchy setup is archived on the `quill` branch.
