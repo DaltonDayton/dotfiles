@@ -56,6 +56,8 @@ return {
       { "<leader>t", group = "[T]abs" },
       { "<leader>t_", hidden = true },
       { "<leader>u", group = "[U]I Toggles" },
+      { "<leader>U", group = "[U]nreal" },
+      { "<leader>U_", hidden = true },
       { "<leader>u_", hidden = true },
       { "<leader>v", group = "[V]isual Selection" },
       { "<leader>v_", hidden = true },

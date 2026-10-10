@@ -8,6 +8,7 @@ return {
     local parsers = {
       "bash",
       "c",
+      "cpp",
       "c_sharp",
       "css",
       "diff",
@@ -41,6 +42,7 @@ return {
     local filetypes = {
       "bash",
       "c",
+      "cpp",
       "cs",
       "css",
       "diff",

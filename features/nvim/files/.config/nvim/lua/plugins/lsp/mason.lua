@@ -24,6 +24,7 @@ return {
         "csharp_ls",
         "ruby_lsp",
         "gopls",
+        "clangd",
       },
     },
     dependencies = {
@@ -44,6 +45,7 @@ return {
         "goimports", -- go formatter (handles imports)
         "gofumpt", -- stricter gofmt
         "golangci-lint", -- go linter aggregator
+        "clang-format", -- c/c++ formatter
       },
     },
     dependencies = {
