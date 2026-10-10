@@ -3,3 +3,4 @@ remove_line ~/.bashrc "source $FEATURE/bashrc"
 [[ -e ~/.local/state/omarchy/toggles/screensaver-off ]] && run omarchy toggle screensaver-off off
 hook=~/.config/omarchy/hooks/post-update.d/omarchy-diff.hook
 [[ -e $hook ]] && run rm "$hook"
+rm -f "$STATE/omarchy-changed"

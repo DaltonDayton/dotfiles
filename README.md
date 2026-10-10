@@ -57,6 +57,8 @@ After `omarchy update` (the `basics` feature sends a notification):
 ./omarchy-diff --merge   # 3-way merge it into the feature copies, then review with git diff
 ```
 
+While a snapshot differs, every new shell prints a reminder until `--merge` brings it back in sync.
+
 ## By hand
 
 - **Git signing:** `~/.config/git/config.local` with `user.signingkey` and `commit.gpgsign`.
