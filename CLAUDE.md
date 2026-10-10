@@ -31,6 +31,10 @@ differs from stock and I know why".
   feature names. `./install.sh` applies the current profile and must stay
   idempotent and quiet when nothing changes.
 - Linked files are live: editing the repo copy edits the real config.
+- `features/nvim/.../lazy-lock.json` is tracked: it pins plugin commits so both
+  machines run the same set and `:Lazy restore` has a known-good point. lazy
+  rewrites it on every install or update, so commit it with any nvim change,
+  and on its own as `chore: bump nvim plugins` after a plain `:Lazy update`.
 - `setup`/`off` are sourced by install.sh. Use its helpers (`run`, `say`,
   `ensure_line`, `remove_line`, `ensure_block`, `remove_block`, `bar_set`)
   and guard every action so a rerun
