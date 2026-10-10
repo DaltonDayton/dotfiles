@@ -74,5 +74,8 @@ After `omarchy update` (the `basics` feature sends a notification):
   accessor plugin build, Fab, Blender, Starter Content).
 - **ImprovedTube:** import `other_configs/improvedtube.json` from the extension's options page.
 - **Claude Code ECC plugin:** `/plugin marketplace add affaan-m/ecc`, then `/plugin install ecc@ecc`.
+- **herdr's Claude hook** is tracked in the `claude` feature, so don't run `herdr integration
+  install claude`: it appends a duplicate absolute-path hook entry to `settings.json`. After a herdr
+  update, copy its new script over the tracked one if `herdr integration status` says outdated.
 
 The pre-Omarchy setup is archived on the `quill` branch.
