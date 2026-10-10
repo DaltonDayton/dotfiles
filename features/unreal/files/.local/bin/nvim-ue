@@ -1,0 +1,14 @@
+#!/bin/bash
+# Open neovim connected to the running Unreal Editor.
+# The editor's Neovim accessor sends files to the socket named in the $NVIM
+# it inherited at launch and never re-reads it, so a neovim that listens on
+# that same address picks the pairing back up after the original instance
+# closed. Run it from the project directory; extra args go to nvim.
+set -e
+pid=$(pgrep -x UnrealEditor | head -1) || { echo "nvim-ue: Unreal Editor is not running" >&2; exit 1; }
+sock=$(tr '\0' '\n' < "/proc/$pid/environ" | sed -n 's/^NVIM=//p')
+if [[ -z $sock ]]; then
+  echo "nvim-ue: editor was not launched from neovim (no \$NVIM); use <leader>Uo" >&2
+  exit 1
+fi
+exec nvim --listen "$sock" "$@"
