@@ -1,0 +1,10 @@
+# Layer over Omarchy's config with an include rather than linking the file:
+# `omarchy font set` rewrites ~/.config/ghostty/config with sed -i, which
+# would detach a symlink.
+line="config-file = ?\"$FEATURE/ghostty.conf\""
+if ! grep -qxF -- "$line" ~/.config/ghostty/config 2>/dev/null; then
+  ensure_line ~/.config/ghostty/config "$line"
+  run omarchy restart terminal
+fi
+
+[[ $(omarchy default terminal) == ghostty ]] || run omarchy default terminal ghostty

@@ -1,0 +1,2 @@
+remove_line ~/.config/ghostty/config "config-file = ?\"$FEATURE/ghostty.conf\""
+[[ $(omarchy default terminal) == ghostty ]] && run omarchy default terminal foot
