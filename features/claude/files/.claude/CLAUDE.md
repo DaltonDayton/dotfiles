@@ -102,6 +102,16 @@ Default convention, change if the repo says otherwise:
 - Show diffs/changes over prose descriptions of changes.
 - Flag assumptions and risks briefly; don't bury them.
 - At a real decision point or ambiguity, ask one sharp question rather than guessing.
+- Ask questions in chat, never with the AskUserQuestion tool. Number the questions and
+  letter the options, recommendation marked, so I can answer `1a, 2b`:
+  ```
+  Q1: Where should the hook script live?
+  a. In the feature, linked like any other file (recommended: no installer step)
+  b. Installed per machine from `setup`
+  Q2: Push after committing?
+  a. Yes
+  b. No, I'll review first
+  ```
 
 ---
 
