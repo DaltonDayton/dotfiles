@@ -1,0 +1,50 @@
+{
+  "permissions": {
+    "defaultMode": "auto"
+  },
+  "model": "claude-fable-5-1[1m]",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/home/dalton/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "ecc@ecc": true
+  },
+  "extraKnownMarketplaces": {
+    "ecc": {
+      "source": {
+        "source": "github",
+        "repo": "affaan-m/ecc"
+      }
+    }
+  },
+  "pluginConfigs": {
+    "ecc@ecc": {
+      "options": {
+        "hook_profile": "standard"
+      }
+    }
+  },
+  "tui": "fullscreen",
+  "timeFormat": "24-hour",
+  "skipDangerousModePermissionPrompt": true,
+  "theme": "auto",
+  "remoteControlAtStartup": true,
+  "agentPushNotifEnabled": true,
+  "editorMode": "vim",
+  "attribution": {
+    "commit": "",
+    "pr": "",
+    "sessionUrl": false
+  }
+}

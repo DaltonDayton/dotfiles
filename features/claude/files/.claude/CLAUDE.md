@@ -83,6 +83,7 @@ Default convention, change if the repo says otherwise:
 - Subject line imperative, under ~72 chars; body explains *why* when it's not obvious.
 - One logical change per commit. Don't bundle an unrelated refactor into a feature commit.
 - Don't commit unless I ask, and never push without explicit go-ahead.
+- No attribution trailers: no `Co-Authored-By`, `Claude-Session`, or "Generated with" lines in commit messages or PR descriptions.
 
 ---
 
