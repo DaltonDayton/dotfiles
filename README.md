@@ -69,6 +69,9 @@ After `omarchy update` (the `basics` feature sends a notification):
   (monitor layout widget; Omarchy's own monitor widget may be enough).
 - **Tray pins** (desktop): pin Steam, Discord, NordVPN from the tray itself.
 - **Battle.net:** `omarchy install gaming battlenet` before enabling `battlenet-tsm`.
+- **Unreal Engine, Blender** (desktop): manual installs under `~/software/`. The `unreal` feature
+  ships the window rules and `nvim-ue`; `features/unreal/README.md` is the runbook (engine,
+  accessor plugin build, Fab, Blender, Starter Content).
 - **ImprovedTube:** import `other_configs/improvedtube.json` from the extension's options page.
 - **Claude Code ECC plugin:** `/plugin marketplace add affaan-m/ecc`, then `/plugin install ecc@ecc`.
 

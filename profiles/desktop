@@ -1,4 +1,4 @@
-# One feature per line (see features/). Draft from the old setup; check it on the desktop.
+# One feature per line (see features/). Add with ./install.sh --pick or by hand.
 bar-tweaks
 basics
 battlenet-tsm
@@ -14,4 +14,5 @@ nightlight-sunset
 nvim
 special-workspaces
 ssh-pve
+unreal
 yt-transcript

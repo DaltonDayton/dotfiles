@@ -1,1 +1,1 @@
-Desktop only: nfs-utils for the pve media export, ASMedia USB4 udev fix (sudo)
+Desktop only: nfs-utils for the NAS stash share (/mnt/stash), ASMedia USB4 udev fix (sudo)
