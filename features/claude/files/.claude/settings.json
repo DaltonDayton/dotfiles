@@ -1,6 +1,9 @@
 {
   "permissions": {
-    "defaultMode": "auto"
+    "defaultMode": "auto",
+    "deny": [
+      "AskUserQuestion"
+    ]
   },
   "model": "claude-fable-5-1[1m]",
   "hooks": {
