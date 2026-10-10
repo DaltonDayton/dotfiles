@@ -29,7 +29,9 @@ directory, so always pass an absolute path on a command line.
 ## Engine install (manual)
 
 1. Extract the Linux release to `~/software/UnrealEngine/5.8.3`.
-2. Register it so projects find it by id:
+2. Register it so projects find it by id. Neither this file nor the `.desktop`
+   `Exec` line expands `~`, so the absolute `/home/dalton` paths below need
+   your own home directory:
    ```ini
    # ~/.config/Epic/UnrealEngine/Install.ini
    [Installations]
@@ -298,35 +300,6 @@ still runs through XIM segfaults it in `Xutf8ResetIC`.
 After changing `environment_variables` in the neovim spec, restart neovim
 before `<leader>Uo`; a running instance keeps the old table.
 
-## Log
-
-- 2026-10-01: engine extracted to `~/UnrealEngine/5.8.3`, `.desktop` added.
-  Diagnosed the Wayland backend problems above; moved to X11. Two Hyprland
-  rules. Toasts confirmed working under XWayland later that day.
-- 2026-10-01: clangd/clang-format/cpp parser added to neovim (`13654be`).
-  UnrealEngine.nvim installed, accessor built, Marketplace symlink,
-  preference set, keys moved to `<leader>U` after a clash, `nvim-ue` added.
-  Verified open-in-neovim end to end. First hot reload of a C++ game mode.
-- 2026-10-01: engine moved to `~/software/UnrealEngine/5.8.3`; Install.ini,
-  launcher, nvim spec and clangd database updated. Blender 5.2.2 extracted,
-  desktop entry and PATH symlink. Starter Content extracted and copied into
-  BadDecisionsTutorial.
-- 2026-10-04: opacity rules for Unreal and Blender. PSO hitch diagnosis; NVIDIA
-  shader cache env added, live after reboot. Slider drag bug diagnosed;
-  `UE_NORELATIVEMOUSEMODE=1` added to both launch paths. Keyboard dead a second
-  time; plan above. Discovered `sed -i` had detached
-  `~/.features/unreal/hypr.lua` from its repo symlink on 10-01; restored and
-  committed (`e921aaf`). Prefer editing the repo path or `sed -i --follow-symlinks`.
-- 2026-10-04: keyboard died a third time; `fcitx5 -r` crashed the editor in
-  `Xutf8ResetIC`, confirming fcitx5's XIM in the keyboard path. IM bypass added
-  to the launcher and the neovim spec. Runbook written (`features/unreal/README.md`).
-  The hand restart also put `omarchy-fcitx5.service` into a 2 s restart loop
-  that broke keys a fourth time; fixed by killing the orphan. First session
-  with the bypass confirmed working.
-- 2026-10-06: Fab plugin installed; Stack O Bot obtained via the Windows VM;
-  toasts made clickable (no_focus removed); UE_NORELATIVEMOUSEMODE retired
-  after confirming sliders and Play both work with relative mode on.
-
 ## Laptop checklist
 
 1. Add `unreal` to the machine's profile and run `./install.sh`. That delivers the Hyprland rules and env,
@@ -336,5 +309,3 @@ before `<leader>Uo`; a running instance keeps the old table.
 4. Blender and Starter Content if wanted.
 5. Log out and in for the `hl.env` entries. On a non-NVIDIA laptop they are
    inert.
-6. The `.desktop` files and `Install.ini` hardcode `/home/dalton`; adjust if
-   the username differs.

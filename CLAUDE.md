@@ -30,7 +30,9 @@ differs from stock and I know why".
   `linkdirs`, `packages`, `aur`, `setup`, `off`. Profiles in `profiles/` list
   feature names. `./install.sh` applies the current profile and must stay
   idempotent and quiet when nothing changes.
-- Linked files are live: editing the repo copy edits the real config.
+- Linked files are live: editing the repo copy edits the real config. Edit the
+  repo path, or use `sed -i --follow-symlinks`: plain `sed -i` replaces the
+  symlink with a detached copy.
 - `features/nvim/.../lazy-lock.json` is tracked: it pins plugin commits so both
   machines run the same set and `:Lazy restore` has a known-good point. lazy
   rewrites it on every install or update, so commit it with any nvim change,

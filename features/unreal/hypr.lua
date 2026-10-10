@@ -15,11 +15,12 @@ o.window({ class = "^UnrealEditor$", title = "^$", float = true }, {
 -- Unreal (now running under XWayland via SDL_VIDEO_DRIVER=x11 in its launcher)
 -- sends activation requests as menus, tooltips and dialogs open, and Omarchy's
 -- misc.focus_on_activate = true answers each with a cursor warp. Ignore the
--- requests, same treatment as Battle.net above.
+-- requests, same treatment as Battle.net in features/battlenet-tsm/hypr.lua.
 o.window({ class = "^UnrealEditor$" }, { focus_on_activate = false })
 
 -- Keep the Unreal Editor fully opaque, focused or not. Same override form as
--- the YouTube rule above so it beats Omarchy's default-opacity tag.
+-- the YouTube rule in features/hypr-tweaks/hypr.lua so it beats Omarchy's
+-- default-opacity tag.
 o.window({ class = "^UnrealEditor$" }, {
   opacity = "1 override 1 override 1 override",
 })
