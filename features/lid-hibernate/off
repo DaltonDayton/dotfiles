@@ -1,0 +1,3 @@
+for f in /etc/systemd/logind.conf.d/30-lid-hibernate.conf /etc/systemd/sleep.conf.d/30-hibernate-delay.conf; do
+  if [[ -e $f ]]; then run sudo rm "$f"; fi
+done

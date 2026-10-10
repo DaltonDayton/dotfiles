@@ -1,0 +1,9 @@
+# logind reads this only at startup, and restarting it can kill the session,
+# so the lid change takes effect on next boot. sleep.conf is read per sleep.
+for pair in logind.conf.d/30-lid-hibernate.conf sleep.conf.d/30-hibernate-delay.conf; do
+  dst=/etc/systemd/$pair
+  if ! cmp -s "$FEATURE/$(basename "$pair")" "$dst"; then
+    run sudo install -Dm644 "$FEATURE/$(basename "$pair")" "$dst"
+    [[ $pair == logind.conf.d/* ]] && say "lid change applies after a reboot"
+  fi
+done
