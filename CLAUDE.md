@@ -57,8 +57,9 @@ Omarchy layers some config and snapshots the rest:
   git `[include]`, a `source` line in `.bashrc`, `omarchy bar set`): Omarchy
   keeps its defaults, and the feature only adds. Prefer these.
 - **Snapshot** (`starship.toml`, `hyprsunset.conf`, terminal configs, …):
-  the feature's copy replaces Omarchy's. Put Omarchy's current default at the
-  same path under `upstream/` so `./omarchy-diff` can merge later changes.
+  the feature's copy replaces Omarchy's. Declare it in the feature's
+  `upstream` file (`<path under files/>` TAB `<path under /usr/share/omarchy/>`);
+  `./omarchy-diff` records Omarchy's copy under `upstream/` and merges later changes.
 
 `diff /usr/share/omarchy/config/<path> ~/.config/<path>` first. If it matches
 the default, it doesn't belong here. Keep files to the lines that actually
