@@ -1,0 +1,2 @@
+jq -e '.bar.layout | .. | objects | select(.id? == "dalton.workspaces")' ~/.config/omarchy/shell.json >/dev/null 2>&1 &&
+  run omarchy plugin enable omarchy.workspaces

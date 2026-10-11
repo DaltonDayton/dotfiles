@@ -1,5 +1,6 @@
 # One feature per line (see features/). Add with ./install.sh --pick or by hand.
 bar-tweaks
+bar-workspaces
 basics
 battlenet-tsm
 claude

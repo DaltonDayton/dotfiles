@@ -1,0 +1,11 @@
+# The clone replaces omarchy.workspaces in the bar layout; the shell swaps a
+# cloned widget for its original in place. A just-linked plugin isn't known
+# until the shell rescans, so wait for discovery like `omarchy plugin clone`.
+if ! jq -e '.bar.layout | .. | objects | select(.id? == "dalton.workspaces")' ~/.config/omarchy/shell.json >/dev/null 2>&1; then
+  omarchy-shell shell rescanPlugins >/dev/null
+  for _ in $(seq 40); do
+    omarchy-plugin-list --json | jq -e 'any(.[]; .id == "dalton.workspaces")' >/dev/null && break
+    sleep 0.1
+  done
+  run omarchy plugin enable dalton.workspaces
+fi
