@@ -37,6 +37,7 @@ It leaves empty directories and `.drift` files behind.
 | `linkdirs` | paths under `files/` to link as one directory (e.g. nvim, which lazy.nvim writes into) |
 | `packages`, `aur` | installed with `omarchy pkg add` / `omarchy pkg aur add` |
 | `setup`, `off` | bash sourced by install.sh with helpers (`run`, `ensure_line`, `bar_set`, …); must be safe to rerun |
+| `upstream` | snapshots of Omarchy files: `<path under files/>` TAB `<path under /usr/share/omarchy/>`, one per line, for `omarchy-diff` |
 
 Omarchy's `bindings.lua`, `input.lua`, `looknfeel.lua`, `autostart.lua`,
 `.bashrc`, git config, and `shell.json` stay Omarchy's. Features add to them
@@ -48,16 +49,21 @@ and prints the `diff` command so you can pull the change in.
 
 ## Keeping up with Omarchy
 
-A few features ship a snapshot of an Omarchy file (`starship.toml`,
-`hyprsunset.conf`). Omarchy's version as of the last sync lives in `upstream/`.
-After `omarchy update` (the `basics` feature sends a notification):
+Some features ship a snapshot of an Omarchy file instead of layering on it
+(`starship.toml`, `hyprsunset.conf`, `monitors.lua`, the cloned workspaces
+widget). Each one is declared in the feature's `upstream` file, and Omarchy's
+version as of the last sync lives under `upstream/`, mirroring
+`/usr/share/omarchy/`. After `omarchy update`, the `basics` feature sends a
+notification if any of them changed, and every new shell repeats the reminder
+until they are back in sync:
 
 ```sh
-./omarchy-diff           # what Omarchy changed since the last sync
-./omarchy-diff --merge   # 3-way merge it into the feature copies, then review with git diff
+./omarchy-diff                 # what Omarchy changed since the last sync
+./omarchy-diff --merge         # per file: merge (3-way, review with git diff), keep mine, or later
+./omarchy-diff --merge --all   # merge everything without asking
 ```
 
-While a snapshot differs, every new shell prints a reminder until `--merge` brings it back in sync.
+A snapshot without a baseline gets one recorded on the next run.
 
 ## By hand
 
@@ -67,8 +73,8 @@ While a snapshot differs, every new shell prints a reminder until `--merge` brin
   `yt-transcript` uses that same model.
 - **Bar plugins** (third-party, run unsandboxed, so review before installing):
   `omarchy plugin add https://github.com/rmacy/omarchy-system-monitor.git` (CPU/temp chip; pick
-  monitors in its settings) and `omarchy plugin add https://github.com/crmne/omarchy-hyprmoncfg.git`
-  (monitor layout widget; Omarchy's own monitor widget may be enough).
+  monitors in its settings). Not hyprmoncfg: applying a layout from it writes its own workspace
+  rules and a loader into `hyprland.lua` that override `monitors.lua`. Edit the feature file instead.
 - **Tray pins** (desktop): pin Steam, Discord, NordVPN from the tray itself.
 - **Battle.net:** `omarchy install gaming battlenet` before enabling `battlenet-tsm`.
 - **Unreal Engine, Blender** (desktop): manual installs under `~/software/`. The `unreal` feature

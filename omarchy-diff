@@ -1,39 +1,85 @@
 #!/usr/bin/env bash
-# What did Omarchy change in the snapshot configs since the last sync?
-#   ./omarchy-diff           show upstream's changes (not yours)
-#   ./omarchy-diff --merge   3-way merge them into every feature's copy, then record the new baseline
+# What did Omarchy change in the files this repo snapshots?
+#   ./omarchy-diff                 show upstream's changes since the last sync
+#   ./omarchy-diff --merge         per file: merge it in, keep mine, or decide later
+#   ./omarchy-diff --merge --all   merge everything without asking
 #
-# upstream/<path> holds Omarchy's config/<path> as of the last sync; the copies
-# are features/*/files/.config/<path>.
+# A feature declares its snapshots in `upstream`, one per line:
+#   <path under files/> <TAB> <path under /usr/share/omarchy/>
+# upstream/<omarchy path> is Omarchy's copy as of the last sync: the base of
+# the 3-way merge. A snapshot without a baseline gets one recorded on any run.
 #
 # While any snapshot differs, $STATE/omarchy-changed exists; the basics bashrc
 # mentions it in every new shell, so a missed post-update notification isn't lost.
 set -euo pipefail
 repo=$(cd "$(dirname "$0")" && pwd)
-omarchy=/usr/share/omarchy/config
+omarchy=${OMARCHY_PATH:-/usr/share/omarchy}
 marker=${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/omarchy-changed
 
-cd "$repo/upstream"
-changed=0
-while read -r f; do
-  new="$omarchy/$f"
-  [[ -e $new ]] || { echo "gone upstream: $f"; continue; }
-  cmp -s "$f" "$new" && continue
+mode=show all=0
+for arg in "$@"; do
+  case $arg in
+    --merge) mode=merge ;;
+    --all) all=1 ;;
+    *) echo "usage: omarchy-diff [--merge [--all]]" >&2; exit 1 ;;
+  esac
+done
 
-  if [[ ${1:-} == --merge ]]; then
-    for mine in "$repo"/features/*/files/.config/"$f"; do
-      [[ -e $mine ]] || continue
-      if git merge-file "$mine" "$f" "$new"; then
-        echo "merged    ${mine#"$repo"/}"
-      else
-        echo "CONFLICT  ${mine#"$repo"/}  (resolve the <<<<<<< markers)"
-      fi
-    done
-    cp "$new" "$f"
-  else
-    changed=1
-    echo "== $f"; diff -u "$f" "$new" || true
+# copies[<omarchy path>] = newline-separated "features/<f>/files/<path>" entries.
+declare -A copies=()
+for decl in "$repo"/features/*/upstream; do
+  feature=$(basename "$(dirname "$decl")")
+  while IFS=$'\t' read -r mine rel; do
+    [[ -n $mine && -n $rel ]] || continue
+    copies[$rel]+="features/$feature/files/$mine"$'\n'
+  done < "$decl"
+done
+
+for rel in $(printf '%s\n' "${!copies[@]}" | sort); do
+  base=$repo/upstream/$rel
+  live=$omarchy/$rel
+  [[ -e $live ]] || { echo "gone upstream: $rel"; continue; }
+  if [[ ! -e $base ]]; then
+    mkdir -p "${base%/*}"
+    cp "$live" "$base"
+    echo "baseline recorded: upstream/$rel"
+    continue
   fi
-done < <(find . -type f | sed 's|^\./||' | sort)
+  cmp -s "$base" "$live" && continue
 
-if (( changed )); then mkdir -p "${marker%/*}"; touch "$marker"; else rm -f "$marker"; fi
+  echo "== $rel"
+  choice=merge
+  if [[ $mode == show ]]; then
+    diff -u "$base" "$live" || true
+    continue
+  elif (( ! all )); then
+    diff -u "$base" "$live" || true
+    choice=$(gum choose --header "Omarchy changed $rel" "merge" "keep mine" "later") || choice=later
+  fi
+
+  case $choice in
+    merge)
+      while read -r mine; do
+        [[ -n $mine ]] || continue
+        if git merge-file "$repo/$mine" "$base" "$live"; then
+          echo "merged    $mine"
+        else
+          echo "CONFLICT  $mine  (resolve the <<<<<<< markers)"
+        fi
+      done <<<"${copies[$rel]}"
+      cp "$live" "$base" ;;
+    "keep mine")
+      cp "$live" "$base"
+      echo "kept mine, baseline advanced" ;;
+    *)
+      echo "left for later" ;;
+  esac
+done
+
+# Marker reflects what is still out of sync after this run.
+pending=0
+for rel in "${!copies[@]}"; do
+  [[ -e $omarchy/$rel && -e $repo/upstream/$rel ]] || continue
+  cmp -s "$repo/upstream/$rel" "$omarchy/$rel" || pending=1
+done
+if (( pending )); then mkdir -p "${marker%/*}"; touch "$marker"; else rm -f "$marker"; fi
