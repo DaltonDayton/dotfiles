@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Unreal Engine 5.8.3
+Comment=Unreal Editor (nested X server, see features/unreal/README.md)
+Exec=/home/dalton/.local/bin/ue-nested
+Icon=/home/dalton/software/UnrealEngine/5.8.3/Engine/Source/Runtime/Launch/Resources/Linux/UnrealEngine.png
+Terminal=false
+Type=Application
+Categories=Development;
+StartupWMClass=Xwayland

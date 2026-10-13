@@ -38,3 +38,10 @@ o.window({ class = "^[Bb]lender$" }, {
 -- logout/login is needed, not just a reload.
 hl.env("__GL_SHADER_DISK_CACHE_SIZE", "10737418240")
 hl.env("__GL_SHADER_DISK_CACHE_SKIP_CLEANUP", "1")
+
+-- ue-nested runs Unreal on a rootful Xwayland; that single window is what
+-- Hyprland sees. Keep it opaque like the editor itself.
+o.window({ class = "^Xwayland$" }, {
+  opacity = "1 override 1 override 1 override",
+  focus_on_activate = false,
+})

@@ -38,21 +38,54 @@ directory, so always pass an absolute path on a command line.
    UE_5.8=/home/dalton/software/UnrealEngine/5.8.3
    ```
    Projects carry `"EngineAssociation": "5.8"`, which resolves through this.
-3. App menu entry at `~/.local/share/applications/UnrealEngine-5.8.3.desktop`:
-   ```ini
-   [Desktop Entry]
-   Name=Unreal Engine 5.8.3
-   Comment=Unreal Editor
-   Exec=env -u SDL_IM_MODULE -u QT_IM_MODULE XMODIFIERS=@im=none SDL_VIDEO_DRIVER=x11 /home/dalton/software/UnrealEngine/5.8.3/Engine/Binaries/Linux/UnrealEditor
-   Path=/home/dalton/software/UnrealEngine/5.8.3/Engine/Binaries/Linux
-   Icon=/home/dalton/software/UnrealEngine/5.8.3/Engine/Source/Runtime/Launch/Resources/Linux/UnrealEngine.png
-   Terminal=false
-   Type=Application
-   Categories=Development;
-   StartupWMClass=UnrealEditor
-   ```
-   Keep the `env` form: the project browser spawns a child editor process that
-   must inherit these variables.
+3. App menu entry: `features/unreal/files/.local/share/applications/UnrealEngine-5.8.3.desktop`,
+   linked by `install.sh`. Its `Exec` is `ue-nested` (next section), which
+   carries the environment below; the project browser's child editor process
+   inherits it. The `Icon` line hardcodes `/home/dalton`.
+
+### Nested X server: `ue-nested` (2026-10-12)
+
+`features/unreal/files/.local/bin/ue-nested [abs .uproject]` runs the editor
+on its own rootful `Xwayland` (fullscreen, 3440x1440) with `openbox` inside
+(package in `features/unreal/packages`). Hyprland sees one window of class
+`Xwayland`; every window Unreal opens (asset editors, drag previews, menus,
+toasts) is an X11 client on that server, where openbox floats it and nothing
+tiles it. Dragging an asset editor tab into the main window works, which it
+never did under rootless XWayland (the torn-off tab became a Hyprland window
+mid-drag). Trade-off: Unreal lives on one monitor.
+
+- `files/.config/openbox/ue-rc.xml`: openbox with no key or mouse bindings
+  and decorations off. Default openbox grabs Alt+LMB drag, which is viewport
+  orbit, and Slate draws its own window chrome.
+- A window manager is required, not optional: SDL ignores the pointer-root
+  focus an unmanaged X server gives and drops all relative mouse motion.
+- No `-host-grab`. It locks the host keyboard and pointer into the nested
+  server, so Super keys never reach Hyprland (no workspace switching, no
+  moving the window). Without it Hyprland keys pass through normally.
+- `SDL_MOUSE_RELATIVE_CURSOR_VISIBLE=0`. Unreal sets this hint to 1, so in
+  relative mouse mode (viewport look, spin-box drags) SDL re-centres the
+  pointer on every motion, and on XWayland that means hide cursor, warp, show
+  cursor each time. Xwayland locks the host pointer on the hide and releases
+  it on the show, so almost every motion event fell in a gap: measured 34
+  events per 10 s of dragging, against 1919 with the cursor hidden for the
+  whole drag (the lock then stays held) and 3772 with
+  `SDL_MOUSE_RELATIVE_MODE_CENTER=0` (no warps, but then the pointer can
+  leave the window onto the other monitor mid-drag). An env var beats
+  Unreal's `SDL_SetHint` because SDL gives environment hints priority. Side
+  effect: the cursor hides while dragging, as on Windows.
+- Rootful Xwayland is the same binary Hyprland runs, so Vulkan goes through
+  DRI3 at full speed. Xephyr has no GPU path and gamescope hides extra
+  toplevels, so neither fits.
+- `~/.config/hypr` rule for class `Xwayland`: opacity override and
+  `focus_on_activate = false`, same as the `UnrealEditor` rules, which stay
+  for direct launches.
+
+Direct launch (rootless XWayland, the pre-2026-10-12 setup) still works for
+one-off runs:
+```sh
+env -u SDL_IM_MODULE -u QT_IM_MODULE XMODIFIERS=@im=none SDL_VIDEO_DRIVER=x11 \
+  ~/software/UnrealEngine/5.8.3/Engine/Binaries/Linux/UnrealEditor /abs/path/Project.uproject
+```
 
 ### Why those variables
 
@@ -123,7 +156,7 @@ this does not apply.
 Tracked by this repo:
 
 - `features/nvim/files/.config/nvim/lua/plugins/unrealengine.lua`: `mbwilding/UnrealEngine.nvim`,
-  `engine_path`, the launch variables in `environment_variables`, keys under
+  `engine_path`, `<leader>Uo` running `ue-nested`, keys under
   `<leader>U` (`<leader>u` is the UI Toggles group).
 - `features/nvim/files/.config/nvim/lua/plugins/which-key.lua`: the `[U]nreal` group.
 - `features/nvim/files/.config/nvim/lua/plugins/lsp/mason.lua`, `formatting.lua`,
@@ -166,8 +199,9 @@ Manual, once per machine:
 
 How it pairs: the accessor reads `$NVIM` once at editor start and sends every
 request as `nvim --server $NVIM --remote <file>`. So launch the editor from
-neovim with `<leader>Uo`; a menu launch has no `$NVIM` and open requests just
-log a warning. If that neovim closes, `nvim-ue` from the project directory
+neovim with `<leader>Uo`, which runs `ue-nested` on the `.uproject` in the
+current directory; a menu launch has no `$NVIM` and open requests just log a
+warning. If that neovim closes, `nvim-ue` from the project directory
 starts a new one listening on the same socket and the pairing resumes. Only one
 neovim can own the socket.
 
@@ -297,14 +331,15 @@ method registration, which itself kills X11 keyboard input. Recover with
 with the editor closed: stopping fcitx5 under an editor whose keyboard path
 still runs through XIM segfaults it in `Xutf8ResetIC`.
 
-After changing `environment_variables` in the neovim spec, restart neovim
-before `<leader>Uo`; a running instance keeps the old table.
+`<leader>Uo` no longer passes `environment_variables`; `ue-nested` sets them.
 
 ## Laptop checklist
 
-1. Add `unreal` to the machine's profile and run `./install.sh`. That delivers the Hyprland rules and env,
-   the neovim config and `nvim-ue`.
-2. Engine: extract, `Install.ini`, `.desktop` (section above).
+1. Add `unreal` to the machine's profile and run `./install.sh`. That delivers
+   the Hyprland rules and env, openbox, `ue-nested`, the `.desktop` entry, the
+   neovim config and `nvim-ue`.
+2. Engine: extract, `Install.ini` (section above). Adjust the `-geometry` in
+   `ue-nested` to the laptop panel.
 3. Neovim: open once, then steps 2 to 4 of the neovim section.
 4. Blender and Starter Content if wanted.
 5. Log out and in for the `hl.env` entries. On a non-NVIDIA laptop they are

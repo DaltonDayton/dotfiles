@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Openbox config for ue-nested: floating WM with no bindings at all, so
+     Alt+LMB (orbit), Alt+Tab and every other chord reach Unreal. Slate draws
+     its own chrome, so decorations are off for everything. -->
+<openbox_config xmlns="http://openbox.org/3.4/rc">
+  <focus>
+    <focusNew>yes</focusNew>
+    <followMouse>no</followMouse>
+  </focus>
+  <desktops><number>1</number></desktops>
+  <keyboard/>
+  <mouse/>
+  <applications>
+    <application class="*"><decor>no</decor></application>
+  </applications>
+</openbox_config>

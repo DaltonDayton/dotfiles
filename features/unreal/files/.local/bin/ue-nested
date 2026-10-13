@@ -1,0 +1,31 @@
+#!/bin/bash
+# Run UnrealEditor on its own rootful Xwayland server. Hyprland then sees a
+# single window; every window Unreal opens (asset editors, drag previews,
+# menus, toasts) is an X11 client inside it, managed by openbox with no
+# key or mouse bindings so Alt+drag and friends reach the editor untouched.
+# No -host-grab: it locks the host pointer/keyboard, which traps Hyprland's
+# Super keys and breaks SDL relative mouse mode (viewport look).
+set -e
+UE=$HOME/software/UnrealEngine/5.8.3/Engine/Binaries/Linux/UnrealEditor
+RC=$HOME/.config/openbox/ue-rc.xml
+command -v openbox >/dev/null || { echo "ue-nested: openbox missing (omarchy pkg add openbox)" >&2; exit 1; }
+
+for n in $(seq 2 20); do [[ -e /tmp/.X11-unix/X$n ]] || { D=:$n; break; }; done
+[[ -n $D ]] || { echo "ue-nested: no free X display" >&2; exit 1; }
+
+Xwayland "$D" -geometry 3440x1440 -fullscreen -noreset &
+XPID=$!
+trap 'kill $WMPID $XPID 2>/dev/null' EXIT
+for _ in $(seq 50); do [[ -e /tmp/.X11-unix/X${D#:} ]] && break; sleep 0.1; done
+
+export DISPLAY=$D
+unset WAYLAND_DISPLAY SDL_IM_MODULE QT_IM_MODULE
+export XMODIFIERS=@im=none SDL_VIDEO_DRIVER=x11
+# Relative mouse mode (viewport look, spin-box drags) is near-dead on a rootful
+# Xwayland with a visible cursor: SDL hides/warps/shows the cursor on every
+# motion and each show drops Xwayland's pointer lock. Hidden cursor keeps the
+# lock held; measured 34 vs 1919 motion events per 10 s.
+export SDL_MOUSE_RELATIVE_CURSOR_VISIBLE=0
+openbox --config-file "$RC" &
+WMPID=$!
+"$UE" "$@"

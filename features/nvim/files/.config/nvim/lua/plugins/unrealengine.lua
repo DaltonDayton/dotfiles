@@ -3,8 +3,10 @@
 -- Unreal C++ projects via UnrealBuildTool. Inert on a machine without the
 -- engine (cond below); the setup is in features/unreal/README.md.
 --
--- The editor must be launched with <leader>Uo (open()) so it inherits $NVIM and
--- can route "open file" requests back to this instance.
+-- The editor must be launched with <leader>Uo so it inherits $NVIM and can
+-- route "open file" requests back to this instance. It runs ue-nested
+-- (features/unreal) rather than the plugin's open(): the editor lives on its
+-- own X server so Hyprland never tiles its windows.
 --
 -- Keys live under <leader>U; <leader>u is the UI Toggles group.
 --
@@ -26,7 +28,15 @@ return {
     { "<leader>Ug", function() require("unrealengine.commands").generate_lsp() end, desc = "UnrealEngine: Generate LSP" },
     { "<leader>Ub", function() require("unrealengine.commands").build() end, desc = "UnrealEngine: Build" },
     { "<leader>Ur", function() require("unrealengine.commands").rebuild() end, desc = "UnrealEngine: Rebuild" },
-    { "<leader>Uo", function() require("unrealengine.commands").open() end, desc = "UnrealEngine: Open Editor" },
+    {
+      "<leader>Uo",
+      function()
+        local up = require("unrealengine.helpers").get_uproject_path_info()
+        if not up then return vim.notify("No .uproject in " .. vim.fn.getcwd(), vim.log.levels.ERROR) end
+        vim.fn.jobstart({ "ue-nested", up.path }, { detach = true })
+      end,
+      desc = "UnrealEngine: Open Editor",
+    },
     { "<leader>Uc", function() require("unrealengine.commands").clean() end, desc = "UnrealEngine: Clean" },
     { "<leader>Up", function() require("unrealengine.commands").build_plugin() end, desc = "UnrealEngine: Build Plugin" },
   },
@@ -39,19 +49,5 @@ return {
     register_icon = true,
     register_filetypes = true,
     close_on_success = true,
-    -- Same X11 fallback as the .desktop launcher; UE 5.8's native Wayland
-    -- backend breaks menus, dialogs and the cursor on Hyprland.
-    -- XMODIFIERS=@im=none / empty SDL_IM_MODULE: keep fcitx5 out of the
-    -- editor's keyboard path. With fcitx's XIM in front of SDL, all keys went
-    -- dead at the first text field twice, and a fcitx5 restart crashed the
-    -- editor in Xutf8ResetIC. Unreal has no use for an input method. (This
-    -- also fixed spin-box drags; do not add UE_NORELATIVEMOUSEMODE, it breaks
-    -- mouse capture during Play.)
-    environment_variables = {
-      SDL_VIDEO_DRIVER = "x11",
-      XMODIFIERS = "@im=none",
-      SDL_IM_MODULE = "",
-      QT_IM_MODULE = "",
-    },
   },
 }
