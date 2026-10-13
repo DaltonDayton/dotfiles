@@ -1,0 +1,8 @@
+s=~/.claude/settings.json
+cmd='bash "$HOME/.claude/hooks/herdr-agent-state.sh" session'
+if [[ -f $s ]] && jq -e --arg c "$cmd" '[.hooks.SessionStart[]?.hooks[]?.command] | index($c)' "$s" >/dev/null; then
+  tmp=$(mktemp)
+  jq --arg c "$cmd" '.hooks.SessionStart |= map(select(all(.hooks[]; .command != $c))) | if .hooks.SessionStart == [] then del(.hooks.SessionStart) else . end' "$s" > "$tmp"
+  cat "$tmp" > "$s" && rm "$tmp"
+  say "removed herdr SessionStart hook from $s"
+fi

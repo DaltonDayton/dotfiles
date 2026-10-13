@@ -1,0 +1,11 @@
+# settings.json isn't tracked here (it carries work-machine config), so add
+# herdr's SessionStart hook to the live file instead of linking one.
+s=~/.claude/settings.json
+cmd='bash "$HOME/.claude/hooks/herdr-agent-state.sh" session'
+[[ -f $s ]] || echo '{}' > "$s"
+if ! jq -e --arg c "$cmd" '[.hooks.SessionStart[]?.hooks[]?.command] | index($c)' "$s" >/dev/null; then
+  tmp=$(mktemp)
+  jq --arg c "$cmd" '.hooks.SessionStart += [{matcher: "*", hooks: [{type: "command", command: $c, timeout: 10}]}]' "$s" > "$tmp"
+  cat "$tmp" > "$s" && rm "$tmp"
+  say "added herdr SessionStart hook to $s"
+fi
