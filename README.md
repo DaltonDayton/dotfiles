@@ -69,8 +69,8 @@ A snapshot without a baseline gets one recorded on the next run.
 
 - **Git signing:** `~/.config/git/config.local` with `user.signingkey` and `commit.gpgsign`.
 - **Dictation:** `omarchy voxtype install`, then `sudo voxtype setup gpu --enable` (Omarchy's install
-  tries this but ignores a failure) and `omarchy voxtype model` -> `large-v3-turbo`. The desktop's
-  `yt-transcript` uses that same model.
+  tries this but ignores a failure). The `voxtype` feature owns the config (large-v3-turbo, which the
+  desktop's `yt-transcript` shares, plus LLM cleanup), so don't use `omarchy voxtype model`.
 - **Bar plugins** (third-party, run unsandboxed, so review before installing):
   `omarchy plugin add https://github.com/rmacy/omarchy-system-monitor.git` (CPU/temp chip; pick
   monitors in its settings). Not hyprmoncfg: applying a layout from it writes its own workspace

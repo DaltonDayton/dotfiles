@@ -1,0 +1,46 @@
+# Omarchy's default voxtype config, trimmed to what we change: the large model
+# (the desktop's yt-transcript shares it), a vocabulary hint, and every
+# transcript piped through an LLM before it's typed. Hotkeys stay with
+# Hyprland (F9, Super+Ctrl+X).
+state_file = "auto"
+
+[hotkey]
+enabled = false
+
+[audio]
+device = "default"
+sample_rate = 16000
+max_duration_secs = 60
+pause_media = true
+
+[whisper]
+model = "large-v3-turbo"
+language = "en"
+translate = false
+# Biases recognition toward these names; voxtype-cleanup reads the same line
+# as its spelling list.
+initial_prompt = "Claude, Claude Code, Omarchy, Hyprland, VoxType, AIRHUG, Ollama, Arch, Ghostty, Neovim, Proxmox, Unreal Engine, Blender, Stash"
+
+[text]
+filter_filler_words = true
+
+[output]
+# Typing through wtype loses the odd shifted key ("AIRHG", "hook It"), even
+# with a per-key delay. Paste is instant and exact. ctrl+shift+v pastes in
+# terminals, browsers and Electron apps; Firefox ignores wtype's shift+insert.
+# Native GTK/Qt text fields only take ctrl+v, so they get nothing.
+mode = "paste"
+paste_keys = "ctrl+shift+v"
+restore_clipboard = true
+fallback_to_clipboard = true
+type_delay_ms = 1
+
+# Rambler-style cleanup. On failure or timeout voxtype types the raw transcript.
+[output.post_process]
+command = "voxtype-cleanup"
+timeout_ms = 15000
+
+[output.notification]
+on_recording_start = false
+on_recording_stop = false
+on_transcription = false

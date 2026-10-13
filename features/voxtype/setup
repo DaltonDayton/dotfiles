@@ -1,0 +1,2 @@
+(( CHANGED )) && systemctl --user is-active -q voxtype && run systemctl --user restart voxtype
+true
