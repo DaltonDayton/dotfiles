@@ -138,6 +138,16 @@ Default, adjust per project:
 **Just do it:** anything inside the approved plan, obvious fixes, following existing patterns.
 
 **Stop and ask:** scope creep beyond the plan, a new dependency, a schema/API/contract change, anything destructive (deleting files, data, migrations), or an ambiguity that materially changes the approach.
+---
+
+## 12. Omarchy machines
+
+On an Omarchy system, use Omarchy's own commands over the raw tool underneath:
+
+- Packages: `omarchy pkg add` / `omarchy pkg aur add` / `omarchy pkg drop`, never raw `pacman`, `yay` or `paru`. When sudo is needed, hand me the `omarchy pkg` line to run.
+- Settings: if a menu entry or `omarchy` command covers it, run that (or exactly what it runs) rather than hand-editing the config, and tell me the menu path. Check `/usr/share/omarchy/default/omarchy/omarchy-menu.jsonc` for the action and read the script it names. A config edit is fine only when no command exists; say so.
+
+Why: a menu action may do more than write the file (reloads, notifications, dependent state), and I don't want that silently skipped.
 
 # graphify
 - **graphify** (`~/.claude/skills/graphify/SKILL.md`) - any input to knowledge graph. Trigger: `/graphify`
