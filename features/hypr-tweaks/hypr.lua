@@ -38,3 +38,50 @@ o.window({ class = "^steam$", title = "^Steam$" }, { tile = true })
 o.window({ class = "^[Ff]irefox$", title = ".*YouTube.*" }, {
   opacity = "1 override 1 override 1 override",
 })
+
+-- == Global window opacity: "<active> <inactive>" (Omarchy default: 0.985 0.96)
+o.window({ tag = "default-opacity" }, { opacity = "0.95 0.90" })
+
+-- == Pull floating dialogs that open off-screen back to the monitor's centre
+-- XWayland sees the stacked monitors side by side, so some X11 dialogs (Unity's
+-- Neovim Settings, Unreal's startup toasts) land a monitor-width off the left
+-- edge, invisible. Only windows with a real title: Unity (and other X11 apps)
+-- park untitled helper windows off-screen on purpose, and dragging those into
+-- view leaves Unity thinking a popup is open, which blocks script reloads.
+-- Checked at open and once more 250 ms later, for clients that place their
+-- window after mapping. Tiled windows are never touched.
+local function has_real_title(w)
+  local t = (w.title or ""):lower()
+  return t ~= "" and t ~= (w.class or ""):lower() and t ~= (w.initial_class or ""):lower()
+end
+
+local function recentre_if_offscreen(w)
+  if not w.floating or w.monitor == nil or not has_real_title(w) then
+    return
+  end
+  local m = w.monitor
+  local off = w.at.x + w.size.x <= m.x
+    or w.at.x >= m.x + m.width
+    or w.at.y + w.size.y <= m.y
+    or w.at.y >= m.y + m.height
+  if off then
+    hl.dispatch(hl.dsp.window.center({ window = "address:" .. w.address }))
+  end
+end
+
+hl.on("window.open", function(w)
+  recentre_if_offscreen(w)
+  hl.timer(function()
+    if w.mapped then
+      recentre_if_offscreen(w)
+    end
+  end, { timeout = 250, type = "oneshot" })
+end)
+
+-- == Don't let apps steal focus (Omarchy default: focus_on_activate = true)
+-- Activation requests just mark the window urgent, as in the pre-Omarchy setup.
+-- warp_on_change_workspace off so a focus change elsewhere can't drag the cursor.
+hl.config({
+  misc = { focus_on_activate = false },
+  cursor = { warp_on_change_workspace = 0 },
+})
