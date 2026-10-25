@@ -13,9 +13,9 @@ return {
     vim.keymap.set("n", "<leader>ma", function() harpoon:list():add() end, { desc = "Add to Harpoon" })
 
     -- Select harpoon marks
-    vim.keymap.set("n", "<M-j>", function() harpoon:list():select(1) end, { desc = "Harpoon file 1" })
-    vim.keymap.set("n", "<M-k>", function() harpoon:list():select(2) end, { desc = "Harpoon file 2" })
-    vim.keymap.set("n", "<M-l>", function() harpoon:list():select(3) end, { desc = "Harpoon file 3" })
-    vim.keymap.set("n", "<M-;>", function() harpoon:list():select(4) end, { desc = "Harpoon file 4" })
+    vim.keymap.set("n", "<M-h>", function() harpoon:list():select(1) end, { desc = "Harpoon file 1" })
+    vim.keymap.set("n", "<M-j>", function() harpoon:list():select(2) end, { desc = "Harpoon file 2" })
+    vim.keymap.set("n", "<M-k>", function() harpoon:list():select(3) end, { desc = "Harpoon file 3" })
+    vim.keymap.set("n", "<M-l>", function() harpoon:list():select(4) end, { desc = "Harpoon file 4" })
   end,
 }
