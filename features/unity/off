@@ -1,0 +1,2 @@
+[[ -e ~/.local/share/unity-analyzers ]] && run rm -r ~/.local/share/unity-analyzers
+true

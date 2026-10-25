@@ -1,0 +1,7 @@
+{
+  "name": "com.dalton.refresh-on-save",
+  "version": "1.0.0",
+  "displayName": "Refresh On Save",
+  "description": "Refresh the asset database when a file under Assets/ changes on disk. Unity on Linux only rescans when its window regains focus, and under Hyprland that signal never arrives (hyprwm/Hyprland issue 7333).",
+  "unity": "2021.3"
+}

@@ -6,3 +6,12 @@
 o.window({ class = "^Unityhub-unity-editor.*" }, {
   opacity = "1 override 1 override 1 override",
 })
+
+-- The Ghostty window the Unity Neovim package launches (features/unity/README.md).
+-- Floating and centered so it overlays the editor instead of tiling into it;
+-- the package itself focuses it through this initial title.
+o.window({ initial_title = "^nvimunity-.*" }, {
+  float = true,
+  size = { 1920, 1080 },
+  center = true,
+})

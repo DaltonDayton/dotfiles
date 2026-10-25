@@ -1,0 +1,13 @@
+# Microsoft.Unity.Analyzers: the Roslyn analyzer that knows Unity's conventions
+# (message methods are not "unused", etc.). The Unity Neovim package adds the
+# .dll to every generated .csproj once pointed at it (README.md). Not on
+# nuget's CLI path, so fetch the nupkg (a zip) and keep only the dll.
+ver=1.28.0
+dll=~/.local/share/unity-analyzers/Microsoft.Unity.Analyzers.dll
+if [[ ! -e $dll ]]; then
+  tmp=$(mktemp -d)
+  run curl -fsSL -o "$tmp/pkg.nupkg" "https://api.nuget.org/v3-flatcontainer/microsoft.unity.analyzers/$ver/microsoft.unity.analyzers.$ver.nupkg"
+  mkdir -p "${dll%/*}"
+  run unzip -q -j -o "$tmp/pkg.nupkg" analyzers/dotnet/cs/Microsoft.Unity.Analyzers.dll -d "${dll%/*}"
+  rm -r "$tmp"
+fi

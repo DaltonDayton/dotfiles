@@ -1,0 +1,5 @@
+{
+  "name": "Dalton.RefreshOnSave.Editor",
+  "includePlatforms": ["Editor"],
+  "autoReferenced": false
+}
