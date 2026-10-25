@@ -4,12 +4,13 @@ hl.workspace_rule({ workspace = "special:obsidian", on_created_empty = "obsidian
 o.bind("SUPER + ALT + O", "Toggle Obsidian workspace", hl.dsp.workspace.toggle_special("obsidian"))
 o.bind("SUPER + SHIFT + ALT + O", "Move window to Obsidian workspace", hl.dsp.window.move({ workspace = "special:obsidian", follow = true }))
 
--- == Playwright's Chromium parked on a hidden workspace, never steals focus (SUPER+ALT+B)
--- The tag has to go first, or Omarchy's browser tile rule wins. Suppressing
--- activation is what keeps it off screen when Playwright raises the window.
+-- == Agent browser (Playwright / chrome-devtools MCP) parked on a hidden workspace (SUPER+ALT+B)
+-- Automation launches Chromium with --class=agent-browser (set in the MCP and
+-- playwright-cli configs), so this never catches a Chromium opened by hand or an
+-- Omarchy web app, and Omarchy's browser tile rule never matches it either.
+-- Suppressing activation is what keeps it off screen when Playwright raises the window.
 hl.workspace_rule({ workspace = "special:playwright", gaps_out = 20, gaps_in = 10 })
-o.window({ class = "^chromium$" }, { tag = "-chromium-based-browser" })
-o.window({ class = "^chromium$" }, {
+o.window({ class = "^agent-browser$" }, {
   float = true,
   size = { 1920, 1080 },
   center = true,

@@ -152,3 +152,19 @@ Why: a menu action may do more than write the file (reloads, notifications, depe
 # graphify
 - **graphify** (`~/.claude/skills/graphify/SKILL.md`) - any input to knowledge graph. Trigger: `/graphify`
 When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.
+
+## 13. Browsers
+
+- **My browser is Firefox.** Anything you open for me to look at (a report, a
+  page, a link) opens in Firefox: `setsid firefox <url> &`. Never Google Chrome.
+- **Automation uses the agent browser.** System Chromium launched with
+  `--class=agent-browser`; a Hyprland rule (dotfiles `special-workspaces`)
+  parks that class floating on `special:playwright` so it never steals focus
+  (SUPER+ALT+B peeks). Two front ends are wired to it:
+  - `playwright cli open|goto|screenshot|close` (config `~/.playwright/cli.config.json`,
+    which also allows `file:` URLs; screenshots land in `.playwright-cli/` under
+    the cwd, so run it from the scratchpad)
+  - the user-scope `chrome-devtools` MCP server (`claude mcp get chrome-devtools`),
+    not the ecc plugin's copy, which launches Google Chrome.
+  - Fallback for a quick render: `chromium --headless=new --screenshot=...`.
+  Do not route automation through my Firefox.
