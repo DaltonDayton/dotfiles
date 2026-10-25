@@ -26,17 +26,12 @@ return {
   },
   {
     "OXY2DEV/markview.nvim",
-    ft = { "markdown", "codecompanion" },
+    ft = "markdown",
     dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-mini/mini.icons" },
     config = function()
-      -- CodeCompanion chat buffers are markdown content under a non-markdown filetype.
-      -- markview calls vim.treesitter.start(), which errors if the filetype has no parser,
-      -- so point codecompanion at the markdown parser.
-      vim.treesitter.language.register("markdown", "codecompanion")
-
       require("markview").setup({
         preview = {
-          filetypes = { "markdown", "codecompanion" }, -- also render the CodeCompanion chat buffer
+          filetypes = { "markdown" },
           condition = function(buf)
             -- return false skips a buffer, nil falls through to the filetypes allowlist.
             -- Only force-skip inside the vaults dir; let everything else use normal gating

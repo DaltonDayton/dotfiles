@@ -1,5 +1,4 @@
 {
-  "99": { "branch": "master", "commit": "c17422457027c913c76c75a921fca1e623d2678e" },
   "FixCursorHold.nvim": { "branch": "master", "commit": "1900f89dc17c603eec29960f57c00bd9ae696495" },
   "LuaSnip": { "branch": "master", "commit": "642b0c595e11608b4c18219e93b88d7637af27bc" },
   "UnrealEngine.nvim": { "branch": "main", "commit": "de517971f08d75541172b827096525e53606f879" },
@@ -7,9 +6,7 @@
   "ashen.nvim": { "branch": "main", "commit": "bfb04bd50b69d863469b2deb9fb361cf0d945ba7" },
   "bamboo.nvim": { "branch": "master", "commit": "1309bc88bffcf1bedc3e84e7fa9004de93da774a" },
   "blink.cmp": { "branch": "main", "commit": "78336bc89ee5365633bcf754d93df01678b5c08f" },
-  "blink.compat": { "branch": "main", "commit": "2ed6d9a28b07fa6f3bface818470605f8896408c" },
   "catppuccin": { "branch": "main", "commit": "edefef779ab08ce1a4a404713e3012b0d202bd35" },
-  "codecompanion.nvim": { "branch": "main", "commit": "6794c8bcbe9e8614588749cafb5de29d7fa57c3b" },
   "conform.nvim": { "branch": "master", "commit": "016802de402556da54c36bd7359b441266b01cdd" },
   "diagram.nvim": { "branch": "master", "commit": "54d71d6ae72afa236eedb2a918a35d7414ba39f6" },
   "ethereal.nvim": { "branch": "main", "commit": "a0ec73332e537228981b6a4f465cef82bb3e1d36" },
