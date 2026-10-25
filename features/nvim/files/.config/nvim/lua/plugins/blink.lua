@@ -13,6 +13,9 @@ return {
 
         -- Load friendly-snippets
         require("luasnip.loaders.from_vscode").lazy_load()
+        -- Its Unity set (MonoBehaviour, message methods) is filed under the
+        -- pseudo-language "unity", so .cs buffers only see it via extend.
+        ls.filetype_extend("cs", { "unity" })
 
         -- Load custom snippets from ~/.config/nvim/snippets/ (VS Code style JSON)
         require("luasnip.loaders.from_vscode").lazy_load({
@@ -95,6 +98,11 @@ return {
       preset = "enter",
       ["<Tab>"] = { "select_and_accept", "snippet_forward", "fallback" },
     },
+
+    -- Expand through LuaSnip, so the loaders, filetype_extend and the
+    -- C-l/C-h/C-j node keymaps above apply. Without this blink loads
+    -- friendly-snippets itself and ignores LuaSnip entirely.
+    snippets = { preset = "luasnip" },
 
     signature = {
       enabled = true,
