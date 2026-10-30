@@ -85,3 +85,40 @@ hl.config({
   misc = { focus_on_activate = false },
   cursor = { warp_on_change_workspace = 0 },
 })
+
+-- == Floating windows follow their workspace back after a monitor reconnects
+-- When a monitor drops its link in standby, its workspaces move to the other
+-- one; on wake the workspaces return (per the workspace rules) and tiled
+-- windows re-lay out, but floating windows keep the pixel position they got
+-- on the other monitor and are left stranded there. Translate each float by
+-- the monitor offset so TSM, Battle.net and friends keep their layout. X11
+-- windows (WoW) can also end up a monitor-width off-screen, as on open above,
+-- so those get the same recentre.
+local function monitor_at(x, y)
+  for _, m in ipairs(hl.get_monitors()) do
+    if x >= m.x and x < m.x + m.width and y >= m.y and y < m.y + m.height then
+      return m
+    end
+  end
+end
+
+local function pull_floats_home()
+  for _, w in ipairs(hl.get_windows({ floating = true, mapped = true })) do
+    local home, here = w.monitor, monitor_at(w.at.x, w.at.y)
+    if here == nil then
+      recentre_if_offscreen(w)
+    elseif home and here.name ~= home.name then
+      hl.dispatch(hl.dsp.window.move({
+        x = w.at.x - here.x + home.x,
+        y = w.at.y - here.y + home.y,
+        window = "address:" .. w.address,
+      }))
+    end
+  end
+end
+
+for _, ev in ipairs({ "monitor.added", "monitor.layout_changed", "workspace.move_to_monitor" }) do
+  hl.on(ev, function()
+    hl.timer(pull_floats_home, { timeout = 500, type = "oneshot" })
+  end)
+end
