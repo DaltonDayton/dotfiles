@@ -10,6 +10,10 @@ alias githistall="git log --pretty='%C(yellow)%h %C(cyan)%cd %Cblue%aN%C(auto)%d
 # uv's installer puts ~/.local/bin first so its binaries beat /usr/bin.
 [[ -r "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
 
+# bob (nvim version manager) shim goes ahead of /usr/bin so `bob use` picks the
+# nvim. Only active where bob has been used at least once.
+[[ -d "$HOME/.local/share/bob/nvim-bin" ]] && PATH="$HOME/.local/share/bob/nvim-bin:$PATH"
+
 # sdev: pick a zoxide dir, open (or switch to) a tmux session there with
 # ai / nvim / term windows.
 sdev() {
