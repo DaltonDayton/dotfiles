@@ -8,24 +8,19 @@ return {
     })
 
     -- Integrate hlslens with default search keymaps
-    local kopts = { noremap = true, silent = true }
-
-    vim.api.nvim_set_keymap(
-      "n",
-      "n",
-      [[<Cmd>execute('normal! ' . v:count1 . 'n')<CR>zzzv<Cmd>lua require('hlslens').start()<CR>]],
-      kopts
-    )
-    vim.api.nvim_set_keymap(
-      "n",
-      "N",
-      [[<Cmd>execute('normal! ' . v:count1 . 'N')<CR>zzzv<Cmd>lua require('hlslens').start()<CR>]],
-      kopts
-    )
-    vim.api.nvim_set_keymap("n", "*", [[*<Cmd>lua require('hlslens').start()<CR>]], kopts)
-    vim.api.nvim_set_keymap("n", "#", [[#<Cmd>lua require('hlslens').start()<CR>]], kopts)
-    vim.api.nvim_set_keymap("n", "g*", [[g*<Cmd>lua require('hlslens').start()<CR>]], kopts)
-    vim.api.nvim_set_keymap("n", "g#", [[g#<Cmd>lua require('hlslens').start()<CR>]], kopts)
+    local function search(key, desc, center)
+      vim.keymap.set("n", key, function()
+        vim.cmd(("normal! %d%s"):format(vim.v.count1, key))
+        if center then vim.cmd("normal! zzzv") end
+        require("hlslens").start()
+      end, { silent = true, desc = desc })
+    end
+    search("n", "Next match (centered, lens)", true)
+    search("N", "Previous match (centered, lens)", true)
+    search("*", "Search word under cursor forward")
+    search("#", "Search word under cursor backward")
+    search("g*", "Search word under cursor forward (partial)")
+    search("g#", "Search word under cursor backward (partial)")
 
     -- Clear search highlight, and multicursors (0.13+; a no-op namespace before
     -- that). Built-in <C-l> would do both but vim-tmux-navigator owns <C-l>.
