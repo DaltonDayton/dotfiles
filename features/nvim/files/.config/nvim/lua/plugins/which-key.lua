@@ -11,54 +11,14 @@ return {
   config = function(_, opts)
     require("which-key").setup(opts)
 
-    -- Document key groups only - individual keybinds have their own desc where defind
-    require("which-key").add({
-      -- Non-leader prefixes
-      { "g", group = "[G]oto" },
-      { "[", group = "Previous" },
-      { "]", group = "Next" },
-
-      -- Leader groups
-      { "<leader>b", group = "[B]uffer" },
-      { "<leader>b_", hidden = true },
-      { "<leader>c", group = "[C]ode/LSP" },
-      { "<leader>c_", hidden = true },
-      { "<leader>d", group = "[D]ebug" },
-      { "<leader>d_", hidden = true },
-      { "<leader>e", group = "[E]xplorer" },
-      { "<leader>e_", hidden = true },
-      { "<leader>f", group = "[F]ind" },
-      { "<leader>f_", hidden = true },
-      { "<leader>g", group = "[G]it" },
-      { "<leader>g_", hidden = true },
-      { "<leader>gh", group = "Git [H]unk" },
-      { "<leader>gh_", hidden = true },
-      { "<leader>ght", group = "[T]oggle (Git)" },
-      { "<leader>ght_", hidden = true },
-      { "<leader>m", group = "[M]arks (Harpoon)" },
-      { "<leader>m_", hidden = true },
-      { "<leader>k", group = "Multi[k]ursor" },
-      { "<leader>k_", hidden = true },
-      { "<leader>o", group = "[O]bsidian" },
-      { "<leader>o_", hidden = true },
-      { "<leader>n", group = "[N]eotest" },
-      { "<leader>n_", hidden = true },
-      { "<leader>np", group = "[P]laywright" },
-      { "<leader>np_", hidden = true },
-      { "<leader>q", group = "[Q]uickfix" },
-      { "<leader>q_", hidden = true },
-      { "<leader>s", group = "[S]earch" },
-      { "<leader>s_", hidden = true },
-      { "<leader>t", group = "[T]abs" },
-      { "<leader>t_", hidden = true },
-      { "<leader>u", group = "[U]I Toggles" },
-      { "<leader>U", group = "[U]nreal" },
-      { "<leader>U_", hidden = true },
-      { "<leader>u_", hidden = true },
-      { "<leader>v", group = "[V]isual Selection" },
-      { "<leader>v_", hidden = true },
-      { "<leader>w", group = "[W]indow" },
-      { "<leader>w_", hidden = true },
-    })
+    -- Group titles live in lua/cheatsheet/groups.lua, shared with <leader>?.
+    local spec = {}
+    for _, g in ipairs(require("cheatsheet.groups")) do
+      if g.prefix ~= "" and g.prefix ~= "<leader>" and g.prefix ~= "<" and g.prefix ~= "<F" then
+        table.insert(spec, { g.prefix, group = g.title })
+        table.insert(spec, { g.prefix .. "_", hidden = true })
+      end
+    end
+    require("which-key").add(spec)
   end,
 }

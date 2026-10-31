@@ -4,6 +4,8 @@ vim.opt.hlsearch = true
 
 -- increment/decrement numbers use vim defaults: <C-a> and <C-x>
 
+vim.keymap.set("n", "<leader>?", function() require("cheatsheet").float() end, { desc = "Keybind cheatsheet" })
+
 vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
 -- Buffer navigation: [b / ]b provided by Neovim 0.11+ defaults
