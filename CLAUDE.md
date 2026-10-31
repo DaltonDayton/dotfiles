@@ -37,6 +37,15 @@ differs from stock and I know why".
   machines run the same set and `:Lazy restore` has a known-good point. lazy
   rewrites it on every install or update, so commit it with any nvim change,
   and on its own as `chore: bump nvim plugins` after a plain `:Lazy update`.
+- Neovim changes update the cheatsheet (`features/nvim/.../lua/cheatsheet/`),
+  which `<leader>?` and `:Cheatsheet html` render from live keymaps plus two
+  hand-written files. Every new map gets a `desc`, or it is invisible there.
+  A new key prefix gets an entry in `groups.lua` (title, blurb; which-key
+  reads its groups from the same file). A new, removed or reworked feature
+  gets its `features.lua` entry added, dropped or rewritten, with the keys it
+  references kept current: a listed key that no longer exists renders as
+  "unmapped". Before committing, open a file and run `:Cheatsheet check`, or
+  headless: `nvim --headless <some file> +'Cheatsheet check' +qa`.
 - `setup`/`off` are sourced by install.sh. Use its helpers (`run`, `say`,
   `ensure_line`, `remove_line`, `ensure_block`, `remove_block`, `bar_set`)
   and guard every action so a rerun
