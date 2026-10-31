@@ -1,5 +1,6 @@
 require("config.options")
 require("config.keymaps")
+require("config.multicursor")
 require("config.autocmds")
 require("config.lazy")
 require("lsp")

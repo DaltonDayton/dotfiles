@@ -27,12 +27,11 @@ return {
     vim.api.nvim_set_keymap("n", "g*", [[g*<Cmd>lua require('hlslens').start()<CR>]], kopts)
     vim.api.nvim_set_keymap("n", "g#", [[g#<Cmd>lua require('hlslens').start()<CR>]], kopts)
 
-    -- Clear search highlight when done
-    vim.api.nvim_set_keymap(
-      "n",
-      "<Esc>",
-      "<Cmd>noh<CR><Esc>",
-      { noremap = true, silent = true }
-    )
+    -- Clear search highlight, and multicursors (0.13+; a no-op namespace before
+    -- that). Built-in <C-l> would do both but vim-tmux-navigator owns <C-l>.
+    vim.keymap.set("n", "<Esc>", function()
+      vim.cmd.nohlsearch()
+      vim.api.nvim_buf_clear_namespace(0, vim.api.nvim_create_namespace("nvim.multicursor"), 0, -1)
+    end, { silent = true, desc = "Clear search highlight and multicursors" })
   end,
 }

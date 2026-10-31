@@ -37,6 +37,8 @@ return {
       { "<leader>ght_", hidden = true },
       { "<leader>m", group = "[M]arks (Harpoon)" },
       { "<leader>m_", hidden = true },
+      { "<leader>k", group = "Multi[k]ursor" },
+      { "<leader>k_", hidden = true },
       { "<leader>o", group = "[O]bsidian" },
       { "<leader>o_", hidden = true },
       { "<leader>n", group = "[N]eotest" },
