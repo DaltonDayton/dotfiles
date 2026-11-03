@@ -12,3 +12,4 @@ fd-find
 jq
 btop
 bash-completion
+pulseaudio-utils
