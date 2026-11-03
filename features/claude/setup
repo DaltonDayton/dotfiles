@@ -1,11 +1,18 @@
-# settings.json isn't tracked here (it carries work-machine config), so add
-# herdr's SessionStart hook to the live file instead of linking one.
+# settings.json isn't tracked here (it carries machine-specific config), so add
+# herdr's SessionStart hook to the live file instead of linking one. The entry
+# is the one `herdr integration install claude` (v11) writes, so the two never
+# stack; the pre-v11 form this used to add is dropped.
 s=~/.claude/settings.json
-cmd='bash "$HOME/.claude/hooks/herdr-agent-state.sh" session'
+cmd="bash '$HOME/.claude/hooks/herdr-agent-state.sh' session"
+old='bash "$HOME/.claude/hooks/herdr-agent-state.sh" session'
 [[ -f $s ]] || echo '{}' > "$s"
-if ! jq -e --arg c "$cmd" '[.hooks.SessionStart[]?.hooks[]?.command] | index($c)' "$s" >/dev/null; then
-  tmp=$(mktemp)
-  jq --arg c "$cmd" '.hooks.SessionStart += [{matcher: "*", hooks: [{type: "command", command: $c, timeout: 10}]}]' "$s" > "$tmp"
-  cat "$tmp" > "$s" && rm "$tmp"
+has() { jq -e --arg c "$1" '[.hooks.SessionStart[]?.hooks[]?.command] | index($c)' "$s" >/dev/null; }
+edit() { local tmp; tmp=$(mktemp); jq "$@" "$s" > "$tmp" && cat "$tmp" > "$s" && rm "$tmp"; }
+if has "$old"; then
+  edit --arg c "$old" '.hooks.SessionStart |= map(select(all(.hooks[]?; .command != $c)))'
+  say "removed the pre-v11 herdr SessionStart hook from $s"
+fi
+if ! has "$cmd"; then
+  edit --arg c "$cmd" '.hooks.SessionStart += [{matcher: "^(startup|resume|clear|compact|fork)$", hooks: [{type: "command", command: $c, timeout: 10}]}]'
   say "added herdr SessionStart hook to $s"
 fi
