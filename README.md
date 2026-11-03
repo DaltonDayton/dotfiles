@@ -77,6 +77,12 @@ A snapshot without a baseline gets one recorded on the next run.
   rules and a loader into `hyprland.lua` that override `monitors.lua`. Edit the feature file instead.
 - **Tray pins** (desktop): pin Steam, Discord, NordVPN from the tray itself.
 - **Battle.net:** `omarchy install gaming battlenet` before enabling `battlenet-tsm`.
+- **TSM updates:** the TSM installer asks PowerShell whether the app is running, and
+  Wine's PowerShell stub answers yes forever ("TradeSkillMaster cannot be closed"). Before
+  letting it update, rename `powershell.exe` under both `drive_c/windows/system32/WindowsPowerShell/v1.0/`
+  and `syswow64/.../v1.0/` in `~/Games/battlenet` (they are symlinks into GE-Proton), then
+  rename them back. The old Python app under `Program Files (x86)/TradeSkillMaster Application`
+  is not removed by the new installer; run its `unins000.exe` once.
 - **Unreal Engine, Blender** (desktop): manual installs under `~/software/`. The `unreal` feature
   ships the window rules and `nvim-ue`; `features/unreal/README.md` is the runbook (engine,
   accessor plugin build, Fab, Blender, Starter Content).

@@ -4,11 +4,13 @@
 # The guard matches the Wine-side path (backslashes) rather than the umu-run
 # command line: umu-run lingers after TSM quits, and matching it would skip
 # every relaunch.
+# --no-sandbox: Chromium's Windows sandbox crashes the Electron app under Wine
+# when it starts next to Battle.net (CHECK failure right after spawning helpers).
 set -e
 PREFIX="$HOME/Games/battlenet"
-TSM="$PREFIX/drive_c/Program Files (x86)/TradeSkillMaster Application/app/TSMApplication.exe"
-if [[ -f $TSM ]] && ! pgrep -f '\\TSMApplication\.exe' >/dev/null; then
+TSM="$PREFIX/drive_c/users/steamuser/AppData/Local/Programs/TradeSkillMaster/TradeSkillMaster.exe"
+if [[ -f $TSM ]] && ! pgrep -f '\\TradeSkillMaster\.exe' >/dev/null; then
   env WINEPREFIX="$PREFIX" PROTONPATH=GE-Proton GAMEID=umu-battlenet PROTON_VERB=run \
-    setsid -f umu-run "$TSM" >/dev/null 2>&1
+    setsid -f umu-run "$TSM" --no-sandbox >/dev/null 2>&1
 fi
 exec omarchy-launch-battlenet "$@"
