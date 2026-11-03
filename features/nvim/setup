@@ -1,9 +1,20 @@
 # A previous nvim setup may have left plugins and mason tools in the data
-# dirs. lazy.nvim would reuse those checkouts instead of lazy-lock.json's
-# commits, so start clean when the config is first linked. off puts them back.
+# dirs. lazy.nvim would keep using those old checkouts, so start clean when
+# the config is first linked. off puts them back.
 if (( CHANGED )); then
   ts=$(date +%s)
   for d in ~/.local/share/nvim ~/.local/state/nvim ~/.cache/nvim; do
     [[ -e $d ]] && run mv "$d" "$d.bak.$ts"
   done
+fi
+
+# nvim is bob's nightly: mise's neovim tracks stable, which lacks the 0.13
+# builtins (multicursor). Drop the old mise neovim, then select nightly once;
+# updates are manual (`bob update nightly`).
+if mise_installed neovim; then
+  run mise unuse --global neovim
+  remove_line "$STATE/packages" "nvim	mise:neovim"
+fi
+if [[ $(~/.local/share/bob/nvim-bin/nvim --version 2>/dev/null) != *-dev* ]]; then
+  run bob use nightly
 fi

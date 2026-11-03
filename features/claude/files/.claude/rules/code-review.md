@@ -4,7 +4,7 @@ Detailed rules for drafting and posting PR reviews. Read and follow this before
 drafting any review. Loaded on demand (not `@`-imported), so it stays out of
 context until you actually review.
 
-The always-on guardrail (universal `CLAUDE.md` section 7) still applies: never
+The always-on guardrail still applies: never
 post anything automatically; draft, wait for explicit sign-off, then post exactly
 what was approved.
 

@@ -6,3 +6,5 @@ for d in ~/.local/share/nvim ~/.local/state/nvim ~/.cache/nvim; do
   [[ -e $d ]] && run mv "$d" "$d.dotfiles.$ts"
   run mv "$bak" "$d"
 done
+# Remove bob's nvim builds and shim (install.sh then drops bob itself).
+[[ -d ~/.local/share/bob ]] && run bob erase

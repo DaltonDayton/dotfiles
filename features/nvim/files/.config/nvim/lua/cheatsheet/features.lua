@@ -277,8 +277,8 @@ return {
   {
     title = "Plugin management",
     tag = "ui",
-    summary = "lazy.nvim with a tracked lock file and an update checker.",
-    body = [[:Lazy opens the manager. lazy-lock.json is committed so both machines run the same plugin commits and :Lazy restore returns to that set; commit it with any nvim change. The checker notifies when updates are available. sp fuzzy-finds a plugin's spec.]],
+    summary = "lazy.nvim on latest, with an update checker; roll back one plugin from its reflog.",
+    body = [[:Lazy opens the manager; the checker notifies when updates are available. lazy-lock.json is local only (untracked). If a plugin misbehaves after an update, `git -C ~/.local/share/nvim/lazy/<plugin> reflog` shows where each update moved it: HEAD@{1} is the version before the last update. Pin that with commit = "<sha>" in its spec, :Lazy update <plugin>, and drop the pin once upstream is fixed. If nvim itself broke, `bob rollback` returns to the previous nightly. sp fuzzy-finds a plugin's spec.]],
     keys = { "<leader>sp" },
   },
   -- shell --------------------------------------------------------------
@@ -289,5 +289,12 @@ return {
     body = [[From any shell, sdev fuzzy-picks a directory from zoxide's history and opens (or switches to) a tmux session named after it, with an ai window, an nvim window already running `nvim .`, and a term window. Lives in features/basics/bash/personal.]],
     keys = {},
     see = "features/basics/bash/personal",
+  },
+  {
+    title = "Neovim versions with bob",
+    tag = "shell",
+    summary = "Stable and nightly side by side; bob use swaps.",
+    body = [[bob (from mise) installs builds under ~/.local/share/bob and its shim sits first in PATH when present. The nvim feature selects nightly; `bob use stable` switches back, and `bob update nightly` pulls a newer snapshot.]],
+    keys = {},
   },
 }

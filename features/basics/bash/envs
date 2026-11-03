@@ -28,4 +28,11 @@ case ":$PATH:" in
   *":$HOME/.local/bin:"*) ;;
   *) PATH="$PATH:$HOME/.local/bin" ;;
 esac
+# bob's nvim shim goes first so it wins over any other nvim (nvim feature).
+if [[ -d $HOME/.local/share/bob/nvim-bin ]]; then
+  case ":$PATH:" in
+    *":$HOME/.local/share/bob/nvim-bin:"*) ;;
+    *) PATH="$HOME/.local/share/bob/nvim-bin:$PATH" ;;
+  esac
+fi
 export PATH
