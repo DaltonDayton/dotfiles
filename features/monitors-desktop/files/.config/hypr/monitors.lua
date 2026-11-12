@@ -8,6 +8,3 @@ hl.monitor({ output = "", mode = "preferred", position = "auto", scale = omarchy
 
 hl.monitor({ output = "DP-2", mode = "3440x1440@144", position = "0x0", scale = omarchy_monitor_scale }) -- AOC (top)
 hl.monitor({ output = "DP-3", mode = "3440x1440@165", position = "0x1440", scale = omarchy_monitor_scale }) -- Samsung (bottom)
-
-hl.workspace_rule({ workspace = "1", monitor = "DP-3", persistent = true })
-hl.workspace_rule({ workspace = "2", monitor = "DP-2", persistent = true })
