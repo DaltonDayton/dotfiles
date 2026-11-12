@@ -26,3 +26,38 @@ hl.on("window.open", function(window)
 end)
 -- Wine's activation requests otherwise warp the cursor on every open/close.
 o.window({ class = "^steam_app_battlenet$" }, { focus_on_activate = false })
+-- World of Warcraft opens on the games workspace (slot 6 of the bottom monitor) and
+-- stays on-screen. Its GxMaximize asks X11 for (0,0); Hyprland lays XWayland monitors
+-- in a row and converts that relative to the window's current monitor, so on the
+-- lower of two stacked monitors the window lands one monitor-width off the left
+-- edge. The request arrives after mapping (and again on display changes), so a
+-- static move rule doesn't hold: watch the position for a while after it opens.
+local function bottom_monitor()
+  local bottom
+  for _, m in ipairs(hl.get_monitors()) do
+    if bottom == nil or m.y > bottom.y then bottom = m end
+  end
+  return bottom
+end
+local wow = { class = "^steam_app_battlenet$", title = "^World of Warcraft$" }
+local games = bottom_monitor()
+if games then
+  o.window(wow, { workspace = tostring(o.workspaces.workspace_id(games, 6)) })
+end
+local function keep_wow_on_screen(window)
+  local m = window.monitor
+  if not m or not window.mapped or window.title ~= "World of Warcraft" then return end
+  if window.at.x < m.x or window.at.y < m.y then
+    hl.dispatch(hl.dsp.window.move({ x = m.x, y = m.y, window = "address:" .. window.address }))
+  end
+end
+hl.on("window.open", function(window)
+  if window.class ~= "steam_app_battlenet" then return end
+  local function check(left)
+    keep_wow_on_screen(window)
+    if left > 0 then
+      hl.timer(function() check(left - 1) end, { type = "oneshot", timeout = 1000 })
+    end
+  end
+  check(30)
+end)
