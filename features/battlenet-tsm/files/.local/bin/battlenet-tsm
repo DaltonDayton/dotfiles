@@ -1,16 +1,24 @@
 #!/bin/bash
-# Start TradeSkillMaster's desktop app in the Battle.net prefix, then Battle.net.
-# Omarchy's launcher is a plain umu-run call, so TSM just reuses its env.
-# The guard matches the Wine-side path (backslashes) rather than the umu-run
-# command line: umu-run lingers after TSM quits, and matching it would skip
-# every relaunch.
+# Start TradeSkillMaster's desktop app, then Battle.net.
+# TSM lives in its own prefix (~/Games/tsm, built by this feature's setup): it
+# runs inside a Wine virtual desktop, which its Electron dropdown menus need
+# under Hyprland (as separate X11 popups they never appear), and a virtual
+# desktop inside WoW's session knocks WoW out of fullscreen and breaks mouselook.
+# Don't use PROTON_ENABLE_WAYLAND for the dropdowns instead: the graphics driver
+# is per wineserver session, so Battle.net (and WoW) would render black.
+# The guard matches the Wine-side path rather than the umu-run command line:
+# umu-run lingers after TSM quits, and matching it would skip every relaunch.
 # --no-sandbox: Chromium's Windows sandbox crashes the Electron app under Wine
 # when it starts next to Battle.net (CHECK failure right after spawning helpers).
+# The desktop size must match the TSM rule in hypr.lua and windowSize in TSM.cfg.
 set -e
-PREFIX="$HOME/Games/battlenet"
+PREFIX="$HOME/Games/tsm"
 TSM="$PREFIX/drive_c/users/steamuser/AppData/Local/Programs/TradeSkillMaster/TradeSkillMaster.exe"
-if [[ -f $TSM ]] && ! pgrep -f '\\TradeSkillMaster\.exe' >/dev/null; then
-  env WINEPREFIX="$PREFIX" PROTONPATH=GE-Proton GAMEID=umu-battlenet PROTON_VERB=run \
-    setsid -f umu-run "$TSM" --no-sandbox >/dev/null 2>&1
+# explorer gets the Windows spelling so the Wine-side command line keeps the
+# backslash form the guard expects.
+TSM_WIN='C:\users\steamuser\AppData\Local\Programs\TradeSkillMaster\TradeSkillMaster.exe'
+if [[ -f $TSM ]] && ! pgrep -f '[\\/]TradeSkillMaster\.exe' >/dev/null; then
+  env WINEPREFIX="$PREFIX" PROTONPATH=GE-Proton GAMEID=umu-tsm PROTON_VERB=run \
+    setsid -f umu-run "$PREFIX/drive_c/windows/explorer.exe" /desktop=TSM,1129x530 "$TSM_WIN" --no-sandbox >/dev/null 2>&1
 fi
 exec omarchy-launch-battlenet "$@"

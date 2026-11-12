@@ -1,1 +1,30 @@
 [[ -d ~/Games/battlenet ]] || say "note: no Battle.net prefix yet; run: omarchy install gaming battlenet"
+
+# TSM gets a prefix of its own. Its dropdown menus only work inside a Wine
+# virtual desktop, and a virtual desktop in WoW's Wine session pushes a display
+# change into WoW: it drops out of fullscreen, minimises, and mouselook breaks.
+# The WoW folder is linked in so TSM's wowPath (C:\Program Files (x86)\World of
+# Warcraft) still resolves and addon data lands where WoW reads it.
+BN=~/Games/battlenet
+TP=~/Games/tsm
+TSM_PROG=drive_c/users/steamuser/AppData/Local/Programs/TradeSkillMaster
+TSM_DATA=drive_c/users/steamuser/AppData/Roaming/TradeSkillMaster
+WOW_DIR='drive_c/Program Files (x86)/World of Warcraft'
+if [[ -d $BN ]]; then
+  if [[ ! -d $TP/drive_c/windows ]]; then
+    say "creating TSM prefix at $TP (GE-Proton, takes a minute)"
+    # createprefix exits 1 after building the prefix (it then tries to run an
+    # empty command), so judge by the result instead of the exit code.
+    env WINEPREFIX="$TP" PROTONPATH=GE-Proton GAMEID=umu-tsm umu-run createprefix >/dev/null 2>&1 || true
+    [[ -d $TP/drive_c/windows ]] || say "warning: TSM prefix creation failed"
+  fi
+  # Move, not copy: TSM must not be startable from the Battle.net prefix anymore.
+  for rel in "$TSM_PROG" "$TSM_DATA"; do
+    if [[ -d $BN/$rel && ! -e $TP/$rel ]]; then
+      mkdir -p "$(dirname "$TP/$rel")" && mv "$BN/$rel" "$TP/$rel" && say "moved $(basename "$(dirname "$rel")")/TradeSkillMaster into $TP"
+    fi
+  done
+  if [[ -d $BN/$WOW_DIR && ! -e $TP/$WOW_DIR ]]; then
+    mkdir -p "$(dirname "$TP/$WOW_DIR")" && ln -s "$BN/$WOW_DIR" "$TP/$WOW_DIR" && say "linked WoW folder into $TP"
+  fi
+fi
