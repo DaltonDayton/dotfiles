@@ -1,0 +1,8 @@
+[Desktop Entry]
+Categories=Utility;Network;Game;InstantMessaging
+Comment=Voice chat overlay for Discord
+Exec=env __NV_DISABLE_EXPLICIT_SYNC=1 overlayed
+Icon=overlayed
+Name=Overlayed
+Terminal=false
+Type=Application
