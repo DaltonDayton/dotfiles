@@ -1,10 +1,6 @@
--- == Resize (SUPER+SHIFT+CTRL+arrows) and move (SUPER+CTRL+ALT+arrows) windows
--- Resize with arrows (alongside Omarchy's SUPER + -/=).
-o.bind("SUPER + SHIFT + CTRL + Right", "Resize window wider", hl.dsp.window.resize({ x = 30, y = 0, relative = true }), { repeating = true })
-o.bind("SUPER + SHIFT + CTRL + Left", "Resize window narrower", hl.dsp.window.resize({ x = -30, y = 0, relative = true }), { repeating = true })
-o.bind("SUPER + SHIFT + CTRL + Up", "Resize window shorter", hl.dsp.window.resize({ x = 0, y = -30, relative = true }), { repeating = true })
-o.bind("SUPER + SHIFT + CTRL + Down", "Resize window taller", hl.dsp.window.resize({ x = 0, y = 30, relative = true }), { repeating = true })
-
+-- == Move windows (SUPER+CTRL+ALT+arrows)
+-- (The old SUPER+SHIFT+CTRL+arrow resize keys are gone: Omarchy 4.5 binds
+-- that chord to "move window to monitor". Resize with SUPER + -/= instead.)
 -- Move windows: re-tiles (unlike Omarchy's SUPER+SHIFT+arrows swap), or
 -- nudges 30px when floating.
 local function move_win(dx, dy, dir)
@@ -38,9 +34,6 @@ o.window({ class = "^steam$", title = "^Steam$" }, { tile = true })
 o.window({ class = "^[Ff]irefox$", title = ".*YouTube.*" }, {
   opacity = "1 override 1 override 1 override",
 })
-
--- == Global window opacity: "<active> <inactive>" (Omarchy default: 0.985 0.96)
-o.window({ tag = "default-opacity" }, { opacity = "0.95 0.90" })
 
 -- == Pull floating dialogs that open off-screen back to the monitor's centre
 -- XWayland sees the stacked monitors side by side, so some X11 dialogs (Unity's
