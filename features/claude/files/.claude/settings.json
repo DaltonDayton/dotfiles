@@ -1,11 +1,16 @@
 {
+  "attribution": {
+    "commit": "",
+    "pr": "",
+    "sessionUrl": false
+  },
   "permissions": {
-    "defaultMode": "auto",
     "deny": [
       "AskUserQuestion"
-    ]
+    ],
+    "defaultMode": "auto"
   },
-  "model": "claude-fable-5-1[1m]",
+  "model": "fable[1m]",
   "hooks": {
     "SessionStart": [
       {
@@ -31,6 +36,7 @@
       }
     }
   },
+  "outputStyle": "Concise",
   "pluginConfigs": {
     "ecc@ecc": {
       "options": {
@@ -42,13 +48,7 @@
   "timeFormat": "24-hour",
   "skipDangerousModePermissionPrompt": true,
   "theme": "auto",
-  "remoteControlAtStartup": true,
-  "agentPushNotifEnabled": true,
   "editorMode": "vim",
-  "attribution": {
-    "commit": "",
-    "pr": "",
-    "sessionUrl": false
-  },
-  "outputStyle": "Concise"
+  "remoteControlAtStartup": true,
+  "agentPushNotifEnabled": true
 }
