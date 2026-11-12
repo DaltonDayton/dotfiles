@@ -1,1 +1,1 @@
-Bar shows, per monitor, only that monitor's workspaces with windows (cloned workspaces widget)
+Bar shows, per monitor, only that monitor's workspaces with windows (cloned widget; dropped for the 4.5 trial, clone currently equals upstream so the filter must be re-applied before re-enabling)
