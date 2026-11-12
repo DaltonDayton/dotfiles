@@ -115,3 +115,14 @@ for _, ev in ipairs({ "monitor.added", "monitor.layout_changed", "workspace.move
     hl.timer(pull_floats_home, { timeout = 500, type = "oneshot" })
   end)
 end
+
+-- == F9 holds to dictate
+-- Omarchy 4.5 binds Alt+Space (toggle) and Right Alt (hold) for dictation and
+-- drives Superwhisper through `omarchy-dictation`. Superwhisper's own Lua
+-- refuses to bind F9 on Omarchy (it assumes Omarchy owns it), so F9 is bound
+-- here the same way Omarchy binds Right Alt. Superwhisper's shortcuts stay off
+-- these keys (toggle Ctrl+Alt+Space, hold none) or each press fires twice.
+if o.dictation_installed and o.dictation_installed() then
+  o.bind_hold("F9", "Start dictation (push-to-talk)", "omarchy-dictation start",
+    "Stop dictation (push-to-talk)", "omarchy-dictation stop")
+end
