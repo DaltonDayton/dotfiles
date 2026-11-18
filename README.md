@@ -53,9 +53,7 @@ Some features ship a snapshot of an Omarchy file instead of layering on it
 (`starship.toml`, `hyprsunset.conf`, `monitors.lua`, the cloned workspaces
 widget). Each one is declared in the feature's `upstream` file, and Omarchy's
 version as of the last sync lives under `upstream/`, mirroring
-`/usr/share/omarchy/`. After `omarchy update`, the `basics` feature sends a
-notification if any of them changed, and every new shell repeats the reminder
-until they are back in sync:
+`/usr/share/omarchy/`:
 
 ```sh
 ./omarchy-diff                 # what Omarchy changed since the last sync
@@ -64,6 +62,27 @@ until they are back in sync:
 ```
 
 A snapshot without a baseline gets one recorded on the next run.
+
+Overrides can hide a new default or a new key. After every `omarchy update` the
+`basics` hook runs `./omarchy-review --check`, and when anything is due it sends a
+notification and every new shell repeats the reminder until the review runs:
+
+```sh
+./omarchy-review               # review, then record this version in upstream/VERSION
+./omarchy-review --check       # what is due, exit 1 (the hook)
+```
+
+A review shows, in order: the version range with its release notes and the
+migrations that ran since the last review; `omarchy-diff` for the snapshots; the
+diff of each stock file listed in `upstream/watch` (bindings, input, look and
+feel, window rules, `shell.json`, the menu); keys a feature binds that stock also
+binds; options a feature pins (`hl.config`) whose stock line changed; and every
+`shell.json` key that differs from stock, flagged when stock itself moved.
+`upstream/VERSION` is the marker (version, newest migration seen); it is tracked,
+so a machine that updates later sees the same range.
+
+`docs/customizations.md` lists everything that differs from stock, including what
+the repo does not own, with the version it was last reviewed against.
 
 ## By hand
 
@@ -87,7 +106,6 @@ A snapshot without a baseline gets one recorded on the next run.
   ships the window rules and `nvim-ue`; `features/unreal/README.md` is the runbook (engine,
   accessor plugin build, Fab, Blender, Starter Content).
 - **ImprovedTube:** import `other_configs/improvedtube.json` from the extension's options page.
-- **Claude Code ECC plugin:** `/plugin marketplace add affaan-m/ecc`, then `/plugin install ecc@ecc`.
 - **herdr's Claude hook** is tracked in the `claude` feature, so don't run `herdr integration
   install claude`: it appends a duplicate absolute-path hook entry to `settings.json`. After a herdr
   update, copy its new script over the tracked one if `herdr integration status` says outdated.
