@@ -9,8 +9,9 @@
 # upstream/<omarchy path> is Omarchy's copy as of the last sync: the base of
 # the 3-way merge. A snapshot without a baseline gets one recorded on any run.
 #
-# While any snapshot differs, $STATE/omarchy-changed exists; the basics bashrc
-# mentions it in every new shell, so a missed post-update notification isn't lost.
+# While any snapshot differs, or upstream/VERSION is behind the installed Omarchy
+# (see omarchy-review), $STATE/omarchy-changed exists; the basics bashrc mentions it
+# in every new shell, so a missed post-update notification isn't lost.
 set -euo pipefail
 repo=$(cd "$(dirname "$0")" && pwd)
 omarchy=${OMARCHY_PATH:-/usr/share/omarchy}
@@ -78,6 +79,7 @@ done
 
 # Marker reflects what is still out of sync after this run.
 pending=0
+[[ $(sed -n 1p "$repo/upstream/VERSION" 2>/dev/null) == "$(omarchy-version)" ]] || pending=1
 for rel in "${!copies[@]}"; do
   [[ -e $omarchy/$rel && -e $repo/upstream/$rel ]] || continue
   cmp -s "$repo/upstream/$rel" "$omarchy/$rel" || pending=1

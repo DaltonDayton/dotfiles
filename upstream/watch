@@ -1,0 +1,8 @@
+# Stock Omarchy files no feature copies, baselined under upstream/ by omarchy-review
+# so each review can show what changed. Globs, relative to /usr/share/omarchy/.
+default/hypr/bindings/*.lua
+default/hypr/input.lua
+default/hypr/looknfeel.lua
+default/hypr/windows.lua
+config/omarchy/shell.json
+default/omarchy/omarchy-menu.jsonc

@@ -40,6 +40,6 @@ sdev() {
   fi
 }
 
-# omarchy-diff leaves this marker while Omarchy's snapshot configs differ from upstream/.
+# omarchy-review leaves this marker while an Omarchy update is waiting to be reviewed.
 [[ -e ${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/omarchy-changed ]] &&
-  echo "Omarchy changed snapshot configs: run ./omarchy-diff in $(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+  echo "Omarchy changed: run ./omarchy-review in $(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"

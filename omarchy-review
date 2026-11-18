@@ -1,0 +1,144 @@
+#!/usr/bin/env bash
+# What changed in Omarchy since I last looked, and which of my overrides sit on top of it?
+#   ./omarchy-review           full review, then record this version as reviewed
+#   ./omarchy-review --check   say what is due and exit 1, or exit 0 quietly (post-update hook)
+#
+# upstream/VERSION  the Omarchy version last reviewed, then the newest migration seen then
+# upstream/watch    stock files no feature copies (globs under /usr/share/omarchy/), baselined
+#                   under upstream/ like the snapshots so their diff can be shown
+#
+# A review prints, in order: the version range with its release notes and the migrations
+# that ran, omarchy-diff for the snapshots, the diff of each watched file, keys my features
+# bind that stock also binds, options my features pin whose stock line changed, and the
+# shell.json keys that differ from stock (flagged when stock itself moved).
+set -euo pipefail
+repo=$(cd "$(dirname "$0")" && pwd)
+omarchy=${OMARCHY_PATH:-/usr/share/omarchy}
+shell_json=${XDG_CONFIG_HOME:-$HOME/.config}/omarchy/shell.json
+marker=${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/omarchy-changed
+version_file=$repo/upstream/VERSION
+releases=https://github.com/omacom/omarchy/releases
+
+check=0
+case ${1:-} in
+  "") ;;
+  --check) check=1 ;;
+  *) echo "usage: omarchy-review [--check]" >&2; exit 1 ;;
+esac
+
+now=$(omarchy-version)
+last="" last_mig=0
+[[ -r $version_file ]] && { last=$(sed -n 1p "$version_file"); last_mig=$(sed -n 2p "$version_file"); }
+newest_mig=$(ls "$omarchy/migrations" 2>/dev/null | sed 's/\.sh$//' | sort -n | tail -1)
+
+# Watched files: expand the globs, record missing baselines, collect the diffs of changed ones.
+work=$(mktemp -d); trap 'rm -rf "$work"' EXIT
+changed=()
+while read -r pat; do
+  [[ -n $pat && $pat != \#* ]] || continue
+  for rel in $(cd "$omarchy" && compgen -G "$pat" || true); do
+    base=$repo/upstream/$rel
+    if [[ ! -e $base ]]; then
+      mkdir -p "${base%/*}"; cp "$omarchy/$rel" "$base"
+      (( check )) || echo "baseline recorded: upstream/$rel"
+      continue
+    fi
+    cmp -s "$base" "$omarchy/$rel" && continue
+    changed+=("$rel")
+    mkdir -p "$work/${rel%/*}"
+    diff -u "$base" "$omarchy/$rel" > "$work/$rel" || true
+  done
+done < "$repo/upstream/watch"
+
+snapshots=$("$repo/omarchy-diff")
+
+if (( check )); then
+  due=()
+  [[ -n $last && $last != "$now" ]] && due+=("Omarchy $last -> $now")
+  [[ $snapshots == *"== "* ]] && due+=("snapshot configs changed")
+  (( ${#changed[@]} )) && due+=("stock changed: ${changed[*]}")
+  (( ${#due[@]} )) || exit 0
+  printf '%s\n' "${due[@]}" "run ./omarchy-review in $repo"
+  mkdir -p "${marker%/*}"; touch "$marker"
+  exit 1
+fi
+
+# 1. Version range, release notes, migrations that ran since the last review.
+if [[ -n $last && $last != "$now" ]]; then
+  echo "== Omarchy $last -> $now"
+  echo "   release notes: $releases"
+  echo "   migrations run since the last review:"
+  for f in "$omarchy"/migrations/*.sh; do
+    ts=$(basename "$f" .sh)
+    (( ts > last_mig )) || continue
+    printf '   %s  %s\n' "$ts" "$(head -1 "$f" | sed 's/^echo "//; s/"$//')"
+  done
+fi
+
+# 2. Snapshots, 3. watched files.
+[[ -n $snapshots ]] && { echo "== snapshots (omarchy-diff)"; echo "$snapshots"; }
+for rel in "${changed[@]}"; do echo "== $rel"; cat "$work/$rel"; done
+
+# 4. Keys my features bind that stock also binds. Modifier order is free in
+#    Hyprland, so keys compare with modifiers sorted: SUPER+ALT+SHIFT+B == SUPER+SHIFT+ALT+B.
+norm_key() { tr '[:lower:]' '[:upper:]' <<<"$1" | tr -d ' ' | awk -F+ '
+  { n = split($0, t, "+"); key = t[n]; delete m; for (i = 1; i < n; i++) m[i] = t[i]
+    asort(m); s = ""; for (i = 1; i < n; i++) s = s m[i] "+"; print s key }'; }
+declare -A stock_key=()
+while IFS=$'\t' read -r file key desc; do
+  stock_key[$(norm_key "$key")]="\"$desc\" (${file#"$omarchy/"})"
+done < <(grep -Ho 'o\.bind[a-z_]*("[^"]*", *"[^"]*"' "$omarchy"/default/hypr/bindings.lua "$omarchy"/default/hypr/bindings/*.lua 2>/dev/null |
+  sed -E 's/^([^:]*):o\.bind[a-z_]*\("([^"]*)", *"([^"]*)"$/\1\t\2\t\3/')
+hits=()
+while IFS=$'\t' read -r file key; do
+  n=$(norm_key "$key")
+  [[ -v stock_key[$n] ]] && hits+=("   $key  ${file#"$repo/"}  shadows stock ${stock_key[$n]}")
+done < <(grep -Ho 'o\.bind[a-z_]*("[^"]*"' "$repo"/features/*/hypr.lua 2>/dev/null |
+  sed -E 's/^([^:]*):o\.bind[a-z_]*\("([^"]*)"$/\1\t\2/')
+(( ${#hits[@]} )) && { echo "== keys I bind that stock also binds"; printf '%s\n' "${hits[@]}"; }
+
+# 5. Options my features pin (leaves inside hl.config blocks) whose line changed
+#    in a watched file this review.
+hits=()
+if (( ${#changed[@]} )); then
+  for f in "$repo"/features/*/hypr.lua; do
+    [[ -e $f ]] || continue
+    for leaf in $(perl -0777 -ne 'while (/hl\.config\((\{.*?\})\)/sg) { print "$1\n" }' "$f" |
+                  grep -oE '[a-z_]+ *= *[^ ={]' | sed -E 's/ *=.*//' | sort -u); do
+      for rel in "${changed[@]}"; do
+        grep -qE "^[-+].*\b$leaf\b" "$work/$rel" && hits+=("   $leaf  pinned in ${f#"$repo/"}, changed in $rel")
+      done
+    done
+  done
+fi
+(( ${#hits[@]} )) && { echo "== options I pin that stock changed"; printf '%s\n' "${hits[@]}"; }
+
+# 6. shell.json: every key where mine differs from stock. Widget arrays are keyed by
+#    id rather than position, so adding a widget does not shift every neighbour, and
+#    lists of plain values (pinned tray icons, cities) compare as one value.
+stock_sj=$omarchy/config/omarchy/shell.json
+base_sj=$repo/upstream/config/omarchy/shell.json
+[[ -e $base_sj ]] || base_sj=$stock_sj
+if [[ -e $shell_json && -e $stock_sj ]]; then
+  diffs=$(jq -r -n --slurpfile mine "$shell_json" --slurpfile stock "$stock_sj" --slurpfile base "$base_sj" '
+    def rekey: if type == "array" and length > 0 and all(.[]; type == "object" and has("id"))
+        then map({key: .id, value: (del(.id) | rekey)}) | from_entries
+      elif type == "object" then with_entries(.value |= rekey)
+      elif type == "array" then (if all(.[]; type != "object") then tojson else map(rekey) end)
+      else . end;
+    def flat: rekey | [paths(scalars) as $p | {key: ($p | map(tostring) | join(".")), value: getpath($p)}] | from_entries;
+    def show($o; $k): if ($o | has($k) | not) then "(absent)"
+      elif ($o[$k] | type) == "string" and ($o[$k] | test("^\\[")) then $o[$k] else $o[$k] | tojson end;
+    ($mine[0] | flat) as $m | ($stock[0] | flat) as $s | ($base[0] | flat) as $b
+    | ([$m, $s] | add | keys[]) as $k
+    | select($m[$k] != $s[$k])
+    | "   \($k)  mine \(show($m; $k))  stock \(show($s; $k))" +
+      (if $b[$k] != $s[$k] then "  stock changed since last review (was \(show($b; $k)))" else "" end)')
+  [[ -n $diffs ]] && { echo "== shell.json keys that differ from stock"; echo "$diffs"; }
+fi
+
+# Done: advance the watched baselines and the marker, then let omarchy-diff settle the flag.
+for rel in "${changed[@]}"; do cp "$omarchy/$rel" "$repo/upstream/$rel"; done
+printf '%s\n%s\n' "$now" "${newest_mig:-0}" > "$version_file"
+"$repo/omarchy-diff" >/dev/null
+echo "reviewed: Omarchy $now"
