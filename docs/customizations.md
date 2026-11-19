@@ -48,9 +48,10 @@ shell.json keys every run.
 
 - **Bar** (`omarchy bar set`, Appearance menu, tray right-click): background `none`; `bitr0t.system-monitor` widget on the left (chip mode instrument; cpu, memory, k10temp Tctl); elsewhen cities Salt Lake City, Sao Paulo, London, Dubai, Tokyo, 24h; power `showPercentage`; tray pins steam, discord, NordVPN, wine TSM; `omarchy.tailscale` widget (Tailscale installer); `superwhisper.panel` in tray (Superwhisper installer); dock section removed.
 - **Plugins** (`omarchy plugin add`, unsandboxed): `bitr0t.system-monitor` (rmacy/omarchy-system-monitor v1.2.2), `superwhisper-panel`.
-- **Themes** (`omarchy theme install`): amekoji, aura, bauhaus, crimson, crimson-gold, dotrb, dracula, dreamwave, eldritch, florida-man, lavender, sakura, sakura-mochi, sakurazuki, snow_black. Current: catppuccin_custom (see By hand).
+- **Themes** (`omarchy theme install`): amekoji, aura, bauhaus, crimson, crimson-gold, dotrb, dracula, dreamwave, eldritch, florida-man, lavender, sakura, sakura-mochi, sakurazuki, snow_black. Current: stock catppuccin.
 - **Fonts**: CaskaydiaMono (font feature), ttf-firacode-nerd also installed from the font menu.
 - **Defaults**: agent claude (basics), dictation superwhisper (stock), browser Firefox for http/https/html (stock is Chromium), terminal ghostty (ghostty feature; `omarchy default terminal` writes `~/.config/xdg-terminals.list`).
+- **Wallpapers for stock catppuccin**: 12 files plus one symlink in `~/.config/omarchy/backgrounds/catppuccin/` (the per-theme user folder Install > Style > Background opens). Moved out of the catppuccin_custom fork, removed 2026-11-19.
 - **Weather**: Clinton, UT.
 - **DNS** (`omarchy dns`): AdGuard on pve, Quad9 fallback. Writes `resolved.conf` and `20-omarchy-dns.conf`.
 - **Installers**: Steam, Battle.net (umu, `~/Games/battlenet`), Heroic, Minecraft, Tailscale (+ `tailscaled`, `omarchy-tailscale-receive`), NordVPN (`nordvpnd`), Windows VM, Tailscale admin webapp, owe wallpaper engine (`owed.service`, `theme-set.d/10-owe-sync`).
@@ -66,7 +67,6 @@ Config under `~`:
 - `~/.config/git/ignore`: `**/.claude/settings.local.json`.
 - `~/.bashrc`, `~/.bash_profile`, `~/.profile`, `~/.zshrc`: installer lines (uv `env`, Unity CLI PATH).
 - `~/.config/wireplumber/wireplumber.conf.d/`: `bluetooth-a2dp-autoconnect.conf`, `kef-lsx-no-suspend.conf` (KEF LSX II LT firmware stops on suspend).
-- `~/.config/omarchy/themes/catppuccin_custom`: fork of catppuccin, 14 wallpapers, `neovim.lua` uses catppuccin-nvim, icons Yaru-purple.
 - `~/.config/omarchy/branding/about.txt`, `screensaver.txt`.
 - `~/.XCompose`, Nautilus prefs (icon view, bookmarks, SMB the NAS), scheme handlers from installers (claude-cli, curseforge, unityhub, superwhisper).
 - Desktop files: Blender tarball (`~/software`, `~/.local/bin/blender`), Unity Hub/Editor, 6 Steam shortcuts.
