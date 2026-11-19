@@ -1,8 +1,6 @@
 -- == Move windows (SUPER+CTRL+ALT+arrows)
--- (The old SUPER+SHIFT+CTRL+arrow resize keys are gone: Omarchy 4.5 binds
--- that chord to "move window to monitor". Resize with SUPER + -/= instead.)
--- Move windows: re-tiles (unlike Omarchy's SUPER+SHIFT+arrows swap), or
--- nudges 30px when floating.
+-- Re-tiles (unlike Omarchy's SUPER+SHIFT+arrows swap), or nudges 30px when
+-- floating.
 local function move_win(dx, dy, dir)
   return function()
     local w = hl.get_active_window()
@@ -18,6 +16,22 @@ o.bind("SUPER + CTRL + ALT + Left", "Move window left", move_win(-30, 0, "l"), {
 o.bind("SUPER + CTRL + ALT + Right", "Move window right", move_win(30, 0, "r"), { repeating = true })
 o.bind("SUPER + CTRL + ALT + Up", "Move window up", move_win(0, -30, "u"), { repeating = true })
 o.bind("SUPER + CTRL + ALT + Down", "Move window down", move_win(0, 30, "d"), { repeating = true })
+
+-- == Resize windows (SUPER+CTRL+arrows)
+-- Small repeating steps; stock SUPER + -/= stays for coarse jumps. Left/Right
+-- replace stock "grouped window focus", still on SUPER+ALT+TAB.
+local function resize(x, y)
+  return hl.dsp.window.resize({ x = x, y = y, relative = true })
+end
+
+o.rebind("SUPER + CTRL + Left", "Shrink window width", resize(-25, 0), { repeating = true })
+o.rebind("SUPER + CTRL + Right", "Grow window width", resize(25, 0), { repeating = true })
+o.bind("SUPER + CTRL + Up", "Shrink window height", resize(0, -25), { repeating = true })
+o.bind("SUPER + CTRL + Down", "Grow window height", resize(0, 25), { repeating = true })
+
+-- == Hop between monitors (SUPER+U)
+-- One key instead of stock CTRL+ALT+TAB.
+o.bind("SUPER + U", "Focus other monitor", hl.dsp.focus({ monitor = "+1" }))
 
 -- == New tiled windows open on the side of the cursor
 -- Omarchy's default (2) always splits right/bottom.

@@ -22,7 +22,7 @@ stock, where that matters for a review:
 - **dev-envs**: Go, .NET, Python (+uv), Node via `omarchy install dev-env`.
 - **font**: CaskaydiaMono Nerd Font (as `omarchy font set` does).
 - **ghostty**: default terminal, font-size 10 and opacity 0.9 layered over Omarchy's config.
-- **hypr-tweaks**: binds SUPER+CTRL+ALT+arrows (move), F9 hold (dictation). Pins `dwindle.force_split 0`, `input.touchpad.natural_scroll true`, `misc.focus_on_activate false`, `cursor.warp_on_change_workspace 0`. Rules: Steam tiled, Firefox opaque on YouTube. Handlers: recentre off-screen floats, pull floats home after monitor reconnect.
+- **hypr-tweaks**: binds SUPER+CTRL+ALT+arrows (move), SUPER+CTRL+arrows (resize 25px, repeating; Left/Right override stock group focus), SUPER+U (focus other monitor), F9 hold (dictation). Pins `dwindle.force_split 0`, `input.touchpad.natural_scroll true`, `misc.focus_on_activate false`, `cursor.warp_on_change_workspace 0`. Rules: Steam tiled, Firefox opaque on YouTube. Handlers: recentre off-screen floats, pull floats home after monitor reconnect.
 - **local-wallpapers**: wallpapers that live on this device only (`~/.config/omarchy/backgrounds/.local`, 65 files tagged per theme in a manifest) behind two Appearance rows, Local Backgrounds and All Local Backgrounds, via `omarchy-bg-local` and the feature's menu extension. Replaced the theme-tweaks toolkit on 2026-11-19.
 - **idle-inhibit-audio**: no idle lock while audio plays.
 - **monitors-desktop**: stacked 3440x1440 ultrawides, scale 1 (snapshot of `monitors.lua`).
