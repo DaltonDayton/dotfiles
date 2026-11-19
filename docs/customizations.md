@@ -5,7 +5,7 @@ features are the first section; the rest is what the repo cannot own yet, kept
 here so an Omarchy update can be checked against it. Review workflow and the
 automatic checks: `./omarchy-review` (README).
 
-Reviewed against omarchy 4.5.0-3 on 2026-11-18 (desktop); attention items worked through on 18 and 19 November. Still open: only the spare stock `linux` kernel. The full audit that
+Reviewed against omarchy 4.5.0-3 on 2026-11-18 (desktop); attention items worked through on 18 and 19 November. Nothing open. The full audit that
 seeded this file is `~/Documents/omarchy-config-report.html`.
 
 ## Dotfiles features (desktop profile)
@@ -80,6 +80,6 @@ System (`/etc`, services):
 - `/etc/cups/printers.conf`: Brother HL-L3220CDW default printer. The orphaned `cups-browsed` drop-in was removed 2026-11-19.
 - `/etc/udev/rules.d` ASMedia rule (desktop-extras installs it).
 
-Packages outside any feature: CurseForge, discover-overlay-git, gameconqueror/scanmem, vulkan-tools, uv (standalone), bob, git-lfs, android-tools (+ udev, adbusers), freerdp, yazi, openbsd-netcat, graphify; stock `linux` kernel kept beside linux-omarchy.
+Packages outside any feature: CurseForge, discover-overlay-git, gameconqueror/scanmem, vulkan-tools, uv (standalone), bob, git-lfs, android-tools (+ udev, adbusers), freerdp, yazi, openbsd-netcat, graphify; stock `linux` kernel kept beside linux-omarchy on purpose (decided 2026-11-19): a boot fallback and a way to rule the Omarchy kernel in or out of the hard-reset investigation. Switch with `omarchy kernel set`. Cost: NVIDIA dkms and initramfs build twice per kernel update.
 
 Services: `voxtype.service` disabled 2026-11-18 (was holding 1.5 GB of VRAM beside Superwhisper, the default). The voxtype feature stays for its config and the whisper model yt-transcript reads.
