@@ -5,7 +5,7 @@ features are the first section; the rest is what the repo cannot own yet, kept
 here so an Omarchy update can be checked against it. Review workflow and the
 automatic checks: `./omarchy-review` (README).
 
-Reviewed against omarchy 4.5.0-3 on 2026-11-18 (desktop); attention items worked through the same day. The full audit that
+Reviewed against omarchy 4.5.0-3 on 2026-11-18 (desktop); attention items worked through on 18 and 19 November. Still open: the orphaned `/etc/systemd/system/cups-browsed.service.d` drop-in (needs sudo) and the spare stock `linux` kernel. The full audit that
 seeded this file is `~/Documents/omarchy-config-report.html`.
 
 ## Dotfiles features (desktop profile)
@@ -23,6 +23,7 @@ stock, where that matters for a review:
 - **font**: CaskaydiaMono Nerd Font (as `omarchy font set` does).
 - **ghostty**: default terminal, font-size 10 and opacity 0.9 layered over Omarchy's config.
 - **hypr-tweaks**: binds SUPER+CTRL+ALT+arrows (move), F9 hold (dictation). Pins `dwindle.force_split 0`, `input.touchpad.natural_scroll true`, `misc.focus_on_activate false`, `cursor.warp_on_change_workspace 0`. Rules: Steam tiled, Firefox opaque on YouTube. Handlers: recentre off-screen floats, pull floats home after monitor reconnect.
+- **local-wallpapers**: wallpapers that live on this device only (`~/.config/omarchy/backgrounds/.local`, 65 files tagged per theme in a manifest) behind two Appearance rows, Local Backgrounds and All Local Backgrounds, via `omarchy-bg-local` and the feature's menu extension. Replaced the theme-tweaks toolkit on 2026-11-19.
 - **idle-inhibit-audio**: no idle lock while audio plays.
 - **monitors-desktop**: stacked 3440x1440 ultrawides, scale 1 (snapshot of `monitors.lua`).
 - **nightlight-sunset**: hyprsunset at sunset/sunrise (snapshot of `hyprsunset.conf`).
@@ -49,7 +50,7 @@ shell.json keys every run.
 - **Plugins** (`omarchy plugin add`, unsandboxed): `bitr0t.system-monitor` (rmacy/omarchy-system-monitor v1.2.2), `superwhisper-panel`.
 - **Themes** (`omarchy theme install`): amekoji, aura, bauhaus, crimson, crimson-gold, dotrb, dracula, dreamwave, eldritch, florida-man, lavender, sakura, sakura-mochi, sakurazuki, snow_black. Current: catppuccin_custom (see By hand).
 - **Fonts**: CaskaydiaMono (font feature), ttf-firacode-nerd also installed from the font menu.
-- **Defaults**: agent claude (basics), dictation superwhisper (stock), browser Firefox for http/https/html (stock is Chromium), terminal ghostty (ghostty feature).
+- **Defaults**: agent claude (basics), dictation superwhisper (stock), browser Firefox for http/https/html (stock is Chromium), terminal ghostty (ghostty feature; `omarchy default terminal` writes `~/.config/xdg-terminals.list`).
 - **Weather**: Clinton, UT.
 - **DNS** (`omarchy dns`): AdGuard on pve, Quad9 fallback. Writes `resolved.conf` and `20-omarchy-dns.conf`.
 - **Installers**: Steam, Battle.net (umu, `~/Games/battlenet`), Heroic, Minecraft, Tailscale (+ `tailscaled`, `omarchy-tailscale-receive`), NordVPN (`nordvpnd`), Windows VM, Tailscale admin webapp, owe wallpaper engine (`owed.service`, `theme-set.d/10-owe-sync`).
@@ -61,7 +62,6 @@ Candidates for features when they earn it; until then this list is the record.
 
 Config under `~`:
 - `~/.config/fontconfig/fonts.conf`: monospace alias bound to CaskaydiaMono so GTK/Qt match the terminals.
-- `~/.config/xdg-terminals.list`: ghostty first. Redundant with `omarchy default terminal`.
 - `~/.config/git/config`: hand `[user]` and `[credential]` blocks beside the basics include. `config.local` (2026-11-18): SSH signing with `~/.ssh/id_ed25519.pub`, `commit.gpgsign`, `tag.gpgsign`, `allowed_signers`. Key registered on GitHub as a signing key ("desktop") the same day.
 - `~/.config/git/ignore`: `**/.claude/settings.local.json`.
 - `~/.bashrc`, `~/.bash_profile`, `~/.profile`, `~/.zshrc`: installer lines (uv `env`, Unity CLI PATH).
@@ -83,11 +83,3 @@ System (`/etc`, services):
 Packages outside any feature: CurseForge, discover-overlay-git, gameconqueror/scanmem, vulkan-tools, uv (standalone), bob, git-lfs, android-tools (+ udev, adbusers), freerdp, yazi, openbsd-netcat, graphify; stock `linux` kernel kept beside linux-omarchy.
 
 Services: `voxtype.service` disabled 2026-11-18 (was holding 1.5 GB of VRAM beside Superwhisper, the default). The voxtype feature stays for its config and the whisper model yt-transcript reads.
-
-## Dead weight (safe to delete when convenient)
-
-- `~/.config/omarchy/theme-tweaks/` and `theme-tweaks-record-background.service` (disabled 2026-11-07; Omarchy 4.5 remembers wallpapers itself).
-- `~/.config/omarchy/themes/ztest` (380 MB scratch copy, `.hidden` marker nothing honours).
-- `~/.config/omarchy/plugins/.dalton.image-picker.bak.*`.
-- `~/.config/hypr/hyprland.lua.bak.*`, `hyprsunset.conf.bak.*` (pre-dotfiles backups, content now in features or identical to stock).
-- `~/.config/kitty/kitty.conf` (old full config; stock 4.5 is a 21-line overlay).
