@@ -5,6 +5,7 @@ bar-tweaks
 special-workspaces
 font
 ghostty
+local-wallpapers
 cursor-bibata
 idle-inhibit-audio
 claude
@@ -13,3 +14,4 @@ nvim
 dev-envs
 nightlight-sunset
 lid-hibernate
+voxtype

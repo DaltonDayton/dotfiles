@@ -83,3 +83,21 @@ System (`/etc`, services):
 Packages outside any feature: CurseForge, discover-overlay-git, gameconqueror/scanmem, vulkan-tools, uv (standalone), bob, git-lfs, android-tools (+ udev, adbusers), freerdp, yazi, openbsd-netcat, graphify; stock `linux` kernel kept beside linux-omarchy on purpose (decided 2026-11-19): a boot fallback and a way to rule the Omarchy kernel in or out of the hard-reset investigation. Switch with `omarchy kernel set`. Cost: NVIDIA dkms and initramfs build twice per kernel update.
 
 Services: `voxtype.service` disabled 2026-11-18 (was holding 1.5 GB of VRAM beside Superwhisper, the default). The voxtype feature stays for its config and the whisper model yt-transcript reads.
+
+## Laptop profile differences
+
+The sections above describe the desktop. The laptop (single 3200x2000 panel, scale 2,
+Intel Arc) follows it except here. Brought level with the desktop on 2026-11-19,
+omarchy 4.5.0-3.
+
+- **Features only here**: lid-hibernate (suspend, then hibernate after 60 min).
+- **Desktop features not here**: battlenet-tsm, desktop-extras, monitors-desktop, openrgb, overlayed, unity, unreal, yt-transcript. Hardware or apps this machine does not have.
+- **local-wallpapers**: enabled, folder and manifest empty until wallpapers are copied over by hand.
+- **Bar**: background `none`, same Elsewhen cities; system monitor shows cpu and memory only (no k10temp); no tray pins, no tailscale widget; `superwhisper.panel` in tray.
+- **Themes**: stock catppuccin current. Installed extras: bauhaus, ghost-pastel, rose-pine-dark, rose-pine-moon, void.
+- **Dictation**: superwhisper default, `voxtype.service` disabled, as on the desktop (2026-11-19).
+- **Hooks**: `post-update.d/setup-fingerprint.hook`, `install-voxtype.hook` (Omarchy-installed).
+- **Monitors**: `~/.config/hypr/monitors.lua` is the stock template with scale 2, not a snapshot.
+- **By hand, also present**: fontconfig monospace alias, wireplumber drop-ins, `~/.XCompose`.
+- **By hand, signing**: git `config.local` (SSH signing with this machine's `~/.ssh/id_ed25519.pub`, `commit.gpgsign`, `tag.gpgsign`, `allowed_signers`) and `~/.config/git/ignore`, set up 2026-11-19. Key registered on GitHub as a signing key ("laptop").
+- **Not carried over**: the desktop's `/etc` changes (fstab mounts, pstore, homelab search domain, ufw mDNS rule, nordlynx unit, printer), DNS to the homelab AdGuard, the second kernel.
