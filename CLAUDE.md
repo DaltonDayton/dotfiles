@@ -74,6 +74,15 @@ Omarchy layers some config and snapshots the rest:
 the default, it doesn't belong here. Keep files to the lines that actually
 change something, without Omarchy's commented-out template examples.
 
+## Keeping the state documents current
+
+`docs/customizations.md` (tracked) and `docs/current-state.html` (gitignored: it
+names LAN addresses and hardware) describe how this machine differs from stock
+Omarchy *now*, not how it got there. When a change alters that difference (a
+feature added or dropped, an override removed, a hand-made file or service
+changed, an attention item resolved), update both in the same change. Keep the
+tracked file to roles, not addresses ("the NAS", not an IP).
+
 ## Not in scope
 
 The `quill` branch is the archived pre-Omarchy setup (the `quill` Go CLI). Don't port its

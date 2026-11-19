@@ -5,7 +5,7 @@ features are the first section; the rest is what the repo cannot own yet, kept
 here so an Omarchy update can be checked against it. Review workflow and the
 automatic checks: `./omarchy-review` (README).
 
-Reviewed against omarchy 4.5.0-3 on 2026-11-18 (desktop). The full audit that
+Reviewed against omarchy 4.5.0-3 on 2026-11-18 (desktop); attention items worked through the same day. The full audit that
 seeded this file is `~/Documents/omarchy-config-report.html`.
 
 ## Dotfiles features (desktop profile)
@@ -51,7 +51,7 @@ shell.json keys every run.
 - **Fonts**: CaskaydiaMono (font feature), ttf-firacode-nerd also installed from the font menu.
 - **Defaults**: agent claude (basics), dictation superwhisper (stock), browser Firefox for http/https/html (stock is Chromium), terminal ghostty (ghostty feature).
 - **Weather**: Clinton, UT.
-- **DNS** (`omarchy dns`): 192.168.86.12 (AdGuard on pve), Quad9 fallback. Writes `resolved.conf` and `20-omarchy-dns.conf`.
+- **DNS** (`omarchy dns`): AdGuard on pve, Quad9 fallback. Writes `resolved.conf` and `20-omarchy-dns.conf`.
 - **Installers**: Steam, Battle.net (umu, `~/Games/battlenet`), Heroic, Minecraft, Tailscale (+ `tailscaled`, `omarchy-tailscale-receive`), NordVPN (`nordvpnd`), Windows VM, Tailscale admin webapp, owe wallpaper engine (`owed.service`, `theme-set.d/10-owe-sync`).
 - **Hooks**: `theme-set.d/10-owe-sync` (owe).
 
@@ -62,27 +62,27 @@ Candidates for features when they earn it; until then this list is the record.
 Config under `~`:
 - `~/.config/fontconfig/fonts.conf`: monospace alias bound to CaskaydiaMono so GTK/Qt match the terminals.
 - `~/.config/xdg-terminals.list`: ghostty first. Redundant with `omarchy default terminal`.
-- `~/.config/git/config`: hand `[user]` and `[credential]` blocks beside the basics include. `config.local` (signing key) still missing.
+- `~/.config/git/config`: hand `[user]` and `[credential]` blocks beside the basics include. `config.local` (2026-11-18): SSH signing with `~/.ssh/id_ed25519.pub`, `commit.gpgsign`, `tag.gpgsign`, `allowed_signers`. Key registered on GitHub as a signing key ("desktop") the same day.
 - `~/.config/git/ignore`: `**/.claude/settings.local.json`.
 - `~/.bashrc`, `~/.bash_profile`, `~/.profile`, `~/.zshrc`: installer lines (uv `env`, Unity CLI PATH).
 - `~/.config/wireplumber/wireplumber.conf.d/`: `bluetooth-a2dp-autoconnect.conf`, `kef-lsx-no-suspend.conf` (KEF LSX II LT firmware stops on suspend).
 - `~/.config/omarchy/themes/catppuccin_custom`: fork of catppuccin, 14 wallpapers, `neovim.lua` uses catppuccin-nvim, icons Yaru-purple.
 - `~/.config/omarchy/branding/about.txt`, `screensaver.txt`.
-- `~/.XCompose`, Nautilus prefs (icon view, bookmarks, SMB 192.168.86.11), scheme handlers from installers (claude-cli, curseforge, unityhub, superwhisper).
+- `~/.XCompose`, Nautilus prefs (icon view, bookmarks, SMB the NAS), scheme handlers from installers (claude-cli, curseforge, unityhub, superwhisper).
 - Desktop files: Blender tarball (`~/software`, `~/.local/bin/blender`), Unity Hub/Editor, 6 Steam shortcuts.
 
 System (`/etc`, services):
-- `/etc/fstab`: NTFS `/mnt/4TB_HDD` (currently failing: ntfs3 bad superblock), `/mnt/1TB_HDD` (99% full), NFS automount `/mnt/stash`.
-- `/etc/default/limine`: `efi_pstore.pstore_disable=0` (crash investigation). `systemd-pstore.service` is still disabled, so nothing copies pstore records out.
+- `/etc/fstab`: NTFS `/mnt/4TB_HDD` (ntfs3 refuses the volume whenever Windows leaves it dirty; `sudo ntfsfix -d /dev/sdc1` clears it, a Windows `chkdsk /f` with Fast Startup off stops it recurring), `/mnt/1TB_HDD` (full by design: Stash data), NFS automount `/mnt/stash`.
+- `/etc/default/limine`: `efi_pstore.pstore_disable=0` (crash investigation). `systemd-pstore.service` enabled 2026-11-18 so records land in `/var/lib/systemd/pstore` after a reset.
 - `/etc/NetworkManager/conf.d/30-homelab-search.conf`: search domain `home.arpa`.
-- `/etc/ufw/user.rules`: allow udp 5353 from 192.168.86.0/24 (mDNS).
+- `/etc/ufw/user.rules`: allow udp 5353 from the LAN (mDNS).
 - `/etc/systemd/system/nordlynx-dnssec.service`: `resolvectl dnssec nordlynx no` when the NordVPN link appears.
 - `/etc/cups/printers.conf`: Brother HL-L3220CDW default printer. `cups-browsed` drop-in orphaned (package removed).
 - `/etc/udev/rules.d` ASMedia rule (desktop-extras installs it).
 
 Packages outside any feature: CurseForge, discover-overlay-git, gameconqueror/scanmem, vulkan-tools, uv (standalone), bob, git-lfs, android-tools (+ udev, adbusers), freerdp, yazi, openbsd-netcat, graphify; stock `linux` kernel kept beside linux-omarchy.
 
-Services: `voxtype.service` and Superwhisper both enabled (default dictation is Superwhisper).
+Services: `voxtype.service` disabled 2026-11-18 (was holding 1.5 GB of VRAM beside Superwhisper, the default). The voxtype feature stays for its config and the whisper model yt-transcript reads.
 
 ## Dead weight (safe to delete when convenient)
 
@@ -91,4 +91,3 @@ Services: `voxtype.service` and Superwhisper both enabled (default dictation is 
 - `~/.config/omarchy/plugins/.dalton.image-picker.bak.*`.
 - `~/.config/hypr/hyprland.lua.bak.*`, `hyprsunset.conf.bak.*` (pre-dotfiles backups, content now in features or identical to stock).
 - `~/.config/kitty/kitty.conf` (old full config; stock 4.5 is a 21-line overlay).
-- `~/.local/state/omarchy/defaults/dictation.lock` (empty leftover).
