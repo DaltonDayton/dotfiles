@@ -1,0 +1,6 @@
+{
+  // dotfiles local-wallpapers feature: wallpapers that live on this device only
+  // (~/.config/omarchy/backgrounds/.local), tagged per theme, outside the stock picker.
+  "appearance.background-local": {"icon":"","label":"Local Backgrounds","aliases":["local"],"description":"This device's wallpapers tagged for the current theme","action":"$HOME/.local/bin/omarchy-bg-local"},
+  "appearance.background-local-all": {"icon":"","label":"All Local Backgrounds","description":"Every wallpaper kept on this device","action":"$HOME/.local/bin/omarchy-bg-local --all"}
+}

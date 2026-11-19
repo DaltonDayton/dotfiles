@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# Pick one of this device's local wallpapers for the current theme.
+#   omarchy-bg-local            files tagged for the current theme, plus the theme's own backgrounds/extra/
+#   omarchy-bg-local --all      every local wallpaper
+#   omarchy-bg-local --print    list the files instead of opening the picker
+#
+# ~/.config/omarchy/backgrounds/.local holds wallpapers that live on this machine only
+# (never in the dotfiles repo) and are shared by many themes. A dot-directory next to
+# Omarchy's per-theme user folders, so the stock picker and cycling stay uncluttered.
+# Its manifest tags each file with the themes it suits, one per line:
+#   <file>: <theme> [theme ...]      (no themes = reachable only with --all)
+# The picker opens on a symlink view under ~/.cache with stable paths, so Omarchy's
+# thumbnail cache stays warm. Omarchy 4.5 remembers the pick per theme on its own.
+set -euo pipefail
+local=${XDG_CONFIG_HOME:-$HOME/.config}/omarchy/backgrounds/.local
+state=${XDG_STATE_HOME:-$HOME/.local/state}/omarchy
+cache=${XDG_CACHE_HOME:-$HOME/.cache}/omarchy/local-wallpapers
+
+all=0 print=0
+for arg in "$@"; do
+  case $arg in
+    --all) all=1 ;;
+    --print) print=1 ;;
+    *) echo "usage: omarchy-bg-local [--all] [--print]" >&2; exit 1 ;;
+  esac
+done
+
+theme=$(cat "$state/current/theme.name" 2>/dev/null || true)
+[[ -n $theme ]] || { echo "no current theme" >&2; exit 1; }
+
+files=()
+if (( all )); then
+  view=$cache/all
+  while IFS= read -r -d '' f; do files+=("$f"); done < <(find -L "$local" -maxdepth 1 -type f ! -name manifest -print0 2>/dev/null | sort -z)
+else
+  view=$cache/$theme
+  # Manifest lines whose theme list contains this theme, matched as a whole word.
+  while IFS= read -r name; do
+    [[ -n $name && -f $local/$name ]] && files+=("$local/$name")
+  done < <(awk -F': *' -v t="$theme" '!/^#/ && NF > 1 { n = split($2, ts, " "); for (i = 1; i <= n; i++) if (ts[i] == t) { print $1; break } }' "$local/manifest" 2>/dev/null)
+fi
+while IFS= read -r -d '' f; do files+=("$f"); done < <(find -L "$state/current/theme/backgrounds/extra" -maxdepth 1 -type f -print0 2>/dev/null | sort -z)
+
+# Rebuild the view from scratch: a removed wallpaper must not linger as a dead link.
+rm -rf "$view"; mkdir -p "$view"
+for f in "${files[@]}"; do ln -s "$f" "$view/${f##*/}"; done
+
+if (( print )); then (( ${#files[@]} )) && printf '%s\n' "${files[@]##*/}"; exit 0; fi
+if (( ${#files[@]} == 0 )); then
+  echo "No local backgrounds for $theme"
+  command -v omarchy-notification-send >/dev/null && omarchy-notification-send "No local backgrounds for $theme" -t 2000
+  exit 0
+fi
+
+current=$(readlink -f "$state/current/background" 2>/dev/null || true)
+choice=$(omarchy-menu-images --selected "$current" "$view")
+if [[ -n $choice ]]; then omarchy-theme-bg-set "$(readlink -f "$choice")"; fi

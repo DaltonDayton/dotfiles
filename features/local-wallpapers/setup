@@ -1,0 +1,4 @@
+# The wallpapers are data, not config: the folder is created empty so the menu rows
+# work on a new machine; files and the manifest are copied in by hand.
+local=~/.config/omarchy/backgrounds/.local
+[[ -d $local ]] || { run mkdir -p "$local"; printf '# filename: theme [theme ...]  (no themes = reachable only via All Local Backgrounds)\n' > "$local/manifest"; }

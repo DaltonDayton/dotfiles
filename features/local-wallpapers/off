@@ -1,0 +1,2 @@
+# The wallpapers stay. Only the symlink views go.
+[[ -d ~/.cache/omarchy/local-wallpapers ]] && run rm -r ~/.cache/omarchy/local-wallpapers
