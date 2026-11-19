@@ -10,7 +10,7 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "fable[1m]",
+  "model": "claude-fable-5-2",
   "hooks": {
     "SessionStart": [
       {
@@ -25,30 +25,13 @@
       }
     ]
   },
-  "enabledPlugins": {
-    "ecc@ecc": true
-  },
-  "extraKnownMarketplaces": {
-    "ecc": {
-      "source": {
-        "source": "github",
-        "repo": "affaan-m/ecc"
-      }
-    }
-  },
   "outputStyle": "Concise",
-  "pluginConfigs": {
-    "ecc@ecc": {
-      "options": {
-        "hook_profile": "standard"
-      }
-    }
-  },
   "tui": "fullscreen",
   "timeFormat": "24-hour",
   "skipDangerousModePermissionPrompt": true,
   "theme": "auto",
   "editorMode": "vim",
   "remoteControlAtStartup": true,
-  "agentPushNotifEnabled": true
+  "agentPushNotifEnabled": true,
+  "autoCompactEnabled": false
 }

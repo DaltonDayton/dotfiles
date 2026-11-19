@@ -164,7 +164,6 @@ When the user types `/graphify`, use the installed graphify skill or instruction
   - `playwright cli open|goto|screenshot|close` (config `~/.playwright/cli.config.json`,
     which also allows `file:` URLs; screenshots land in `.playwright-cli/` under
     the cwd, so run it from the scratchpad)
-  - the user-scope `chrome-devtools` MCP server (`claude mcp get chrome-devtools`),
-    not the ecc plugin's copy, which launches Google Chrome.
+  - the user-scope `chrome-devtools` MCP server (`claude mcp get chrome-devtools`).
   - Fallback for a quick render: `chromium --headless=new --screenshot=...`.
   Do not route automation through my Firefox.
