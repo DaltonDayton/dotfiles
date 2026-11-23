@@ -2,3 +2,4 @@ dotnet
 node
 python
 go
+uv
