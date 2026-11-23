@@ -12,6 +12,17 @@ one-time snapshot of Omarchy's shell defaults and is edited directly.
   feature names. `./install.sh` applies the current profile and must stay
   idempotent and quiet when nothing changes.
 - Linked files are live: editing the repo copy edits the real config.
+- `features/nvim/.../lazy-lock.json` is tracked: it pins plugin commits so
+  `:Lazy restore` has a known-good point. lazy rewrites it on every install or
+  update, so commit it with any nvim change.
+- Neovim changes update the cheatsheet (`features/nvim/.../lua/cheatsheet/`),
+  which `<leader>?` and `:Cheatsheet html` render from live keymaps plus two
+  hand-written files. Every new map gets a `desc`. A new key prefix gets an
+  entry in `groups.lua`; a new, removed or reworked feature gets its
+  `features.lua` entry kept current. Before committing:
+  `nvim --headless <some file> +'Cheatsheet check' +qa`.
+- `~/.claude/settings.json` is deliberately untracked: the work machine keeps
+  its own. Don't add one under `features/claude/files/`.
 - `setup`/`off` are sourced by install.sh. Use its helpers (`run`, `say`,
   `ensure_line`, `remove_line`, `ensure_block`, `remove_block`) and guard every
   action so a rerun does nothing. `$FEATURE` is the feature dir, `$STATE` is
@@ -22,6 +33,6 @@ one-time snapshot of Omarchy's shell defaults and is edited directly.
 
 ## Not in scope
 
-`slim` is the Omarchy setup for the personal machines and `main` is the
+`main` is the Omarchy setup for the personal machines and `quill` is the
 archived pre-Omarchy one. Don't port patterns from either here; this branch is
 managed on its own.

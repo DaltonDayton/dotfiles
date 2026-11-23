@@ -1,7 +1,7 @@
 # dotfiles (wsl)
 
 Terminal-only setup for Ubuntu 24.04 under WSL. It started as a snapshot of
-the Omarchy configs from my personal machines (branch `slim`) and forks from
+the Omarchy configs from my personal machines (branch `main`) and forks from
 there; nothing here tracks Omarchy. Split into small features that a profile
 picks from.
 
@@ -53,4 +53,4 @@ no-desktop edits applied, `bash/personal` is my own additions, and
 - **Nvim theme:** `features/nvim/files/.local/state/omarchy/current/theme/neovim.lua`
   is the Omarchy theme spec nvim reads (catppuccin). Swap it for another theme's
   `neovim.lua` from Omarchy's `themes/<name>/` to change colorscheme.
-- **Claude Code ECC plugin:** `/plugin marketplace add affaan-m/ecc`, then `/plugin install ecc@ecc`.
+- **Claude Code settings:** `~/.claude/settings.json` is this machine's own and is not tracked here.
