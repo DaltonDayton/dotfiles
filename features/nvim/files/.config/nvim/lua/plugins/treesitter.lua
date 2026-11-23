@@ -8,6 +8,7 @@ return {
     local parsers = {
       "bash",
       "c",
+      "cpp",
       "c_sharp",
       "css",
       "diff",
@@ -41,6 +42,7 @@ return {
     local filetypes = {
       "bash",
       "c",
+      "cpp",
       "cs",
       "css",
       "diff",
@@ -74,7 +76,13 @@ return {
         pcall(vim.treesitter.start, args.buf)
         vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
         vim.wo.foldmethod = "expr"
-        vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        -- Only where nvim-treesitter ships an indent query; otherwise the
+        -- expression returns -1 for every line and new lines start at column
+        -- 0 (c_sharp has none, so cs keeps Vim's own indent/cs.vim).
+        local lang = vim.treesitter.language.get_lang(args.match)
+        if lang and vim.treesitter.query.get(lang, "indents") then
+          vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        end
       end,
     })
 

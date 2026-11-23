@@ -13,6 +13,9 @@ return {
   {
     "mason-org/mason-lspconfig.nvim",
     opts = {
+      -- roslyn.nvim starts the Roslyn server as "roslyn"; lspconfig's own
+      -- "roslyn_ls" would attach a second copy to every .cs buffer.
+      automatic_enable = { exclude = { "roslyn_ls" } },
       ensure_installed = {
         "lua_ls",
         "ts_ls",
@@ -21,9 +24,9 @@ return {
         "emmet_language_server",
         "pyright",
         "eslint",
-        "csharp_ls",
         "ruby_lsp",
         "gopls",
+        "clangd",
       },
     },
     dependencies = {
@@ -44,6 +47,8 @@ return {
         "goimports", -- go formatter (handles imports)
         "gofumpt", -- stricter gofmt
         "golangci-lint", -- go linter aggregator
+        "clang-format", -- c/c++ formatter
+        "roslyn-language-server", -- c# (roslyn.nvim starts it)
       },
     },
     dependencies = {

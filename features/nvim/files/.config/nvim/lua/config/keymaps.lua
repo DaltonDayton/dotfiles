@@ -4,6 +4,8 @@ vim.opt.hlsearch = true
 
 -- increment/decrement numbers use vim defaults: <C-a> and <C-x>
 
+vim.keymap.set("n", "<leader>?", function() require("cheatsheet").float() end, { desc = "Keybind cheatsheet" })
+
 vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
 -- Buffer navigation: [b / ]b provided by Neovim 0.11+ defaults
@@ -35,6 +37,16 @@ vim.keymap.set("n", "<C-Right>", ":vertical resize -2<CR>", { desc = "Increase w
 
 -- Insert mode: open new line above current line
 vim.keymap.set("i", "<A-o>", "<Esc>ko", { desc = "Open line above (insert mode)" })
+
+-- Append a semicolon to the current line without moving the cursor (A-; fits
+-- next to A-o; works mid-line in insert mode too)
+vim.keymap.set({ "n", "i" }, "<A-;>", function()
+  local row = vim.api.nvim_win_get_cursor(0)[1]
+  local line = vim.api.nvim_get_current_line()
+  if not line:match(";%s*$") then
+    vim.api.nvim_buf_set_lines(0, row - 1, row, false, { line:gsub("%s+$", "") .. ";" })
+  end
+end, { desc = "Append semicolon to line" })
 
 -- Core
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move text down" })

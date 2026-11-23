@@ -1,42 +1,12 @@
 return {
   {
-    -- terminal image backend (kitty graphics protocol); diagram.nvim draws through this
-    "3rd/image.nvim",
-    opts = {
-      backend = "kitty",
-      processor = "magick_cli", -- use system ImageMagick CLI, avoids the luarocks/hererocks build
-      -- clear images when leaving the active tmux window (fixes images stuck on screen
-      -- after switching tmux windows); needs `set -g visual-activity off` in tmux.conf
-      tmux_show_only_in_active_window = true,
-    },
-  },
-  {
-    -- renders ```mermaid (and plantuml/d2) code blocks into inline images via image.nvim + mmdc
-    "3rd/diagram.nvim",
-    dependencies = { "3rd/image.nvim" },
-    ft = { "markdown" },
-    config = function()
-      require("diagram").setup({
-        integrations = { require("diagram.integrations.markdown") },
-        renderer_options = {
-          mermaid = { theme = "dark", background = "transparent" },
-        },
-      })
-    end,
-  },
-  {
     "OXY2DEV/markview.nvim",
-    ft = { "markdown", "codecompanion" },
+    ft = "markdown",
     dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-mini/mini.icons" },
     config = function()
-      -- CodeCompanion chat buffers are markdown content under a non-markdown filetype.
-      -- markview calls vim.treesitter.start(), which errors if the filetype has no parser,
-      -- so point codecompanion at the markdown parser.
-      vim.treesitter.language.register("markdown", "codecompanion")
-
       require("markview").setup({
         preview = {
-          filetypes = { "markdown", "codecompanion" }, -- also render the CodeCompanion chat buffer
+          filetypes = { "markdown" },
           condition = function(buf)
             -- return false skips a buffer, nil falls through to the filetypes allowlist.
             -- Only force-skip inside the vaults dir; let everything else use normal gating
