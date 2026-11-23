@@ -83,6 +83,7 @@ Default convention, change if the repo says otherwise:
 - Subject line imperative, under ~72 chars; body explains *why* when it's not obvious.
 - One logical change per commit. Don't bundle an unrelated refactor into a feature commit.
 - Don't commit unless I ask, and never push without explicit go-ahead.
+- No attribution trailers: no `Co-Authored-By`, `Claude-Session`, or "Generated with" lines in commit messages or PR descriptions.
 
 ---
 
@@ -101,6 +102,16 @@ Default convention, change if the repo says otherwise:
 - Show diffs/changes over prose descriptions of changes.
 - Flag assumptions and risks briefly; don't bury them.
 - At a real decision point or ambiguity, ask one sharp question rather than guessing.
+- Ask questions in chat, never with the AskUserQuestion tool. Number the questions and
+  letter the options, recommendation marked, so I can answer `1a, 2b`:
+  ```
+  Q1: Where should the hook script live?
+  a. In the feature, linked like any other file (recommended: no installer step)
+  b. Installed per machine from `setup`
+  Q2: Push after committing?
+  a. Yes
+  b. No, I'll review first
+  ```
 
 ---
 
