@@ -8,6 +8,19 @@
 #
 # Dropping a feature runs its `off`, removes its links (restoring any file they
 # replaced), and removes the packages and tools install.sh installed for it.
+#
+# How a run goes, top to bottom:
+#   1. parse arguments, work out which profile applies, read its feature list
+#   2. install mise if it's missing
+#   3. undo features that were applied last time but are no longer listed
+#   4. for each listed feature: apt packages, mise tools, links, then its `setup`
+#
+# Memory between runs lives in ~/.local/state/dotfiles/:
+#   profile    the profile name chosen for this machine
+#   applied    feature names applied by the last run (so step 3 knows what to undo)
+#   links      "feature<TAB>path" for every symlink we own (so we only ever remove our own)
+#   packages   "feature<TAB>kind:name" for what *we* installed, kind being apt or mise
+#   install.log  every change, with a timestamp header per run
 set -euo pipefail
 
 REPO=$(cd "$(dirname "$0")" && pwd)
